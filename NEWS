@@ -1,0 +1,157 @@
+marked 1.0.9 24 Jan 2013
+------------
+
+CHANGES
+
+* modified iteration counter so it was stored in an environment rather than in global workspace to meet CRAN policy
+
+
+marked 1.0.8 23 Jan 2013
+------------
+
+NEW FEATURES
+
+* added multi-state model with fixed effects using admb. This is done with new function mscjs and multistate.tpl. 
+It required changes to create.dm,create.dmdf, crm, process.ch and process.data. The code is functional but currently only 
+returns admb object that will not work with other generic functions, so crm will not allow it currently.
+
+
+marked 1.0.7 14 Dec 2012)
+------------
+
+NEW FEATURES
+
+* added use of admb and random effects for CJS. Controlled through arguments use.admb=TRUE and re=TRUE respectively. Doesn't currently work with predict.
+
+BUG FIXES
+
+* fixed problem in create.dmdf which was removing id field if fields (static) specified
+
+* made change to cjs.f which was incorrectly fixed for loss on capture
+
+* made changes to bayesCR.cpp to remove compilation warnings
+
+
+marked 1.0.6 (5 Oct 2012)
+------------
+CHANGES
+
+* removed autoscale feature which complicated code and was not very effective
+
+* Removed simulation code and put in a separate package - simcr.
+
+* restructured the model object that is returned from crm
+
+NEW FEATURES
+
+* Function load.model will return externally stored model. Most useful with crm.wrapper and external=TRUE 
+
+* Generic function predict will provide estimates of real parameters and optionally std errors, conf intervals and vcv matrix for the existing or newdata. Does not handle fixed parameters at present.
+
+* crm.wrapper now returns a list like mark.wrapper in RMark with a model.table.  The model list elements are the filenames of the externally saved model results. A default print method is included to print out model selection table. Also, an external argument was added.
+
+* Modified cjs.initial to use either logit or probit and added initial value calculation to probitCJS 
+
+* Allows initial=value and all parameters given that initial value
+
+* Can now handle specification of more than one method for optimization within optimx; setting control=list(follow.on=TRUE) in the arguments will let it use par estimates as starting values as it proceeds through list of methods.
+
+* Added SANN as a stand alone method with optim. Default of itnmax should be increased substantially for this method.
+
+* Modified cjs.initial to use freq as weight in glm to properly weight estimation when freq>1.
+
+BUG FIXES
+
+* Fixed bug in js.lnl which was not getting lnl correct when there were no groups; cosmetic and did not affect estimates because was constant part (ui)
+
+* Fixed bug in which accumulate argument was not passed to process.data from crm  
+
+
+marked 1.0.5 (12 July 2012)
+------------
+NEW FEATURES
+
+* Simplified code in cjs.f but no obvious payoff in speed. Set p=1e-307 if p=0 and freq>0 to avoid log(0) issue. This is close to value used in MARK.
+
+BUG FIXES
+
+* Fixed bug in hessian calculation which was using 2*lnl instead of lnl
+
+
+marked 1.0.4 (6 July 2012)
+------------
+NEW FEATURES
+
+* js is now structured the same as cjs and includes all features.
+
+* integrated probitCJS into crm.
+
+* Added automatic data accumulation and creation of freq field where all data fields are the same. See argument accumulate in crm.
+
+* added autoscaling of parameters; see autoscale argument
+
+* added simcjs and simpopan and related functions for simulating data for cjs and js models
+
+marked 1.0.3 (4 October 2011)
+------------
+
+NEW FEATURES
+
+* Code was modularized to make package easier to extend. js is now structured the same as cjs.
+
+* If time.interval is a field in the Phi design data it will be used as Phi^time.interval.  This allows variation in time intervals across animals as with cohorts of pups branded at different times each year.
+
+* Added probitCJS model and accompanying code.
+
+
+BUG FIXES
+
+* Change made in cjs.accumulate to compare accumulated frequencies to sum of data frequencies. Previously was using number of rows and would fail if any freq>1.
+
+marked 1.0.2 (30 March 2011)
+------------
+
+NEW FEATURES
+
+* Added check on accumulator to report error if sum of frequencies does not match original number of records.
+
+* Added model convergence check and reporting of model convergence message, if non-null.
+
+* Added function fix.parameters to create matrix needed for fixing real parameters 
+
+* Added option to include remove.intercept=TRUE in model.parameters list for each parameter to force removal of intercept. 
+
+* Added refit argument to crm, cjs and js to control number of refittings if model doesn't converge.
+
+* Added function create.links which works out which real parameters can use a sin link.  Code was added to cjs and cjs.lnl to use the sin link where appropriate.  This is commented out at present!  Not sure it is working correctly.
+
+* Uses optimx function for optimization which allows more methods and multiple methods to be selected.
+
+BUG FIXES
+
+* Fixed issue with capture history accumulator when chunk_size was larger than needed. Added 1 to pieces.
+
+* Beta estimate names were lost once sparse matrices were implemented and this was fixed.
+
+* Made change to accumulation code to correct error introduced in last version with fixed parameters.
+
+* Made fixes to js to accommodate accumulation. 
+  
+marked 1.0.1 (22 March 2011)
+------------
+
+NEW FEATURES
+
+* Added use of sparse matrices for design matrices which sped up code and reduced memory consumption. The argument chunk_size was added to crm, create.dm,cjs, and js to control amount of memory usage.
+
+* Added run timing and various print statements to track progress of model.  If debug=FALSE, includes function evaluation counter (every 100) and neg lnl which remains on same line unless used in Rterm.
+
+marked 1.0.0 (Initial posting 2011)
+------------
+
+NEW FEATURES
+
+* Extracted crm and accompanying code from RMark and created initial base package.
+
+
+
