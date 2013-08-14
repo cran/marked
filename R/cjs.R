@@ -131,18 +131,16 @@ cjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL,m
 	   {
 		   mod=suppressPackageStartupMessages(optimx(par,cjs.lnl,model_data=model_data,method=method,hessian=FALSE,
 						   debug=debug,control=control,itnmax=itnmax,cjsenv=cjsenv,...))
-		   objfct=unlist(mod$fvalues)
-		   bestmin=which.min(objfct)
-		   par= mod$par[[bestmin]]
-		   convergence=mod$conv[[bestmin]]
-		   counts=mod$itns[[length(mod$itns)]]
-		   lnl=mod$fvalues[[bestmin]]
+		   par <- coef(mod, order="value")[1, ]
+		   mod=as.list(summary(mod, order="value")[1, ])
+		   convergence=mod$convcode
+		   lnl=mod$value
 	   }
 	   #  Rescale parameter vector 
 	   cjs.beta=unscale.par(par,scale)
        # Create results list 
 	   res=list(beta=cjs.beta,neg2lnl=2*lnl,AIC=2*lnl+2*sum(sapply(cjs.beta,length)),
-			   convergence=convergence,count=counts,optim.details=mod,
+			   convergence=convergence,optim.details=mod,
 			   scale=scale,model_data=model_data,
 			   options=list(accumulate=accumulate,initial=initial,method=method,
 					   chunk_size=chunk_size,itnmax=itnmax,control=control))

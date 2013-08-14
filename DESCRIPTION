@@ -1,15 +1,15 @@
 Package: marked
-Version: 1.0.9
-Date: 2013-01-24
+Version: 1.1.2
+Date: 2013-08-14
 Title: R Code for mark-recapture analysis
 Author: Jeff Laake <jeff.laake@noaa.gov>, Devin Johnson
-        <devin.johnson@noaa.gov>, Paul Conn <paul.conn@noaa.gov>
+    <devin.johnson@noaa.gov>, Paul Conn <paul.conn@noaa.gov>
 Description: This package provides a framework for handling data and
-        analysis for mark-recapture.  Currently it is limited to
-        Cormack-Jolly-Seber and Jolly-Seber models.
-Depends: R (>= 2.12.0), optimx, coda, truncnorm, Matrix, Rcpp (>=
-        0.9.13), ggplot2
-Imports: R2admb
+    analysis for mark-recapture.  Currently it is limited to
+    Cormack-Jolly-Seber and Jolly-Seber models.
+Depends: R (>= 2.12.0)
+Imports: R2admb, truncnorm, coda, optimx (>= 2013.8.6), ggplot2,
+        Matrix, numDeriv, Rcpp (>= 0.9.13)
 LinkingTo: Rcpp
 Suggests: RMark
 SystemRequirements: ADMB version 11 (http://admb-project.org/) for
@@ -17,7 +17,6 @@ SystemRequirements: ADMB version 11 (http://admb-project.org/) for
 LazyLoad: yes
 License: GPL (>= 2)
 Maintainer: Jeff Laake <Jeff.Laake@noaa.gov>
-BuildVignettes: false
 Collate: 'cjs.accumulate.R' 'cjs.initial.R' 'cjs.lnl.r' 'cjs.R'
         'create.dm.R' 'create.dmdf.R' 'create.links.r' 'crm.R'
         'fix.parameters.r' 'js.lnl.r' 'js.r' 'make.design.data.R'
@@ -30,6 +29,7 @@ Collate: 'cjs.accumulate.R' 'cjs.initial.R' 'cjs.lnl.r' 'cjs.R'
         'deriv.inverse.link.R' 'inverse.link.R' 'predict.crm.r'
         'scale.r' 'set.initial.r' 'mscjs.r' 'mixed.model.r'
         'proc.form.r'
-Packaged: 2013-01-24 20:20:16 UTC; JLaake
+Packaged: 2013-08-16 14:16:42 UTC; JLaake
+NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-01-25 08:24:22
+Date/Publication: 2013-08-16 16:31:40

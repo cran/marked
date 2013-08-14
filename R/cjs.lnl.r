@@ -33,7 +33,8 @@
 #' {
 #' # compute p matrix from parameters (beta) and list of design matrices (dm) 
 #' # created by function create.dm
-#'   ps=cbind(rep(1,nrow(dm)/(nocc-1)),matrix(dm%*%beta,ncol=nocc-1,nrow=nrow(dm)/(nocc-1),byrow=TRUE))
+#'   ps=cbind(rep(1,nrow(dm)/(nocc-1)),
+#'      matrix(dm%*%beta,ncol=nocc-1,nrow=nrow(dm)/(nocc-1),byrow=TRUE))
 #'   ps[Fplus==1]=plogis(ps[Fplus==1]) 
 #'   return(ps) 
 #' }
@@ -41,7 +42,8 @@
 #' {
 #' # compute Phi matrix from parameters (beta) and list of design matrices (dm)
 #' # created by function create.dm 
-#'   Phis=cbind(rep(1,nrow(dm)/(nocc-1)),matrix(dm%*%beta,ncol=nocc-1,nrow=nrow(dm)/(nocc-1),byrow=TRUE))
+#'   Phis=cbind(rep(1,nrow(dm)/(nocc-1)),
+#'      matrix(dm%*%beta,ncol=nocc-1,nrow=nrow(dm)/(nocc-1),byrow=TRUE))
 #'   Phis[Fplus==1]=plogis(Phis[Fplus==1]) 
 #'   return(Phis) 
 #' }
@@ -52,7 +54,8 @@
 #'# cjs.accumulate call to process.ch would have to have all=TRUE to get Fplus and L.
 #'# Arguments: 
 #'# par             - vector of beta parameters 
-#'# imat           - list of freq, indicator vector and matrices for ch data created by process.ch 
+#'# imat           - list of freq, indicator vector and matrices for ch data created 
+#'#                   by process.ch 
 #'# Phi.dm         - list of design matrices; a dm for each capture history 
 #'# p.dm           - list of design matrices; a dm for each capture history 
 #'# debug          - if TRUE show iterations with par and -2lnl 
@@ -66,8 +69,10 @@
 #'	np=ncol(model_data$p.dm) 
 #'	beta.phi=par[1:nphi]
 #'	beta.p=par[(nphi+1):(nphi+np)] 
-#'	#construct parameter matrices (1 row for each capture history and a column for each occasion)
-#'	Phis=get.Phi(beta.phi,model_data$Phi.dm,nocc=ncol(model_data$imat$chmat),model_data$imat$Fplus)
+#'	#construct parameter matrices (1 row for each capture history and
+#'  #  a column for each occasion)
+#'	Phis=get.Phi(beta.phi,model_data$Phi.dm,nocc=ncol(model_data$imat$chmat),
+#'           model_data$imat$Fplus)
 #'	if(!is.null(model_data$time.intervals)) 
 #'	{
 #'		exponent=cbind(rep(1,nrow(Phis)),model_data$time.intervals)
@@ -80,7 +85,8 @@
 #'	# compute cummulative survival from release across each subsequent time
 #'	# and the cummulative probability for detection (capture) across each time
 #'	Phi.cumprod=1-model_data$imat$Fplus + Phis*model_data$imat$Fplus 
-#'	cump=(1-model_data$imat$Fplus)+model_data$imat$Fplus*(model_data$imat$chmat*ps+(1-model_data$imat$chmat)*(1-ps))
+#'	cump=(1-model_data$imat$Fplus)+model_data$imat$Fplus*(model_data$imat$chmat*ps+
+#'           (1-model_data$imat$chmat)*(1-ps))
 #'	for (i in 2:ncol(cump))
 #'	{
 #'		Phi.cumprod[,i]=Phi.cumprod[,i-1]*Phi.cumprod[,i] 
