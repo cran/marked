@@ -15,7 +15,7 @@
 #' @param dml list of design matrices created by \code{\link{create.dm}} from
 #' formula and design data
 #' @param model_data a list of all the relevant data for fitting the model including
-#' imat, Phi.dm,p.dm,Psi.dm,Phi.fixed,p.fixed,Psi.fixed and time.intervals. It is used to save values
+#' imat, Phi.dm, p.dm, Psi.dm, Phi.fixed, p.fixed, Psi.fixed and time.intervals. It is used to save values
 #' and avoid accumulation again if the model was re-rerun with an additional call to cjs when
 #' using autoscale or re-starting with initial values.  It is stored with returned model object.
 #' @param parameters equivalent to \code{model.parameters} in \code{\link{crm}}

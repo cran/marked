@@ -2,7 +2,8 @@
 \alias{predict.crm}
 \title{Compute estimates of real parameters}
 \usage{
-  \method{predict}{crm}(object,newdata=NULL,ddl=NULL,parameter=NULL,unique=TRUE,vcv=FALSE,se=FALSE,chat=1,subset,select,...)
+  \method{predict}{crm}(object,newdata=NULL,ddl=NULL,parameter=NULL,unique=TRUE,
+    vcv=FALSE,se=FALSE,chat=1,subset,select,...)
 }
 \arguments{
   \item{object}{model object}
@@ -51,7 +52,8 @@
 data(dipper)
 dipper.proc=process.data(dipper,model="cjs",begin.time=1)
 dipper.ddl=make.design.data(dipper.proc)
-mod.Phisex.pdot=crm(dipper.proc,dipper.ddl,model.parameters=list(Phi=list(formula=~sex+time),p=list(formula=~1)),hessian=TRUE)
+mod.Phisex.pdot=crm(dipper.proc,dipper.ddl,
+  model.parameters=list(Phi=list(formula=~sex+time),p=list(formula=~1)),hessian=TRUE)
 xx=predict(mod.Phisex.pdot)
 xx
 xx=predict(mod.Phisex.pdot,newdata=dipper[c(1,23),],vcv=TRUE)

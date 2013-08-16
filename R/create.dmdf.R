@@ -152,7 +152,7 @@
 #' values "M","F","M" for the 3 records in our example, and the argument
 #' \code{fields=c("sex")} was used then a column named \code{sex} would be
 #' included in design dataframe with the values
-#' "M","M","M","F","F","F","M","M","M".  The value of the column \code{sex} in
+#' "M", "M", "M", "F", "F", "F", "M", "M", "M".  The value of the column \code{sex} in
 #' \code{x} is repeated for each of the occasions for that animal(capture
 #' history). Now if the value of the field changes for each occasion then we
 #' use the argument \code{time.varying} instead.  To differentiate the values
