@@ -48,9 +48,9 @@ crm model}
   written by Trent McDonald and how they relate to the
   implementation in \code{\link{cjs}}.  With MARK, animals
   can be placed in groups and the parameters for the model
-  specified via PIMs (parameter information matrices) link
-  the parameters to the specific animals.  For example, if
-  for a particular group the \code{Phi} PIM is
+  specified via PIMs (parameter index matrices) link the
+  parameters to the specific animals.  For example, if for
+  a particular group the \code{Phi} PIM is
 
   \preformatted{ 1 2 3 4 5 6 }
 
@@ -197,9 +197,9 @@ crm model}
   \code{sex} with the values "M","F","M" for the 3 records
   in our example, and the argument \code{fields=c("sex")}
   was used then a column named \code{sex} would be included
-  in design dataframe with the values "M", "M", "M", "F",
-  "F", "F", "M", "M", "M".  The value of the column
-  \code{sex} in \code{x} is repeated for each of the
+  in design dataframe with the values
+  "M","M","M","F","F","F","M","M","M".  The value of the
+  column \code{sex} in \code{x} is repeated for each of the
   occasions for that animal(capture history). Now if the
   value of the field changes for each occasion then we use
   the argument \code{time.varying} instead.  To
@@ -251,6 +251,11 @@ crm model}
   combination of factor and numeric variables that are
   either time-invariant or time-varying (and named
   appropriately).
+
+  The behavior of create.dmdf can vary depending on the
+  values of begin.time and time.intervals. An explanation
+  of these values and how they can be used is given in
+  \code{\link{process.data}}.
 }
 \author{
   Jeff Laake

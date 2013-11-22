@@ -23,21 +23,30 @@
 print.crm=function(x,...)
 {
    if(!is.null(x$results))x=x$results
-   cat("\ncrm Model Summary\n")
-   if(class(x)[2]=="mcmc")
-	   cat("\nNpar : ",sum(sapply(x$beta,nrow)))   
+   if(class(x)[2]=="admb")
+   {
+	   class(x)[1]="admb"
+       print(x)
+   }
    else
    {
-	   cat("\nNpar : ",sum(sapply(x$beta,length)))
-	   cat("\n-2lnL: ",x$neg2lnl)
-	   cat("\nAIC  : ",x$AIC)
+	   cat("\ncrm Model Summary\n")
+       if(class(x)[2]=="mcmc")
+	       cat("\nNpar : ",sum(sapply(x$beta,nrow)))   
+       else
+       {
+	       cat("\nNpar : ",sum(sapply(x$beta,length)))
+	       cat("\n-2lnL: ",x$neg2lnl)
+	       cat("\nAIC  : ",x$AIC)
+       }
+       cat("\n\nBeta\n")
+       print(coef(x))
    }
-   cat("\n\nBeta\n")
-   print(coef(x))
    return(NULL)
 }
 coef.crm=function(object,...)
 {
+   if("results"%in%names(object)) object=object$results
    if(class(object)[2]=="mcmc")
    {
 	   beta=do.call(rbind,object$beta)
@@ -46,13 +55,21 @@ coef.crm=function(object,...)
    }
    else
    {
-	   beta=data.frame(Estimate=unlist(object$beta))
-	   if(!is.null(object$beta.vcv))
+       if(class(object)[2]=="admb")
 	   {
-		   beta$se=sqrt(diag(object$beta.vcv))
-		   beta$lcl=beta$Estimate - 1.96*beta$se
-		   beta$ucl=beta$Estimate + 1.96*beta$se
+		   class(object)[1]="admb"
+		   beta=coef(object)
 	   }
+       else
+	   {
+	       beta=data.frame(Estimate=unlist(object$beta))
+	       if(!is.null(object$beta.vcv))
+	       {
+		       beta$se=sqrt(diag(object$beta.vcv[1:length(beta$Estimate),1:length(beta$Estimate)]))
+		       beta$lcl=beta$Estimate - 1.96*beta$se
+		       beta$ucl=beta$Estimate + 1.96*beta$se
+	       }
+       }
    }
    return(beta)
 }

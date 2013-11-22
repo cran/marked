@@ -25,11 +25,10 @@
 #' dipper.proc=process.data(dipper,model="cjs",begin.time=1)
 #' dipper.ddl=make.design.data(dipper.proc)
 #' mod.Phisex.pdot=crm(dipper.proc,dipper.ddl,
-#'          model.parameters=list(Phi=list(formula=~sex+time),p=list(formula=~1)),hessian=TRUE)
+#'  model.parameters=list(Phi=list(formula=~sex+time),p=list(formula=~1)),hessian=TRUE)
 #' xx=compute.real(mod.Phisex.pdot,"Phi",unique=TRUE,vcv=TRUE)
 #' @keywords utility
-compute.real <-function(model,parameter,ddl=NULL,unique=TRUE,vcv=FALSE,se=FALSE,
-                         chat=1,subset,select,showDesign=FALSE)
+compute.real <-function(model,parameter,ddl=NULL,unique=TRUE,vcv=FALSE,se=FALSE,chat=1,subset,select,showDesign=FALSE)
 {
   if(is.null(ddl))return(model$results$reals)
   mcmc=ifelse(class(model)[2]=="mcmc",TRUE,FALSE)
@@ -55,7 +54,17 @@ compute.real <-function(model,parameter,ddl=NULL,unique=TRUE,vcv=FALSE,se=FALSE,
   if(link=="mlogit")
 	  if(parameter=="pent")
 		  link=paste("mlogit",data$id,sep="")
-  if(length(link)>1)link=link[indices]
+  if(length(link)>1)link=link[indices] 
+  # Set indices for real parameters that have been fixed and at any boundaries
+  if(!is.null(data$fix))
+  {
+	  fixedparms=!is.na(data$fix)
+	  fixedvalues=data$fix
+  }else
+  {
+	  fixedparms=rep(FALSE,nrow(data))
+	  fixedvalues=rep(NA,nrow(data))
+  }
   # set up data to be displayed with estimates
   df=data
   if(missing(select))
@@ -76,20 +85,6 @@ compute.real <-function(model,parameter,ddl=NULL,unique=TRUE,vcv=FALSE,se=FALSE,
 	  if(ncol(design)!=length(beta))
          stop("Mismatch between number of design columns and length of beta")
   }
-# Set indices for real parameters that have been fixed and at any boundaries
-#
-#if(!is.null(model$fixed))
-#{
-#   if(is.null(model$simplify))
-#      fixedparms=(1:dim(design)[1])%in%model$fixed$index
-#   else
-#      fixedparms=(1:dim(design)[1])%in%model$simplify$pim.translation[model$fixed$index]
-#}
-#else
-   fixedparms=rep(FALSE,dim(design)[1])
-#boundaryparms=model$results$real$se==0 & !fixedparms
-   fixedvalues=rep(NA,nrow(design))
-#fixedvalues[model$simplify$pim.translation[model$fixed$index]]=model$fixed$value
 #
 #  Compute real parameters; if neither se or vcv then return vector of real parameters
 #  
@@ -222,4 +217,3 @@ if(mcmc)
     else
         return(reals)
 }
-

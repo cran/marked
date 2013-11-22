@@ -6,8 +6,8 @@
     accumulate = TRUE, initial = NULL, method,
     hessian = FALSE, debug = FALSE, chunk_size = 1e+07,
     refit, itnmax = NULL, control = NULL, scale,
-    use.admb = FALSE, re = FALSE, compile = FALSE,
-    extra.args = "", ...)
+    use.admb = FALSE, crossed = TRUE, compile = FALSE,
+    extra.args = NULL, reml, clean = TRUE, ...)
 }
 \arguments{
   \item{x}{processed dataframe created by process.data}
@@ -61,13 +61,19 @@
   \item{use.admb}{if TRUE creates data file for admbcjs.tpl
   and runs admb optimizer}
 
-  \item{re}{if TRUE creates random effect model
-  admbcjsre.tpl and runs admb optimizer}
+  \item{crossed}{if TRUE it uses cjs.tpl or cjs_reml.tpl if
+  reml=FALSE or TRUE respectively; if FALSE, then it uses
+  cjsre which can use Gauss-Hermite integration}
 
   \item{compile}{if TRUE forces re-compilation of tpl file}
 
   \item{extra.args}{optional character string that is
   passed to admb if use.admb==TRUE}
+
+  \item{reml}{if set to TRUE uses cjs_reml if crossed}
+
+  \item{clean}{if TRUE, deletes the tpl and executable
+  files for amdb if use.admb=T}
 
   \item{...}{any remaining arguments are passed to
   additional parameters passed to \code{optim} or
@@ -76,16 +82,15 @@
 \value{
   The resulting value of the function is a list with the
   class of crm,cjs such that the generic functions print
-  and coef can be used. \item{beta}{named vector of
-  parameter estimates} \item{lnl}{-2*log likelihood}
-  \item{AIC}{lnl + 2* number of parameters}
-  \item{convergence}{result from \code{optim}; if 0
-  \code{optim} thinks it converged}
-  \item{count}{\code{optim} results of number of function
-  evaluations} \item{reals}{dataframe of data and real Phi
-  and p estimates for each animal-occasion excluding those
-  that occurred before release} \item{vcv}{var-cov matrix
-  of betas if hessian=TRUE was set}
+  and coef can be used. Elements are 1) beta: named vector
+  of parameter estimatesm 2) lnl: -2*log likelihood, 3)
+  AIC: lnl + 2* number of parameters, 4) convergence:
+  result from \code{optim}; if 0 \code{optim} thinks it
+  converged, 5) count:\code{optim} results of number of
+  function evaluations, 6) reals: dataframe of data and
+  real Phi and p estimates for each animal-occasion
+  excluding those that occurred before release, 7)
+  vcv:var-cov matrix of betas if hessian=TRUE was set.
 }
 \description{
   A function for computing MLEs for a specified

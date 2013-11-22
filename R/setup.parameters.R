@@ -56,7 +56,7 @@ setup.parameters <-
 #                      to the parameter
 #
 #  Arguments:
-#    model      - type of model ("CJS", "Burnham" etc)
+#    model      - type of model ("CJS", "JS" etc)
 #    parameters - list of model parameter specifications
 #    nocc       - number of occasions (value only specified if needed)
 #    check      - default is FALSE; if TRUE it only returns list of parameter names
@@ -71,12 +71,12 @@ setup.parameters <-
 	fdir=system.file(package="marked")	
 	fdir=file.path(fdir,"parameters.txt")	
 	parameter_definitions=read.delim(fdir,header=TRUE,
-			colClasses=c("character","character",rep("numeric",3),rep("character",4),
-					"logical","character","logical","numeric",rep("logical",3),"numeric","logical","logical"))
+			colClasses=c("character","character",rep("numeric",3),rep("character",3),
+					rep("logical",3),"numeric","logical"))
 #
 #  Create valid parameter list depending on model.
 #
-	parameter_definitions=parameter_definitions[parameter_definitions$model==model,]
+	parameter_definitions=parameter_definitions[toupper(parameter_definitions$model)==model,]
 	par.list=parameter_definitions$parname
 #
 #  If this is just a parameter check, return par.list
