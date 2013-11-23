@@ -22,18 +22,16 @@
 #' \item{beta}{list with elements Phi and p which contain summary of MCMC iterations for each beta parameter} 
 #' \item{reals}{list with elements Phi and p which contain summary of MCMC iterations for each real parameter} 
 #' @export
-#' @import truncnorm
-#' @import coda
+#' @import coda truncnorm
 #' @author Devin Johnson
 #' @examples
 #' \donttest{
 #' # Analysis of the dipper data
 #' data(dipper)
 #' # following example uses unrealistically low values for burnin and 
-#' #iteration to reduce package testing time
-#' fit1 <- crm(dipper,model="probitCJS",
-#' model.parameters=list(Phi=list(formula=~time*sex),p=list(formula=~time+sex)), 
-#' burnin=100, iter=1000)
+#' # iteration to reduce package testing time
+#' fit1 <- crm(dipper,model="probitCJS",model.parameters=list(Phi=list(formula=~time*sex),
+#'  p=list(formula=~time+sex)), burnin=100, iter=1000)
 #' fit1
 #' # Real parameter summary
 #' fit1$results$reals
@@ -49,10 +47,8 @@ probitCJS <- function(ddl,dml,parameters,design.parameters,burnin, iter, initial
   	.Call("makeZtildeIdx", ID=id, zvec=zvec, PACKAGE="marked")
   	}
   ### Initial values
-  if(is.null(initial))
-	  beta <- cjs.initial(dml,imat=imat,link="probit")
-  else
-	  beta <- set.initial(c("Phi","p"),dml,initial)
+  if(is.null(initial)) beta <- cjs.initial(dml,imat=imat,link="probit")
+  else beta <- set.initial(c("Phi","p"),dml,initial)$par
   beta.z <- beta$Phi	
   beta.y <- beta$p	  
   ### DATA MANIPULATION ###
@@ -61,9 +57,9 @@ probitCJS <- function(ddl,dml,parameters,design.parameters,burnin, iter, initial
   ddl$p <- ddl$p[ddl$p$Time>=ddl$p$Cohort,]
   yvec <- ddl$p$Y
   n <- length(yvec)
-  Xy <- as.matrix(restricted.dml$p)
+  Xy <- as.matrix(restricted.dml$p$fe)
   pn.p <- colnames(Xy)
-  Xz <- as.matrix(restricted.dml$Phi)
+  Xz <- as.matrix(restricted.dml$Phi$fe)
   pn.phi <- colnames(Xz)
   id <- ddl$p$id
   ###  PRIOR DISTRIBUTIONS ###
@@ -81,6 +77,29 @@ probitCJS <- function(ddl,dml,parameters,design.parameters,burnin, iter, initial
 	  tau.b.y <- parameters$p$prior$tau
 	  mu.b.y <- parameters$p$prior$mu
   }
+  if(!is.null(dml$Phi$re)){
+    n.Phi.re=length(dml$Phi$re)
+    if(is.null(parameters$Phi$priors$re)){
+      a.phi=rep(2,n.Phi.re)
+      b.phi=rep(1.0E-4,n.Phi.re)
+    }
+    else{
+      a.phi=parameters$Phi$priors$re$a.phi
+      b.phi=parameters$Phi$priors$re$b.phi
+    }
+  }
+  if(!is.null(dml$p$re)){
+    n.p.re=length(dml$p$re)
+    if(is.null(parameters$p$priors$re)){
+      a.p=rep(2,n.p.re)
+      b.p=rep(1.0E-4,n.p.re)
+    }
+    else{
+      a.p=parameters$p$priors$re$a.p
+      b.p=parameters$p$priors$re$b.p
+    }
+  }
+  
 	  
   ### STORAGE ###
   beta.z.stor <- matrix(NA, iter, ncol(Xz))
@@ -125,6 +144,9 @@ probitCJS <- function(ddl,dml,parameters,design.parameters,burnin, iter, initial
     m.beta.y <- solve(V.beta.y.inv, crossprod(Xy[zvec==1,],y.tilde[zvec==1])+crossprod(Q.b.y,mu.b.y))
     beta.y <- m.beta.y + solve(chol(V.beta.y.inv), rnorm(ncol(Xy),0,1))
     if(m>burnin) beta.y.stor[m-burnin,] <- beta.y
+   
+   ### RANDOM EFFECT UPDATES ###
+   
     
     ### TIMING OF SAMPLER ###
     if(m==30){
@@ -155,7 +177,7 @@ probitCJS <- function(ddl,dml,parameters,design.parameters,burnin, iter, initial
 		  CI.lower=hpd.p[,1], CI.upper=hpd.p[,2])  
   res=list(beta.mcmc=list(Phi= phibeta.mcmc,p= pbeta.mcmc), 
 		   beta=list(Phi=beta.phi,p=beta.p),
-		   model_data=list(Phi.dm=dml$Phi,p.dm=dml$p))
+		   model_data=list(Phi.dm=dml$Phi$fe,p.dm=dml$p$fe))
   class(res)=c("crm","mcmc","probitCJS")
   return(res)
 }	### END OF FUNCTION ###

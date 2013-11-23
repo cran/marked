@@ -1,5 +1,5 @@
 #' Mixed effect model formula parser
-#' 
+#'  
 #' Parses a mixed effect model in the lme4 structure of  ~fixed +(re1|g1) +...+(ren|gn)
 #' 
 #' @param f formula for mixed effect mode in the form used in lme4; ~fixed +(re1|g1) +...+(ren|gn)
@@ -16,13 +16,15 @@ proc.form <- function(f){
 	if(length(fix.var)==0) 
 		fix.model="~1"
 	else
+	if(length(grep("-1",f))==0)
 		fix.model <- paste("~ ",paste(fix.var, collapse=" + "))
+	else
+		fix.model <- paste("~ -1 +",paste(fix.var, collapse=" + "))
 	re.lst <- tms.lst[sapply(tms.lst, "length")==2]
 	if(length(re.lst)==0) re.model <- NULL
 	else{
 		re.model <- lapply(re.lst, function(x){list(model=paste("~",x[1]), sub=paste("~",x[2],"-1", collapse=""))})
+		names(re.model) <- sapply(re.lst, function(x) x[2])
 	}
 	return(list(fix.model=fix.model, re.model=re.model))
 }
-
-

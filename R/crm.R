@@ -33,7 +33,8 @@
 #' 
 #' In the current implementation, a logit link is used to constrain the
 #' parameters in the unit interval (0,1) except for probability of entry which
-#' uses an mlogit and N which uses a log link.  These could be generalized to
+#' uses an mlogit and N which uses a log link. For the probitCJS model, a probit link is
+#' used for the parameters. These could be generalized to
 #' use other link functions. Following the notation of MARK, the parameters in
 #' the link space are referred to as \code{beta} and those in the actual
 #' parameter space of \code{Phi} and \code{p} as reals.
@@ -91,24 +92,59 @@
 #' occasion 1. The third element in the row is the real value in the closed
 #' unit interval [0,1] for the fixed parameter.  This approach is completely
 #' general allowing you to fix a particular real parameter for a specific
-#' animal and occasion but it is a bit kludgy and later some other
-#' functionality will be included.  To set all of the real values for a
+#' animal and occasion but it is a bit kludgy. Alternatively, you can set fixed
+#' values by specifying values for a field called fix in the design data for a parameter.
+#' If the value of fix is NA the parameter is estimated and if it is not NA then the real
+#' parameter is fixed at that value.  If you also specify fixed as decribed above, they will over-ride any 
+#' values you have also set with fix in the design data. To set all of the real values for a
 #' particular occasion you can use the following example with the dipper data
 #' as a template:
 #' 
-#' \code{model.parameters=list(Phi=list(,fixed=cbind(1:nrow(dipper),rep(2,nrow(dipper)),}
-#' \code{rep(1,nrow(dipper)))))}
+#' \code{model.parameters=list(Phi=list(formula=~1,}
+#' \code{fixed=cbind(1:nrow(dipper),rep(2,nrow(dipper)),rep(1,nrow(dipper)))))}
 #' 
 #' The above sets \code{Phi} to 1 for the interval between occasions 2 and 3
-#' for all animals. At present there is no modification of the parameter count
-#' to address fixing of real parameters.
+#' for all animals. 
 #' 
-#' Be cautious with this function at present.  It does not include many checks
-#' to make sure values are in the specified range of the data.  Normally this
-#' would not be a big problem but because \code{\link{cjs.lnl}} calls an
-#' external FORTRAN subroutine, if it gets a subscript out of bounds, it will
-#' cause R to terminate.  So make sure to save your workspace frequently if you
-#' use this function in its current implementation.
+#' Alternatively, you could do as follows:
+#' 
+#' data(dipper)
+#' dp=process.data(dipper)
+#' ddl=make.design.data(dp)
+#' ddl$Phi$fix=ifelse(ddl$Phi$time==2,1,NA)
+#' 
+#' At present there is no modification of the parameter count
+#' to address fixing of real parameters except that if by fixing reals, a beta is not needed in the design it will be dropped.
+#' For example, if you were to use ~time for Phi with survival fixed to 1 for time 2, then then beta for that time would not
+#' be included.
+#' 
+#' To use ADMB (use.admb=TRUE), you need to install: 1) the R package R2admb, 2) ADMB, and 3) a C++ compiler (I recommend gcc compiler).
+#' The following are instructions for installation with Windows. For other operating systems see (http://www.admb-project.org/downloads) and 
+#'  (http://www.admb-project.org/tools/gcc/). 
+#' 
+#' Windows Instructions:
+#'
+#'  1) In R use install.packages function or choose Packages/Install Packages from menu and select R2admb.
+#' 
+#'  2) Install ADMB 11: http://admb-project.googlecode.com/files/admb-11-mingw-gcc4.5-32bit.exe. Put the software in C:/admb to
+#'  avoid problems with spaces in directory name and for the function below to work.
+#' 
+#'  3) Install gcc 4.5 from: http://www.admb-project.org/tools/gcc/gcc452-win32.zip/view. Put in c:/MinGW
+#' 
+#' I use the following function in R to setup R2admb to access ADMB rather than adding to my path so gcc versions
+#' with Rtools don't conflict. 
+#' 
+#' prepare_admb=function()
+#' {
+#'   Sys.setenv(PATH = paste("c:/admb/bin;c:admb/utilities;c:/MinGW/bin;", 
+#'         Sys.getenv("PATH"), sep = ";"))
+#'     Sys.setenv(ADMB_HOME = "c:/admb")
+#'     invisible()
+#' }
+#' To use different locations you'll need to change the values used above
+#' 
+#' Before running crm with use.admb=T, execute the function prepare_admb().  You could put this function or the code it 
+#' contains in your .First or .Rprofile so it runs each time you start R. 
 #' 
 #' @param data Either the raw data which is a dataframe with at least one
 #' column named ch (a character field containing the capture history) or a
@@ -116,7 +152,7 @@
 #' @param ddl Design data list which contains a list element for each parameter
 #' type; if NULL it is created
 #' @param begin.time Time of first capture(release) occasion
-#' @param model Type of c-r model ("cjs" or "js" at present)
+#' @param model Type of c-r model (eg, "cjs", "js") 
 #' @param title Optional title; not used at present
 #' @param design.parameters Specification of any grouping variables for design
 #' data for each parameter
@@ -141,16 +177,18 @@
 #' @param burnin number of iterations for mcmc burnin; specified default not realistic for actual use
 #' @param iter number of iterations after burnin for mcmc (not realistic default)
 #' @param use.admb if TRUE creates data file for cjs.tpl and runs admb optimizer
-#' @param re if TRUE creates random effect model admbcjsre.tpl and runs admb optimizer
+#' @param crossed if TRUE it uses cjs.tpl or cjs_reml.tpl if reml=FALSE or TRUE respectively; if FALSE, then it uses cjsre which can use Gauss-Hermite integration
+#' @param reml if TRUE uses restricted maximum likelihood
 #' @param compile if TRUE forces re-compilation of tpl file
 #' @param extra.args optional character string that is passed to admb if use.admb==TRUE
 #' @param strata.labels labels for strata used in capture history; they are converted to numeric in the order listed. Only needed to specify unobserved strata. For any unobserved strata p=0..
+#' @param clean if TRUE, deletes the tpl and executable files for amdb if use.admb=T
 #' @param ... optional arguments passed to js or cjs and optimx
 #' @return crm model object with class=("crm",submodel) where submodel is
 #' either "CJS" or "JS" at present.
 #' @author Jeff Laake
 #' @export crm
-#' @import optimx ggplot2 Matrix Rcpp numDeriv  
+#' @import optimx ggplot2 Matrix Rcpp numDeriv plyr
 #' @useDynLib marked
 #' @seealso \code{\link{cjs}}, \code{\link{js}},
 #' \code{\link{make.design.data}},\code{\link{process.data}}
@@ -163,43 +201,59 @@
 #' dipper.proc=process.data(dipper,model="cjs",begin.time=1)
 #' dipper.ddl=make.design.data(dipper.proc)
 #' mod.Phit.pt=crm(dipper.proc,dipper.ddl,
-#'   model.parameters=list(Phi=list(formula=~time),p=list(formula=~time)))
+#'    model.parameters=list(Phi=list(formula=~time),p=list(formula=~time)))
 #' mod.Phit.pt
 #' mod.Phidot.pdot=crm(dipper.proc,dipper.ddl,
-#'   model.parameters=list(Phi=list(formula=~1),p=list(formula=~1)))
+#'    model.parameters=list(Phi=list(formula=~1),p=list(formula=~1)))
 #' mod.Phidot.pdot
 #' mod.Phisex.pdot=crm(dipper.proc,dipper.ddl,groups="sex",
-#'   model.parameters=list(Phi=list(formula=~sex),p=list(formula=~1)))
+#'    model.parameters=list(Phi=list(formula=~sex),p=list(formula=~1)))
 #' mod.Phisex.pdot
 #' # fit same 3 models with calls to mark
 #' \donttest{
 #' require(RMark)
 #' mod0=mark(dipper,
-#'   model.parameters=list(Phi=list(formula=~time),p=list(formula=~time)),output=FALSE)
+#'    model.parameters=list(Phi=list(formula=~time),p=list(formula=~time)),output=FALSE)
 #' summary(mod0,brief=TRUE)
 #' mod1=mark(dipper,
-#'   model.parameters=list(Phi=list(formula=~1),p=list(formula=~1)),output=FALSE)
+#'    model.parameters=list(Phi=list(formula=~1),p=list(formula=~1)),output=FALSE)
 #' summary(mod1,brief=TRUE)
 #' mod2<-mark(dipper,groups="sex",
-#'   model.parameters=list(Phi=list(formula=~sex),p=list(formula=~1)),output=FALSE)
+#'    model.parameters=list(Phi=list(formula=~sex),p=list(formula=~1)),output=FALSE)
 #' summary(mod2,brief=TRUE)
 #' }
 #' # jolly seber model
 #' crm(dipper,model="js",groups="sex",
-#'   model.parameters=list(pent=list(formula=~sex),N=list(formula=~sex)),accumulate=FALSE)
+#'    model.parameters=list(pent=list(formula=~sex),N=list(formula=~sex)),accumulate=FALSE)
 #' \donttest{
 #' mark(dipper,model="POPAN",groups="sex",
-#'   model.parameters=list(pent=list(formula=~sex),N=list(formula=~sex)))
+#'    model.parameters=list(pent=list(formula=~sex),N=list(formula=~sex)))
+#' library(RMark)
+#' data(dipper)
+#' data(mstrata)
+#' mark(dipper,model.parameters=list(p=list(formula=~time)),output=FALSE)$results$beta
+#' mark(mstrata,model="Multistrata",model.parameters=list(p=list(formula=~1),
+#'  S=list(formula=~1),Psi=list(formula=~-1+stratum:tostratum)),
+#'  output=FALSE)$results$beta
+#' detach("package:RMark")
+#' ##CJS example
+#' crm(dipper,model="hmmCJS",model.parameters = list(p = list(formula = ~time)))
+#' ##MSCJS example
+#' ms=process.data(mstrata,model="hmmMSCJS")
+#' ms.ddl=make.design.data(ms)
+#' ms.ddl$Psi$fix=NA
+#' ms.ddl$Psi$fix[ms.ddl$Psi$stratum==ms.ddl$Psi$tostratum]=1
+#' crm(ms,ms.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum)))
 #' }
 crm <- function(data,ddl=NULL,begin.time=1,model="CJS",title="",model.parameters=list(),design.parameters=list(),initial=NULL,
  groups = NULL, time.intervals = NULL,debug=FALSE, method="BFGS", hessian=FALSE, accumulate=TRUE,chunk_size=1e7, 
- control=NULL,refit=1,itnmax=5000,scale=NULL,run=TRUE,burnin=100,iter=1000,use.admb=FALSE,re=FALSE,compile=FALSE,extra.args="",
- strata.labels=NULL,...)
+ control=NULL,refit=1,itnmax=5000,scale=NULL,run=TRUE,burnin=100,iter=1000,use.admb=FALSE,crossed=NULL,reml=FALSE,compile=FALSE,extra.args=NULL,
+ strata.labels=NULL,clean=TRUE,...)
 {
-if(model%in%c("cjs","js","mscjs"))model=toupper(model)
-if(model=="MSCJS")stop("\nMulti-state CJS not fully supported at this time\n")
-if(re)warning("\nReal parameter estimates are not produced currently for random effect models\n")
+model=toupper(model)
 ptm=proc.time()
+if(is.null(crossed))crossed=FALSE
+if(crossed)accumulate=FALSE
 #
 #  If the data haven't been processed (data$data is NULL) do it now with specified or default arguments
 # 
@@ -210,10 +264,9 @@ if(is.null(data$data))
       warning("Warning: specification of ddl ignored, as data have not been processed")
       ddl=NULL
    }
-   cat("Model: ",model,"\n")
-   cat("Processing data\n")
+   message("Model: ",model,"\n")
+   message("Processing data\n")
    flush.console()
-   if(model%in%c("probitCJS","probitMsCJS") | re)accumulate=FALSE
    data.proc=process.data(data,begin.time=begin.time, model=model,mixtures=1, 
 	   groups = groups, age.var = NULL, initial.ages = NULL, 
 	   time.intervals = time.intervals,nocc=NULL,accumulate=accumulate,strata.labels=strata.labels)
@@ -228,7 +281,7 @@ else
 #
 if(is.null(ddl)) 
 {
-	cat("Creating design data. This can take awhile.\n")
+	message("Creating design data.\n")
 	flush.console()
 	ddl=make.design.data(data.proc,design.parameters)
 } else
@@ -239,19 +292,35 @@ if(is.null(ddl))
 number.of.groups=1
 if(!is.null(data.proc$group.covariates))number.of.groups=nrow(data.proc$group.covariates)
 par.list=setup.parameters(data.proc$model,check=TRUE)
+#
+# Check validity of parameter list; stop if not valid
+#
+if(!valid.parameters(model,model.parameters)) stop()
 parameters=setup.parameters(data.proc$model,model.parameters,data$nocc,number.of.groups=number.of.groups)
 parameters=parameters[par.list]
+# See if any formula contain random effects and set re
+re=FALSE
 for (i in 1:length(parameters))
+{
 	if(is.null(parameters[[i]]$formula)) parameters[[i]]$formula=~1
-#
+	mlist=proc.form(parameters[[i]]$formula)
+	if(!is.null(mlist$re.model))re=TRUE
+}
+# currently if re, then set use.admb to TRUE
+if(re) use.admb=TRUE
+if(use.admb & !re) crossed=FALSE
+# if re and accumulate=T, stop with message to use accumulate=FALSE
+if(re & any(data.proc$freq>1)) stop("\n data cannot be accumulated (freq>1) with random effects; set accumulate=FALSE\n")
+#  setup fixed values 
+ddl=set.fixed(ddl,parameters)
 # Create design matrices for each parameter
-#
 dml=create.dml(ddl,model.parameters=parameters,design.parameters=design.parameters,chunk_size=1e7)
-# if not running, return dml
-if(!run) return(dml)
-#
-# Call estimation function
-#
+# For HMM call set.initial to get ptype and set initial values
+if(substr(model,1,3)=="HMM")
+	initial.list=set.initial(names(dml),dml,initial)
+# if not running, return object with data,ddl,dml etc
+if(!run) return(list(model=model,data=data.proc,model.parameters=parameters,design.parameters=design.parameters,ddl=ddl,dml=dml,results=initial.list))
+# Depending on method set some values
 if("SANN"%in%method)
 {
 	if(length(method)>1)
@@ -259,26 +328,57 @@ if("SANN"%in%method)
     control$maxit=itnmax
 }
 if("nlminb"%in%method)control$eval.max=itnmax
+# Call estimation function which depends on the model
+message("Fitting model\n")
 if(model=="CJS")
     runmodel=cjs(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
-		          refit=refit,control=control,itnmax=itnmax,scale=scale,use.admb=use.admb,re=re,compile=compile,extra.args=extra.args,...)
-else
-    if(model=="JS")
-          runmodel=js(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
+		          refit=refit,control=control,itnmax=itnmax,scale=scale,use.admb=use.admb,crossed=crossed,compile=compile,extra.args=extra.args,reml=reml,clean=clean,...)
+if(model=="JS")
+    runmodel=js(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=FALSE,chunk_size=chunk_size,
 		          refit=refit,control=control,itnmax=itnmax,scale=scale,...)
-	else 
-	   if(model=="MSCJS")
-		   runmodel=mscjs(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
-				   refit=refit,control=control,itnmax=itnmax,scale=scale,use.admb=use.admb,re=re,compile=compile,extra.args=extra.args,...)
-	   else{
-	      if(is.null(initial)){
-		      imat=process.ch(data.proc$data$ch,data.proc$data$freq,all=FALSE)
-		      runmodel=probitCJS(ddl,dml,parameters=parameters,design.parameters=design.parameters,
-				               imat=imat,iter=iter,burnin=burnin)
-	      }else
-		      runmodel=probitCJS(ddl,dml,parameters=parameters,design.parameters=design.parameters,
-				               initial=initial,iter=iter,burnin=burnin)
-	    }
+if(model=="MSCJS")
+	runmodel=mscjs(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
+				   refit=refit,control=control,itnmax=itnmax,scale=scale,use.admb=use.admb,re=re,compile=compile,extra.args=extra.args,clean=clean,...)
+if(model=="PROBITCJS")
+{
+	ddl$p$Y=ddl$p$Y-1
+	if(is.null(initial))
+	{
+	    imat=process.ch(data.proc$data$ch,data.proc$data$freq,all=FALSE)
+	    runmodel=probitCJS(ddl,dml,parameters=parameters,design.parameters=design.parameters,
+		               imat=imat,iter=iter,burnin=burnin)
+    }else
+	    runmodel=probitCJS(ddl,dml,parameters=parameters,design.parameters=design.parameters,
+					   initial=initial,iter=iter,burnin=burnin)	   
+}
+if(substr(model,1,3)=="HMM")
+{
+	if(is.null(data.proc$strata.list))		
+	   runmodel=optim(unlist(initial.list$par),HMMLikelihood,type=initial.list$ptype,x=data.proc$ehmat,m=data.proc$m,T=data.proc$nocc,start=data.proc$start,freq=data.proc$freq,
+				fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,parameters=parameters,control=control,
+				method=method,debug=debug,hessian=hessian)
+    else
+	{
+		m=list(ns=length(data.proc$strata.list$states),na=length(data.proc$strata.list[[names(data.proc$strata.list)[names(data.proc$strata.list)!="states"]]]))
+		runmodel=optim(unlist(initial.list$par),HMMLikelihood,type=initial.list$ptype,x=data.proc$ehmat,m=m,T=data.proc$nocc,start=data.proc$start,freq=data.proc$freq,
+				fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,parameters=parameters,control=control,
+				method=method,debug=debug,hessian=hessian)
+	}
+	par=vector("list",length=length(names(initial.list$par)))
+	#par=split(runmodel$par,initial.list$ptype)
+	for(p in names(initial.list$par))
+	{
+		par[[p]]=runmodel$par[initial.list$ptype==p]
+		names(par[[p]])=colnames(dml[[p]]$fe)	
+	}
+	runmodel$beta=par
+	runmodel$par=NULL
+	runmodel$neg2lnl=2*runmodel$value
+	runmodel$value=NULL
+	runmodel$AIC=runmodel$neg2lnl+2*sum(sapply(runmodel$beta,length))
+	if(!is.null(runmodel$hessian))runmodel$beta.vcv=solvecov(runmodel$hessian)$inv
+	class(runmodel)=c("crm","mle",model)
+}
 #
 # Return fitted MARK model object or if external, return character string with same class and save file
 if(!is.null(runmodel$convergence) && runmodel$convergence!=0&!use.admb)
@@ -290,7 +390,7 @@ if(!is.null(runmodel$convergence) && runmodel$convergence!=0&!use.admb)
 }
 object=list(model=model,data=data.proc,model.parameters=parameters,design.parameters=design.parameters,results=runmodel)
 class(object)=class(runmodel)
-if(!re & model!="MSCJS")
+if(!re & model!="MSCJS"& toupper(substr(model,1,3))!="HMM")
 for(parx in names(parameters))
 {
 	object$results$reals[[parx]]=predict(object,ddl=ddl,parameter=parx,unique=TRUE,se=hessian)

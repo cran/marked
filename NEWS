@@ -1,8 +1,76 @@
-marked 1.1.0 13 Aug 2013
-------------
+marked 1.1.3 22 Nov 2013
+-----------------
+
+NEW FEATURES
+
+* use of fix column in ddl is now supported for all models. By assigning a non-NA value, the real parameter is fixed to the assigned value.  If both ddl$fix is assigned and fixed argument is specified these values are merged and the fixed values in the parameter specification will override those in the ddl.
+
+* HMM models are now fitted with crm rather than fitHMM which has been removed. HMM models now include HMMCJS(cjs model),HMMMSCJS (multistate CJS), HMMUMSCJS (multi-state with state uncertainty), HMMU2MSCJS (2 strata level MS with state uncertainty), HMMU2IMSCJS (2 strata level MS with state uncertainty; independent state and second level strata transtions)
+
+* time interval specification can now be assigned via the design data for a parameter if it is not constant across individuals.
+
+
 CHANGES
 
-* made changes due to optimx update
+* model is no longer case-sensitive
+
+* code for creating design data was improved and is now much faster
+
+* error message given if data contains a field called id; id is forced to be a factor variable throughout
+
+* in mscjs, dml now refers to dml$fe to use fixed effects dm because it currently does not support random effects
+
+* removed use of ::: and exported more functions in marked to avoid that usage
+
+marked 1.1.1/1.1.2 14 Aug 2013
+-----------------
+
+* fixes for CRAN submission; same as 1.1.0 except for some transparent changes for CRAN submission
+
+
+marked 1.1.0 5 Aug 2013
+------------
+NEW FEATURES
+
+* improved and added to ADMB options for mixed effect modeling which resulted in the modification of a number of calling arguments to crm.
+
+* included code that looks for ADMB executable files in the package directory or workspace directory and uses them if they are found and !compile. This allows the user to avoid downloading ADMB and gcc but exe's are only available for windows at present. 
+
+* included code for HMM likelihood model fitting of c-r models (fitHMM) and simulation (simHMM) and supporting functions
+
+* added clean argument to remove TPL and executable files remaining in the working directory
+
+* capture history strings can now be comma separated strings to cope with multi-character states
+
+CHANGES
+
+* modified print.marked.version so it would not conflict with loading devtools
+
+* modified code in cjs.f and ADMB TPL files to more closely match MARK in handling small values of Prob(ch) to avoid log(0)
+
+* code was moved from crm to process.data which sets accumulate=FALSE if MCMC method is selected. 
+
+* removed code that prevented splitCH from working on a single ch value
+
+* added code to crm to assure accumulate=FALSE with any random effect; individual random effect is supposed to work with weights but
+tpl and cpp code do not appear to be working together; with accumulate=FALSE, results are correct.
+
+* added code to make.design.data which handles subtract.stratum for Psi type parameters and cjs type parameters which sets value to 1
+when cohort=time. Those changes are for fitHMM code which uses subtract.stratum in MS models and uses first occasion seen parameters to 
+make the hmm code work with JS and CJS type models.
+
+* made changes to cjs and js for changes in optimx package
+
+BUG FIXES
+
+* create.dmdf was not assigning id values correctly for MSCJS model
+
+* fixed problem introduced in v1.0.7 in which scaled parameters were not being adjusted back to original scale with R MLE optimization. Did not affect results with MCMC or when use.admb=T.
+
+* on Mac or Linux the code to assess whether admb was available, did not work. This was patched.
+
+* fixed bug in cjs which was written with a local copy of R2admb and did not work with the posted R2admb. This also involved changes to coef.crm 
+
 
 marked 1.0.9 24 Jan 2013
 ------------

@@ -1,0 +1,35 @@
+\name{cjs_gamma}
+\alias{cjs_gamma}
+\alias{ms2_gamma}
+\alias{ms_gamma}
+\title{HMM Transition matrix functions}
+\usage{
+  cjs_gamma(pars, m, F, T)
+}
+\arguments{
+  \item{pars}{list of real parameter values for each type
+  of parameter}
+
+  \item{m}{number of states}
+
+  \item{F}{initial occasion vector}
+
+  \item{T}{number of occasions}
+}
+\value{
+  array of id and occasion-specific transition matrices -
+  Gamma in Zucchini and MacDonald (2009)
+}
+\description{
+  Functions that compute the transition matrix for various
+  models. Currently only CJS and MS models are included.
+}
+\author{
+  Jeff Laake <jeff.laake@noaa.gov>
+}
+\references{
+  Zucchini, W. and I.L. MacDonald. 2009. Hidden Markov
+  Models for Time Series: An Introduction using R. Chapman
+  and Hall, Boca Raton, FL. 275p.
+}
+

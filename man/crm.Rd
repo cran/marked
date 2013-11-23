@@ -9,9 +9,9 @@
     method = "BFGS", hessian = FALSE, accumulate = TRUE,
     chunk_size = 1e+07, control = NULL, refit = 1,
     itnmax = 5000, scale = NULL, run = TRUE, burnin = 100,
-    iter = 1000, use.admb = FALSE, re = FALSE,
-    compile = FALSE, extra.args = "", strata.labels = NULL,
-    ...)
+    iter = 1000, use.admb = FALSE, crossed = NULL,
+    reml = FALSE, compile = FALSE, extra.args = NULL,
+    strata.labels = NULL, clean = TRUE, ...)
 }
 \arguments{
   \item{data}{Either the raw data which is a dataframe with
@@ -24,8 +24,7 @@
   \item{begin.time}{Time of first capture(release)
   occasion}
 
-  \item{model}{Type of c-r model ("cjs" or "js" at
-  present)}
+  \item{model}{Type of c-r model (eg, "cjs", "js")}
 
   \item{title}{Optional title; not used at present}
 
@@ -81,8 +80,11 @@
   \item{use.admb}{if TRUE creates data file for cjs.tpl and
   runs admb optimizer}
 
-  \item{re}{if TRUE creates random effect model
-  admbcjsre.tpl and runs admb optimizer}
+  \item{crossed}{if TRUE it uses cjs.tpl or cjs_reml.tpl if
+  reml=FALSE or TRUE respectively; if FALSE, then it uses
+  cjsre which can use Gauss-Hermite integration}
+
+  \item{reml}{if TRUE uses restricted maximum likelihood}
 
   \item{compile}{if TRUE forces re-compilation of tpl file}
 
@@ -93,6 +95,9 @@
   history; they are converted to numeric in the order
   listed. Only needed to specify unobserved strata. For any
   unobserved strata p=0..}
+
+  \item{clean}{if TRUE, deletes the tpl and executable
+  files for amdb if use.admb=T}
 
   \item{...}{optional arguments passed to js or cjs and
   optimx}
@@ -147,11 +152,12 @@
   In the current implementation, a logit link is used to
   constrain the parameters in the unit interval (0,1)
   except for probability of entry which uses an mlogit and
-  N which uses a log link.  These could be generalized to
-  use other link functions. Following the notation of MARK,
-  the parameters in the link space are referred to as
-  \code{beta} and those in the actual parameter space of
-  \code{Phi} and \code{p} as reals.
+  N which uses a log link. For the probitCJS model, a
+  probit link is used for the parameters. These could be
+  generalized to use other link functions. Following the
+  notation of MARK, the parameters in the link space are
+  referred to as \code{beta} and those in the actual
+  parameter space of \code{Phi} and \code{p} as reals.
 
   Initial values can be set in 2 ways.  To set a baseline
   intial value for the intercept of \code{Phi} \code{p} set
@@ -224,28 +230,71 @@
   the real value in the closed unit interval [0,1] for the
   fixed parameter.  This approach is completely general
   allowing you to fix a particular real parameter for a
-  specific animal and occasion but it is a bit kludgy and
-  later some other functionality will be included.  To set
-  all of the real values for a particular occasion you can
-  use the following example with the dipper data as a
-  template:
+  specific animal and occasion but it is a bit kludgy.
+  Alternatively, you can set fixed values by specifying
+  values for a field called fix in the design data for a
+  parameter. If the value of fix is NA the parameter is
+  estimated and if it is not NA then the real parameter is
+  fixed at that value.  If you also specify fixed as
+  decribed above, they will over-ride any values you have
+  also set with fix in the design data. To set all of the
+  real values for a particular occasion you can use the
+  following example with the dipper data as a template:
 
-  \code{model.parameters=list(Phi=list(,fixed=cbind(1:nrow(dipper),rep(2,nrow(dipper)),}
-  \code{rep(1,nrow(dipper)))))}
+  \code{model.parameters=list(Phi=list(formula=~1,}
+  \code{fixed=cbind(1:nrow(dipper),rep(2,nrow(dipper)),rep(1,nrow(dipper)))))}
 
   The above sets \code{Phi} to 1 for the interval between
-  occasions 2 and 3 for all animals. At present there is no
-  modification of the parameter count to address fixing of
-  real parameters.
+  occasions 2 and 3 for all animals.
 
-  Be cautious with this function at present.  It does not
-  include many checks to make sure values are in the
-  specified range of the data.  Normally this would not be
-  a big problem but because \code{\link{cjs.lnl}} calls an
-  external FORTRAN subroutine, if it gets a subscript out
-  of bounds, it will cause R to terminate.  So make sure to
-  save your workspace frequently if you use this function
-  in its current implementation.
+  Alternatively, you could do as follows:
+
+  data(dipper) dp=process.data(dipper)
+  ddl=make.design.data(dp)
+  ddl$Phi$fix=ifelse(ddl$Phi$time==2,1,NA)
+
+  At present there is no modification of the parameter
+  count to address fixing of real parameters except that if
+  by fixing reals, a beta is not needed in the design it
+  will be dropped. For example, if you were to use ~time
+  for Phi with survival fixed to 1 for time 2, then then
+  beta for that time would not be included.
+
+  To use ADMB (use.admb=TRUE), you need to install: 1) the
+  R package R2admb, 2) ADMB, and 3) a C++ compiler (I
+  recommend gcc compiler). The following are instructions
+  for installation with Windows. For other operating
+  systems see (http://www.admb-project.org/downloads) and
+  (http://www.admb-project.org/tools/gcc/).
+
+  Windows Instructions:
+
+  1) In R use install.packages function or choose
+  Packages/Install Packages from menu and select R2admb.
+
+  2) Install ADMB 11:
+  http://admb-project.googlecode.com/files/admb-11-mingw-gcc4.5-32bit.exe.
+  Put the software in C:/admb to avoid problems with spaces
+  in directory name and for the function below to work.
+
+  3) Install gcc 4.5 from:
+  http://www.admb-project.org/tools/gcc/gcc452-win32.zip/view.
+  Put in c:/MinGW
+
+  I use the following function in R to setup R2admb to
+  access ADMB rather than adding to my path so gcc versions
+  with Rtools don't conflict.
+
+  prepare_admb=function() { Sys.setenv(PATH =
+  paste("c:/admb/bin;c:admb/utilities;c:/MinGW/bin;",
+  Sys.getenv("PATH"), sep = ";")) Sys.setenv(ADMB_HOME =
+  "c:/admb") invisible() } To use different locations
+  you'll need to change the values used above
+
+  Before running crm with use.admb=T, execute the function
+  prepare_admb().  You could put this function or the code
+  it contains in your .First or .Rprofile so it runs each
+  time you start R.
 }
 \examples{
 # cormack-jolly-seber model
@@ -254,33 +303,49 @@ data(dipper)
 dipper.proc=process.data(dipper,model="cjs",begin.time=1)
 dipper.ddl=make.design.data(dipper.proc)
 mod.Phit.pt=crm(dipper.proc,dipper.ddl,
-  model.parameters=list(Phi=list(formula=~time),p=list(formula=~time)))
+   model.parameters=list(Phi=list(formula=~time),p=list(formula=~time)))
 mod.Phit.pt
 mod.Phidot.pdot=crm(dipper.proc,dipper.ddl,
-  model.parameters=list(Phi=list(formula=~1),p=list(formula=~1)))
+   model.parameters=list(Phi=list(formula=~1),p=list(formula=~1)))
 mod.Phidot.pdot
 mod.Phisex.pdot=crm(dipper.proc,dipper.ddl,groups="sex",
-  model.parameters=list(Phi=list(formula=~sex),p=list(formula=~1)))
+   model.parameters=list(Phi=list(formula=~sex),p=list(formula=~1)))
 mod.Phisex.pdot
 # fit same 3 models with calls to mark
 \donttest{
 require(RMark)
 mod0=mark(dipper,
-  model.parameters=list(Phi=list(formula=~time),p=list(formula=~time)),output=FALSE)
+   model.parameters=list(Phi=list(formula=~time),p=list(formula=~time)),output=FALSE)
 summary(mod0,brief=TRUE)
 mod1=mark(dipper,
-  model.parameters=list(Phi=list(formula=~1),p=list(formula=~1)),output=FALSE)
+   model.parameters=list(Phi=list(formula=~1),p=list(formula=~1)),output=FALSE)
 summary(mod1,brief=TRUE)
 mod2<-mark(dipper,groups="sex",
-  model.parameters=list(Phi=list(formula=~sex),p=list(formula=~1)),output=FALSE)
+   model.parameters=list(Phi=list(formula=~sex),p=list(formula=~1)),output=FALSE)
 summary(mod2,brief=TRUE)
 }
 # jolly seber model
 crm(dipper,model="js",groups="sex",
-  model.parameters=list(pent=list(formula=~sex),N=list(formula=~sex)),accumulate=FALSE)
+   model.parameters=list(pent=list(formula=~sex),N=list(formula=~sex)),accumulate=FALSE)
 \donttest{
 mark(dipper,model="POPAN",groups="sex",
-  model.parameters=list(pent=list(formula=~sex),N=list(formula=~sex)))
+   model.parameters=list(pent=list(formula=~sex),N=list(formula=~sex)))
+library(RMark)
+data(dipper)
+data(mstrata)
+mark(dipper,model.parameters=list(p=list(formula=~time)),output=FALSE)$results$beta
+mark(mstrata,model="Multistrata",model.parameters=list(p=list(formula=~1),
+ S=list(formula=~1),Psi=list(formula=~-1+stratum:tostratum)),
+ output=FALSE)$results$beta
+detach("package:RMark")
+##CJS example
+crm(dipper,model="hmmCJS",model.parameters = list(p = list(formula = ~time)))
+##MSCJS example
+ms=process.data(mstrata,model="hmmMSCJS")
+ms.ddl=make.design.data(ms)
+ms.ddl$Psi$fix=NA
+ms.ddl$Psi$fix[ms.ddl$Psi$stratum==ms.ddl$Psi$tostratum]=1
+crm(ms,ms.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum)))
 }
 }
 \author{

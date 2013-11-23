@@ -23,6 +23,7 @@
 #' @param nocc length of capture history string
 #' @param mixtures number of mixtures
 #' @export
+#' @aliases setup.model setupHMM
 #' @return model.list - a list with following elements \item{etype}{encounter
 #' type string for MARK input; typically same as model} \item{nocc}{number of
 #' capture occasions} \item{num}{number of time intervals relative to number of
@@ -34,38 +35,64 @@
 setup.model <-
 		function(model,nocc,mixtures=1)
 {
-#
-# setup.model - defines list of acceptable models and creates some global fields for the model
-#
-# Arguments:
-# 
-#   model    - name of model (must be in valid.models)
-#   nocc     - length of capture history string
-#   mixtures - number of mixtures
-#
-# Value: 
-#
-#   model.list - a list with following elements
-#                  etype - encounter type string; typically same as model name
-#                  nocc  - number of capture occasions
-#                  num   - number of time intervals relative to number of occasions (0 or -1)
-#                  mixtures - number of mixtures if any
-#                  derived - TRUE if model produces derived parameters
-#
-#
-# Read in parameter definitions
+    # Read in parameter definitions
 	fdir=system.file(package="marked")	
 	fdir=file.path(fdir,"models.txt")	
 	model_definitions=read.delim(fdir,header=TRUE,
-			colClasses=c("character","character",rep("logical",4),rep("numeric",3),"logical"))
+			colClasses=c("character",rep("numeric",1),rep("logical",4)))
 	model_def=model_definitions[model_definitions$model==model,]	
 	if(nrow(model_def)==0)
 		stop("Invalid type of model = ",model," Valid types are\n", paste(model_definitions$model,collapse="\n"))
-	if(mixtures==1) 
-		model_def$mixtures=model_def$default.mixtures
-	else
-		model_def$mixtures=mixtures
-	model_def$default.mixtures=NULL
-	model_def$nocc=nocc/model_def$divisor
-	return(as.list(model_def))
+    # model_def$nocc=nocc/model_def$divisor; not used at present
+	model_def$nocc=nocc
+	model_def=as.list(model_def)
+	return(model_def)
 }
+setupHMM=function(model_def,model,strata.labels)
+{
+	if(toupper(model)%in%c("PROBITCJS","HMMCJS"))
+	{
+		model_def$hmm$ObsLevels=c(0,1)
+		model_def$hmm$fct_dmat=cjs_dmat
+		model_def$hmm$fct_gamma=cjs_gamma
+		model_def$hmm$fct_delta=cjs_delta
+		model_def$hmm$m=2
+	} else
+	if(toupper(model)%in%c("PROBITMSCJS","HMMMSCJS"))
+	{
+		model_def$hmm$ObsLevels=c(0,strata.labels)
+		model_def$hmm$fct_dmat=ms_dmat
+		model_def$hmm$fct_gamma=ms_gamma
+		model_def$hmm$fct_delta=cjs_delta
+		model_def$hmm$strata.labels=strata.labels
+		model_def$hmm$m=length(strata.labels)+1
+	}   
+	if(toupper(model)=="HMMUMSCJS")
+	{
+		model_def$hmm$ObsLevels=c(0,strata.labels,"U")
+		model_def$hmm$fct_dmat=ums_dmat
+		model_def$hmm$fct_gamma=ms_gamma
+		model_def$hmm$fct_delta=cjs_delta
+		model_def$hmm$strata.labels=strata.labels
+		model_def$hmm$m=length(strata.labels)+1
+	}
+	if(toupper(model)%in%c("HMMU2MSCJS","HMMU2IMSCJS"))
+	{
+		if(length(strata.labels)!=2 | !"states"%in%names(strata.labels))
+			stop("structure of strata labels is incorrect; list of 2 character vectors with one named states")
+		obs.states=c(strata.labels$states,"U")
+		strata=strata.labels[[names(strata.labels)[names(strata.labels)!="states"]]]
+        model_def$hmm$ObsLevels=c(0,apply(rev(expand.grid(list(obs.states,strata))),1,paste,collapse=""))
+		model_def$hmm$fct_delta=cjs_delta		
+		model_def$hmm$fct_dmat=ums2_dmat		
+		model_def$hmm$fct_gamma=ms_gamma
+		model_def$hmm$strata.list=strata.labels
+		model_def$hmm$strata.labels=apply(rev(expand.grid(list(strata.labels$states,strata))),1,paste,collapse="")
+		model_def$hmm$m=length(model_def$hmm$strata.labels)+1
+	}
+	if(toupper(model)=="HMMU2IMSCJS") model_def$hmm$fct_gamma=ms2_gamma
+	return(model_def)
+}
+
+
+
