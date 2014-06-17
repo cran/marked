@@ -35,7 +35,7 @@
 #' xx=predict(mod.Phisex.pdot,newdata=dipper[c(1,23),],vcv=TRUE)
 #' xx
 #' @keywords utility
-predict.crm <-function(object,newdata=NULL,ddl=NULL,parameter=NULL,unique=TRUE,vcv=FALSE,se=FALSE,chat=1,subset,select,...)
+predict.crm <-function(object,newdata=NULL,ddl=NULL,parameter=NULL,unique=TRUE,vcv=FALSE,se=FALSE,chat=1,subset=NULL,select=NULL,...)
 {
 	if(!is.null(newdata))
 	{
@@ -49,18 +49,29 @@ predict.crm <-function(object,newdata=NULL,ddl=NULL,parameter=NULL,unique=TRUE,v
 			object$results$model_data$p.dm=dml$p$fe		
 		}else
 			stop("Invalid newdata")
-	}
-	if(is.null(ddl))
-		return(object$results$reals)
-	else
+	} else
 	{
-		if(is.null(parameter) )
+		if(is.null(ddl))
 		{
-			results=NULL
-			for (parameter in names(object$model.parameters))
-				results[[parameter]]=compute.real(object,parameter,ddl,unique,vcv,se,chat,subset=substitute(subset),select)
-			return(results)
+			if(!is.null(object$results$reals))
+				return(object$results$reals)
+			else{
+				if(!is.null(object$results$model_data$ddl))
+					ddl=object$results$model_data$ddl
+				else
+					stop("No ddl or real values available")
+			}
 		} else
-			return(compute.real(object,parameter,ddl,unique,vcv,se,chat,subset=substitute(subset),select))		
+		{
+			dml=create.dml(ddl,model.parameters=object$model.parameters,design.parameters=ddl$design.parameters,chunk_size=1e7)  
+		}
 	}
+	if(is.null(parameter))
+	{
+		results=NULL
+		for (parameter in names(object$model.parameters))
+			results[[parameter]]=compute.real(object,parameter,ddl,dml,unique,vcv,se,chat,subset=substitute(subset),select,include=object$model.parameters[[parameter]]$include)
+		return(results)
+	} else
+		return(compute.real(object,parameter,ddl,dml,unique,vcv,se,chat,subset=substitute(subset),select,include=object$model.parameters[[parameter]]$include))	
 }

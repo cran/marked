@@ -265,7 +265,7 @@ if(is.null(data$data))
       ddl=NULL
    }
    message("Model: ",model,"\n")
-   message("Processing data\n")
+   message("Processing data...\n")
    flush.console()
    data.proc=process.data(data,begin.time=begin.time, model=model,mixtures=1, 
 	   groups = groups, age.var = NULL, initial.ages = NULL, 
@@ -276,16 +276,6 @@ else
 	data.proc=data
 	model=data$model
 }
-#
-# If the design data have not been constructed, do so now
-#
-if(is.null(ddl)) 
-{
-	message("Creating design data.\n")
-	flush.console()
-	ddl=make.design.data(data.proc,design.parameters)
-} else
-	design.parameters=ddl$design.parameters
 #
 # Setup parameter list
 #
@@ -305,14 +295,24 @@ for (i in 1:length(parameters))
 	if(is.null(parameters[[i]]$formula)) parameters[[i]]$formula=~1
 	mlist=proc.form(parameters[[i]]$formula)
 	if(!is.null(mlist$re.model))re=TRUE
+	if(parameters[[i]]$nointercept)parameters[[i]]$remove.intercept=TRUE
 }
 # currently if re, then set use.admb to TRUE
 if(re) use.admb=TRUE
 if(use.admb & !re) crossed=FALSE
 # if re and accumulate=T, stop with message to use accumulate=FALSE
 if(re & any(data.proc$freq>1)) stop("\n data cannot be accumulated (freq>1) with random effects; set accumulate=FALSE\n")
-#  setup fixed values 
-ddl=set.fixed(ddl,parameters)
+#
+# If the design data have not been constructed, do so now
+#
+if(is.null(ddl)) 
+{
+	message("Creating design data...\n")
+	flush.console()
+	ddl=make.design.data(data.proc,design.parameters)
+	ddl=set.fixed(ddl,parameters) #   setup fixed values if old way used
+} else
+	design.parameters=ddl$design.parameters
 # Create design matrices for each parameter
 dml=create.dml(ddl,model.parameters=parameters,design.parameters=design.parameters,chunk_size=1e7)
 # For HMM call set.initial to get ptype and set initial values
@@ -324,7 +324,8 @@ if(!run) return(list(model=model,data=data.proc,model.parameters=parameters,desi
 if("SANN"%in%method)
 {
 	if(length(method)>1)
-		warning("***SANN can only used by itself; other methods ignored.")
+		warning("***SANN can only be used by itself; other methods ignored.")
+	method="SANN"
     control$maxit=itnmax
 }
 if("nlminb"%in%method)control$eval.max=itnmax
@@ -341,7 +342,6 @@ if(model=="MSCJS")
 				   refit=refit,control=control,itnmax=itnmax,scale=scale,use.admb=use.admb,re=re,compile=compile,extra.args=extra.args,clean=clean,...)
 if(model=="PROBITCJS")
 {
-	ddl$p$Y=ddl$p$Y-1
 	if(is.null(initial))
 	{
 	    imat=process.ch(data.proc$data$ch,data.proc$data$freq,all=FALSE)
@@ -353,18 +353,24 @@ if(model=="PROBITCJS")
 }
 if(substr(model,1,3)=="HMM")
 {
-	if(is.null(data.proc$strata.list))		
+	if(is.null(data.proc$strata.list))
+	{
 	   runmodel=optim(unlist(initial.list$par),HMMLikelihood,type=initial.list$ptype,x=data.proc$ehmat,m=data.proc$m,T=data.proc$nocc,start=data.proc$start,freq=data.proc$freq,
 				fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,parameters=parameters,control=control,
 				method=method,debug=debug,hessian=hessian)
-    else
+	   runmodel$mat=HMMLikelihood(par=runmodel$par,type=initial.list$ptype,x=data.proc$ehmat,m=data.proc$m,T=data.proc$nocc,start=data.proc$start,freq=data.proc$freq,
+			fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,parameters=parameters,return.mat=TRUE)
+    } else
 	{
 		m=list(ns=length(data.proc$strata.list$states),na=length(data.proc$strata.list[[names(data.proc$strata.list)[names(data.proc$strata.list)!="states"]]]))
 		runmodel=optim(unlist(initial.list$par),HMMLikelihood,type=initial.list$ptype,x=data.proc$ehmat,m=m,T=data.proc$nocc,start=data.proc$start,freq=data.proc$freq,
 				fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,parameters=parameters,control=control,
 				method=method,debug=debug,hessian=hessian)
+#		runmodel$mat=HMMLikelihood(par=runmodel$par,type=initial.list$ptype,x=data.proc$ehmat,m=m,T=data.proc$nocc,start=data.proc$start,freq=data.proc$freq,
+#				fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,parameters=parameters,return.mat=TRUE)
 	}
 	par=vector("list",length=length(names(initial.list$par)))
+	names(par)=names(initial.list$par)
 	#par=split(runmodel$par,initial.list$ptype)
 	for(p in names(initial.list$par))
 	{
@@ -376,8 +382,14 @@ if(substr(model,1,3)=="HMM")
 	runmodel$neg2lnl=2*runmodel$value
 	runmodel$value=NULL
 	runmodel$AIC=runmodel$neg2lnl+2*sum(sapply(runmodel$beta,length))
-	if(!is.null(runmodel$hessian))runmodel$beta.vcv=solvecov(runmodel$hessian)$inv
+	if(!is.null(runmodel$hessian))
+	{
+		runmodel$beta.vcv=solvecov(runmodel$hessian)$inv
+		colnames(runmodel$beta.vcv)=names(unlist(runmodel$beta))
+		rownames(runmodel$beta.vcv)=colnames(runmodel$beta.vcv)
+	}
 	class(runmodel)=c("crm","mle",model)
+#	runmodel$model_data=list(ddl=ddl)
 }
 #
 # Return fitted MARK model object or if external, return character string with same class and save file
@@ -388,13 +400,12 @@ if(!is.null(runmodel$convergence) && runmodel$convergence!=0&!use.admb)
 	if(is.null(msg)) msg="Exceeded maximum number of iterations"
 	warning(msg)
 }
+
 object=list(model=model,data=data.proc,model.parameters=parameters,design.parameters=design.parameters,results=runmodel)
 class(object)=class(runmodel)
-if(!re & model!="MSCJS"& toupper(substr(model,1,3))!="HMM")
-for(parx in names(parameters))
-{
-	object$results$reals[[parx]]=predict(object,ddl=ddl,parameter=parx,unique=TRUE,se=hessian)
-}
+#if(!re & model!="MSCJS"& toupper(substr(model,1,3))!="HMM")
+if(!re & model!="MSCJS")
+   object$results$reals=predict(object,ddl=ddl,unique=TRUE,se=hessian)
 cat(paste("\nElapsed time in minutes: ",round((proc.time()[3]-ptm[3])/60,digits=4),"\n"))
 return(object)
 }

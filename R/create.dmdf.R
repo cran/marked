@@ -227,7 +227,6 @@ create.dmdf=function(x,parameter,time.varying=NULL,fields=NULL)
    begin.num=parameter$begin+1
    chp = process.ch(x$data$ch)
    firstseen=chp$first
-   if(all(is.na(x$ehmat)))x$ehmat= chp$chmat
    nocc=x$nocc
    time.intervals=x$time.intervals
    if(is.null(x$data$begin.time))
@@ -307,7 +306,8 @@ create.dmdf=function(x,parameter,time.varying=NULL,fields=NULL)
    df$cohort=factor(df$cohort) 
    if("group"%in%names(df))
 	  levels(df$group)=apply(x$group.covariates,1,paste,collapse="")
-   df$Y=as.vector(t(x$ehmat)[begin.num:(nocc-last+begin.num-1),])
+   if(!is.null(x$strata_data)&!is.null(df$stratum))
+	   df=cbind(df,x$strata_data)
    return(df)
 }
 
@@ -346,6 +346,7 @@ create.base.dmdf=function(x,parameter)
 		if(parameter$tostrata)
 		{
 			df=expand.grid(tostratum=sl[1:nstrata],stratum=sl[1:nstrata],occ=occasions,id=factor(1:nrow(x$data)))
+			df=df[,c("stratum","tostratum","occ","id")]
 			df$seq=1:nrow(df)
 		}
 		else

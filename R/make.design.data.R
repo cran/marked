@@ -70,7 +70,6 @@ function(data,parameters=list())
           number.of.groups=dim(data$freq)[2])
   parameters=parameters[par.list]
   model.list=setup.model(data$model,data$nocc,data$mixtures)
-#
 # Create data for the each parameter in the model with age, year and cohort for each index
 # This data matrix (design.data) is used below to create the design matrix from the formulas
 # If age,cohort or year bins are given, use those.  Otherwise each is treated as a factor 
@@ -151,9 +150,9 @@ full.design.data=vector("list",length=length(parameters))
               full.design.data[[i]]=data.frame(N=1)
          }     
       } 
-	  if(!toupper(data$model)%in%c("PROBITCJS","PROBITMSCJS","NULL"))
-		  if("Y" %in% names(full.design.data[[i]]))
-			  full.design.data[[i]]$Y=NULL
+#	  if(!toupper(data$model)%in%c("PROBITCJS","NULL"))
+#		  if("Y" %in% names(full.design.data[[i]]))
+#			  full.design.data[[i]]$Y=NULL
 	  # assign subtract.stratum and fix values to 1 unless subtract.stratum=="NONE"
       # the code now handles parameters for 2iMSCJS where strata are in levels (eg states,areas)
       labels=data$strata.labels
@@ -202,9 +201,15 @@ full.design.data=vector("list",length=length(parameters))
 		  full.design.data[[i]]$fix[as.character(full.design.data[[i]]$time)==as.character(full.design.data[[i]]$cohort)]=1	  
 	  }	
 	  full.design.data[[i]]=droplevels(full.design.data[[i]])
+	  if(names(parameters)[i]=="tau"&!is.null(full.design.data[[i]]$tag1))
+	  {
+		  full.design.data[[i]]$fix=NA
+		  full.design.data[[i]]$fix[full.design.data[[i]]$tag1==0&full.design.data[[i]]$tag2==0]=1	  
+	  }
    }
    names(full.design.data)=names(parameters)
    full.design.data[["design.parameters"]]=parameters
+   full.design.data$ehmat=data$ehmat
    return(full.design.data)
 }
 

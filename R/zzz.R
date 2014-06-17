@@ -17,7 +17,19 @@ print.marked.version <- function()
 .onUnload <- function(libpath)
 {
 #  unloadNamespace("marked")
-  library.dynam.unload("marked", libpath)
+#  library.dynam.unload("marked", libpath)
   cat("\nBye-Bye from marked\n\n")
   return(invisible())
 }
+#' @import methods
+### setMethods for Matrix package
+setMethod(f=crossprod, signature=signature(x="dgeMatrix", y="dtTMatrix"), function(x,y) callNextMethod())
+
+# setMethod(f="%*%", signature=signature(x="ddiMatrix", y="dtTMatrix"), function(x,y) Matrix:::diagCspprod(as(x, "CsparseMatrix"), y))
+# setMethod(f=crossprod, signature=signature(x="dgeMatrix", y="dtTMatrix"), 
+#           definition=function (x, y = NULL){
+#             t(.Call("Csparse_dense_crossprod", as(y, "CsparseMatrix"), x, PACKAGE="Matrix"))
+#           }
+# )
+# 
+

@@ -68,8 +68,9 @@
 #' @param debug if TRUE, print out par values and -log-likelihood
 #' @param parlist list of parameter strings used to split par vector
 #' @param start for each ch, the first non-zero x value and the occasion of the first non-zero value
+#' @param return.mat If TRUE, returns list of transition, observation and delta arrays.
 #' @usage HMMLikelihood(par,type,x,start,m,T,freq=1,fct_dmat,fct_gamma,fct_delta,ddl,
-#'                          dml,parameters,debug=FALSE)
+#'                          dml,parameters,debug=FALSE,return.mat=FALSE)
 #'        reals(ddl,dml,parameters,parlist)
 #'        hmm.lnl(x,start,m,T,dmat,gamma,delta,freq)
 #' @aliases HMMLikelihood reals hmm.lnl
@@ -78,8 +79,8 @@
 #' returns either the column dimension of design matrix for parameter or the real parameter vector
 #' @author Jeff Laake <jeff.laake@@noaa.gov>
 #' @references Zucchini, W. and I.L. MacDonald. 2009. Hidden Markov Models for Time Series: An Introduction using R. Chapman and Hall, Boca Raton, FL. 275p. 
-HMMLikelihood=function(par,type,x,start,m,T,freq=1,fct_dmat,fct_gamma,
-		fct_delta,ddl,dml,parameters,debug=FALSE)
+HMMLikelihood=function(par,type=NULL,x,start,m,T,freq=1,fct_dmat,fct_gamma,
+		fct_delta,ddl,dml,parameters,debug=FALSE,return.mat=FALSE)
 {
 	# Arguments:
 	# par: vector of parameter values for log-likelihood evaluation
@@ -103,7 +104,10 @@ HMMLikelihood=function(par,type,x,start,m,T,freq=1,fct_dmat,fct_gamma,
 	# Create list of parameter matrices from single input parameter vector
 	# First split parameter vector by prameter type (type) 
 	ptm=proc.time()
-	parlist=split(par,type)
+	if(is.null(type))
+		parlist=par
+	else
+	    parlist=split(par,type)
 	pars=list()
 	# For each parameter type call function reals to compute vector
 	# of real parameter values; then use laply and split to create
@@ -112,6 +116,7 @@ HMMLikelihood=function(par,type,x,start,m,T,freq=1,fct_dmat,fct_gamma,
     for(parname in names(parameters))
     {
         R=reals(ddl=ddl[[parname]],dml=dml[[parname]],parameters=parameters[[parname]],parlist=parlist[[parname]])
+		R[is.infinite(R)]=1e199*sign(Inf)
         pars[[parname]]=laply(split(R,ddl[[parname]]$id),function(x) x)
     }
 	# compute 4-d arrays of id- and occasion-specific 
@@ -121,16 +126,19 @@ HMMLikelihood=function(par,type,x,start,m,T,freq=1,fct_dmat,fct_gamma,
 	if(debug) cat("\n time = ",proc.time()-ptm,"\n")
 	# compute matrix of initial state distribution for each id
 	delta=fct_delta(pars,m,F=start[,2],T,start)
+	if(return.mat)return(list(dmat=dmat,gamma=gamma,delta=delta))
 	if(is.list(m)) m=m$ns*m$na+1
-	neglnl=hmm.lnl(x,start,m,T,dmat,gamma,delta,freq)
 	if(debug){
 		cat("\npar \n")
-		print(split(par,type))
+		print(parlist)
 		for(parname in names(parameters))
 		{
 			cat("\n",parname,"\n")
 			print(pars[[parname]][1,])
 		}
+	}
+	neglnl=hmm.lnl(x,start,m,T,dmat,gamma,delta,rowSums(freq))
+	if(debug){
 		cat(" -lnl= ",neglnl)
 		ps=delta[1,]
 		for(i in 1:(T-1))
@@ -150,12 +158,17 @@ reals=function(ddl,dml,parameters,parlist)
 	# type (parname); handles fixed parameters assigned by 
 	# non-NA value in field named fix in the ddl dataframe.
 	dm=dml$fe
-	# Currently for log,logit or identity link, return the inverse values
-	values=switch(parameters$link,
-			log=exp(as.vector(dm%*%parlist)),
-			logit=plogis(as.vector(dm%*%parlist)),
-			identity=as.vector(dm%*%parlist))
-	if(!is.null(ddl$time.interval))values=values^ddl$time.interval
+	if(ncol(dm)!=0)
+	{	
+		# Currently for log,logit or identity link, return the inverse values
+		values=switch(parameters$link,
+				log=exp(as.vector(dm%*%parlist)),
+				logit=plogis(as.vector(dm%*%parlist)),
+				identity=as.vector(dm%*%parlist))
+		if(!is.null(ddl$time.interval))values=values^ddl$time.interval
+	}
+	else
+		values=rep(NA,nrow(dm))
 	# if some reals are fixed, set reals to their fixed values 
 	if(!is.null(ddl$fix))
 		values[!is.na(ddl$fix)]=ddl$fix[!is.na(ddl$fix)]
@@ -318,8 +331,8 @@ loglikelihood=function(par,type,x,id,start,m,T,freq=1,fct_dmat,fct_gamma,
 	object=R_HMMLikelihood(x[id,],start[id,2],m,T,
 								dmat=dmat[id,,,],gamma=gamma[id,,,],
 								delta=delta[id,])
-	object$beta=backward_prob(x[id,],start[id,2],m,T,
-								dmat=dmat[id,,,],gamma=gamma[id,,,])
+#	object$beta=backward_prob(x[id,],start[id,2],m,T,
+#								dmat=dmat[id,,,],gamma=gamma[id,,,])
 	return(object)
 }
 
