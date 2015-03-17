@@ -5,6 +5,7 @@
 DATA_SECTION 
     init_int n;                                           // number of capture histories
     init_int m;                                           // number of capture occasions
+	init_int debug;                                       // 0/1 variable 1 = printout iterations
     init_imatrix ch(1,n,1,m);                             // capture history matrix
     init_ivector frst(1,n);                               // occasion first seen for each history
     init_ivector lst(1,n);                                // occasion last seen for each history
@@ -122,6 +123,12 @@ PROCEDURE_SECTION
 			 else 			 
 		  	     ll_i(i,phi_sigma,p_sigma,phi_u(phi_indices),p_u(p_indices),phi_beta,p_beta);  // phi and p random effects		 
     }
+	if(debug==1)
+	{
+	    cout << "Phi = " << phi_beta << endl;
+	    cout << "p = " << p_beta << endl;
+	    cout << "f = " << f << endl;
+    }
 	
 
 SEPARABLE_FUNCTION void n01_prior(const prevariable&  u)           // taken from glmmadmb.tpl; uses PI 
@@ -194,7 +201,7 @@ SEPARABLE_FUNCTION void ll_i(const int i, const dvar_vector& phi_sigma,const dva
        else       
           pch=pch+cump(j)*phicumprod(j)*(1-phi(j));                // probability of history given possible last occasion alive
     }   
-    f-= log(pch+0.000000000000000000000001);                                // sum log-likelihood log(pr(ch))
+    f-= log(pch+1E-15);                                            // sum log-likelihood log(pr(ch))
 
 SEPARABLE_FUNCTION void nophill_i(const int i, const dvar_vector& p_sigma,const dvar_vector& p_u,const dvar_vector& phi_beta, const dvar_vector& p_beta )
     dvar_vector phi(1,m);                                          // temp vector for Phis for each occasion for a single history
@@ -253,7 +260,7 @@ SEPARABLE_FUNCTION void nophill_i(const int i, const dvar_vector& p_sigma,const 
        else       
           pch=pch+cump(j)*phicumprod(j)*(1-phi(j));                // probability of history given possible last occasion alive
     }   
-    f-= log(pch+0.000000000000000000000001);                                // sum log-likelihood log(pr(ch))
+    f-= log(pch+1E-15);                                            // sum log-likelihood log(pr(ch))
 	
 SEPARABLE_FUNCTION void nopll_i(const int i, const dvar_vector& phi_sigma,const dvar_vector& phi_u,const dvar_vector& phi_beta, const dvar_vector& p_beta )
     dvar_vector phi(1,m);                                          // temp vector for Phis for each occasion for a single history
@@ -312,7 +319,7 @@ SEPARABLE_FUNCTION void nopll_i(const int i, const dvar_vector& phi_sigma,const 
        else       
           pch=pch+cump(j)*phicumprod(j)*(1-phi(j));                // probability of history given possible last occasion alive
     }   
-    f-= log(pch+0.000000000000000000000001);                                // sum log-likelihood log(pr(ch))
+    f-= log(pch+1E-15);                                            // sum log-likelihood log(pr(ch))
 
 REPORT_SECTION
     dvar_vector phi(1,m-1);              // temp vector for Phis for each occasion for a single history

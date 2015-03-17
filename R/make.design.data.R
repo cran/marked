@@ -49,6 +49,7 @@
 #' @keywords utility
 #' @examples
 #' \donttest{
+#' # This example is excluded from testing to reduce package check time
 #' data(dipper)
 #' dipper.proc=process.data(dipper)
 #' ddl=make.design.data(dipper.proc)
@@ -92,6 +93,7 @@ full.design.data=vector("list",length=length(parameters))
 		 else
 			 fields=parameters[[i]]$static   
 		 full.design.data[[i]]=create.dmdf(data,parameters[[i]],time.varying=time.varying,fields=fields)
+		 if(is.null(full.design.data[[i]]))next
 	 }else
 #    Compute design data for N
 	 {
@@ -206,6 +208,7 @@ full.design.data=vector("list",length=length(parameters))
 		  full.design.data[[i]]$fix=NA
 		  full.design.data[[i]]$fix[full.design.data[[i]]$tag1==0&full.design.data[[i]]$tag2==0]=1	  
 	  }
+	  full.design.data[[i]]$order=1:nrow(full.design.data[[i]])
    }
    names(full.design.data)=names(parameters)
    full.design.data[["design.parameters"]]=parameters

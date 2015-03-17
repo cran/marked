@@ -1,5 +1,5 @@
 ### R code from vignette source 'markedVignette.Rnw'
-### Encoding: ASCII
+### Encoding: ISO8859-1
 
 ###################################################
 ### code chunk number 1: markedVignette.Rnw:21-22

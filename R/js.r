@@ -89,6 +89,7 @@ js=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL,me
 	if(is.null(initial))
 		initial=cjs.initial(dml,imat)
 	par=set.initial(names(dml),dml,initial)$par
+	initial=par
 #  Create list of model data for optimization; if passed as an argument create model_data.save 
 #  and use model_data (accumulated values); otherwise create model_data, save it and accumulate it
 #  if requested.
@@ -147,8 +148,8 @@ js=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL,me
 #  create results list
    res=list(beta=js.beta,neg2lnl=2*lnl,AIC=2*lnl+2*sum(sapply(js.beta,length)),
 		   convergence=convergence,optim.details=mod,
-		   scale=scale,model_data=model_data,ns=nobstot,
-		   options=list(accumulate=accumulate,initial=initial,method=method,
+		   model_data=model_data,ns=nobstot,
+		   options=list(scale=scale,accumulate=accumulate,initial=initial,method=method,
 		   chunk_size=chunk_size,itnmax=itnmax,control=control))
 #  Compute hessian if specified   
    if(hessian) 

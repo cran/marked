@@ -118,11 +118,9 @@ compute.real <-function(model,parameter,ddl=NULL,dml=NULL,unique=TRUE,vcv=FALSE,
 	      varnames=c(include,select,"fixed")
   }
   varnames=unique(varnames)
-  if(any(!varnames%in%names(df))) 
-  {
-	  warning(paste("These variable names not in data for real estimates: ",paste(varnames[!varnames%in%names(df)],collapse=""),sep=""))
-	  varnames=varnames[varnames%in%names(df)]
-  }
+  if(any(!select%in%names(df))) 
+	  warning(paste("These variable names not in data for real estimates: ",paste(varnames[!select%in%names(df)],collapse=""),sep=""))
+  varnames=varnames[varnames%in%names(df)]
   df=df[,varnames,drop=FALSE]
 # Check to make sure dimensions of beta and design matrix match
   results=model$results
@@ -137,12 +135,18 @@ compute.real <-function(model,parameter,ddl=NULL,dml=NULL,unique=TRUE,vcv=FALSE,
          stop("Mismatch between number of design columns and length of beta")
   }
 # Compute real parameters using function convert.link.to.real
-  if(mcmc)
-	   real=convert.link.to.real(t(design%*%t(results$beta.mcmc[[parameter]])),links=link,fixed=fixedvalues)
+# added code to handle all parameters being fixed
+  if(length(beta)==0)
+	  real=fixedvalues
   else
-       real=convert.link.to.real(design%*%beta,links=link,fixed=fixedvalues)
-# Set fixed real parameters to their fixed values
-  real[fixedparms]=fixedvalues[fixedparms]
+  {
+	  if(mcmc)
+		  real=convert.link.to.real(t(design%*%t(results$beta.mcmc[[parameter]])),links=link,fixed=fixedvalues)
+	  else
+		  real=convert.link.to.real(design%*%beta,links=link,fixed=fixedvalues)
+     # Set fixed real parameters to their fixed values
+     real[fixedparms]=fixedvalues[fixedparms]
+  }
 # Summarize reals for mcmc models or create dataframe with estimate=real for non-mcmc models
   if(mcmc)
   {

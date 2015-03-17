@@ -30,6 +30,11 @@ set.initial=function(pars,dml,initial)
 	for(parx in pars)
 	{
 		init=initial[[parx]]
+		if(is.null(dml[[parx]]$fe))
+		{
+			par[[parx]]=NULL
+			next
+		}
 		if(is.null(init))
 		{
 			par[[parx]]=rep(0,ncol(dml[[parx]]$fe))
@@ -53,7 +58,8 @@ set.initial=function(pars,dml,initial)
 				}
 			}
 		}
-		ptype=c(ptype,rep(parx,ncol(dml[[parx]]$fe)))		
+		ptype=c(ptype,rep(parx,ncol(dml[[parx]]$fe)))	
+		names(par[[parx]])=colnames(dml[[parx]]$fe)
 	}
 	return(list(par=par,ptype=ptype))
 }
