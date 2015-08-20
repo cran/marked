@@ -1,6 +1,6 @@
 Package: marked
-Version: 1.1.9
-Date: 2015-08-19
+Version: 1.1.10
+Date: 2015-08-20
 Title: Mark-Recapture Analysis for Survival and Abundance Estimation
 Author: Jeff Laake <jeff.laake@noaa.gov>, Devin Johnson
     <devin.johnson@noaa.gov>, Paul Conn <paul.conn@noaa.gov>
@@ -20,6 +20,6 @@ SystemRequirements: ADMB version 11 (http://admb-project.org/) for
 LazyLoad: yes
 License: GPL (>= 2)
 NeedsCompilation: yes
-Packaged: 2015-08-19 22:53:51 UTC; JLaake
+Packaged: 2015-08-20 14:41:31 UTC; JLaake
 Repository: CRAN
-Date/Publication: 2015-08-20 01:23:28
+Date/Publication: 2015-08-20 19:24:01
