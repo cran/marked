@@ -24,28 +24,29 @@ options(width=70)
 
 
 ###################################################
-### code chunk number 4: markedVignette.Rnw:157-160
+### code chunk number 4: markedVignette.Rnw:157-161
 ###################################################
 library(marked) 
+library(ggplot2)
 data(dipper)
 model=crm(dipper)
 
 
 ###################################################
-### code chunk number 5: markedVignette.Rnw:184-185
+### code chunk number 5: markedVignette.Rnw:185-186
 ###################################################
 model
 
 
 ###################################################
-### code chunk number 6: markedVignette.Rnw:204-206
+### code chunk number 6: markedVignette.Rnw:205-207
 ###################################################
 model=cjs.hessian(model)
 model
 
 
 ###################################################
-### code chunk number 7: markedVignette.Rnw:220-225
+### code chunk number 7: markedVignette.Rnw:221-226
 ###################################################
 dipper.proc=process.data(dipper)
 dipper.ddl=make.design.data(dipper.proc)
@@ -55,7 +56,7 @@ model=crm(dipper.proc,dipper.ddl,model.parameters=list(Phi=Phi.sex),
 
 
 ###################################################
-### code chunk number 8: markedVignette.Rnw:245-259
+### code chunk number 8: markedVignette.Rnw:246-260
 ###################################################
 dipper.proc=process.data(dipper)
 dipper.ddl=make.design.data(dipper.proc)
@@ -74,20 +75,20 @@ dipper.models=fit.models()
 
 
 ###################################################
-### code chunk number 9: markedVignette.Rnw:264-265
+### code chunk number 9: markedVignette.Rnw:265-266
 ###################################################
 dipper.models
 
 
 ###################################################
-### code chunk number 10: markedVignette.Rnw:274-276
+### code chunk number 10: markedVignette.Rnw:275-277
 ###################################################
 dipper.models[[1]]
 dipper.models[["Phi.sex.p.dot"]]
 
 
 ###################################################
-### code chunk number 11: markedVignette.Rnw:282-296
+### code chunk number 11: markedVignette.Rnw:283-297
 ###################################################
 dipper.proc=process.data(dipper)
 dipper.ddl=make.design.data(dipper.proc)
@@ -106,14 +107,14 @@ dipper.models=fit.models()
 
 
 ###################################################
-### code chunk number 12: markedVignette.Rnw:299-301
+### code chunk number 12: markedVignette.Rnw:300-302
 ###################################################
 model=load.model(dipper.models[[1]])
 model
 
 
 ###################################################
-### code chunk number 13: markedVignette.Rnw:321-341
+### code chunk number 13: markedVignette.Rnw:322-342
 ###################################################
 data(dipper)
 # Add a dummy weight field which are random values from 1 to 10
@@ -138,7 +139,7 @@ names(dipper)
 
 
 ###################################################
-### code chunk number 14: markedVignette.Rnw:362-372
+### code chunk number 14: markedVignette.Rnw:363-373
 ###################################################
 # Process data 
 dipper.proc=process.data(dipper)
@@ -153,7 +154,7 @@ names(ddl$p)
 
 
 ###################################################
-### code chunk number 15: markedVignette.Rnw:378-382
+### code chunk number 15: markedVignette.Rnw:379-383
 ###################################################
 Phi.sfw=list(formula=~Flood+weight)
 p.ast=list(formula=~age+sex+td)
@@ -162,13 +163,12 @@ model=crm(dipper.proc,ddl,hessian=TRUE,
 
 
 ###################################################
-### code chunk number 16: markedVignette.Rnw:390-399
+### code chunk number 16: markedVignette.Rnw:391-399
 ###################################################
 newdipper=expand.grid(sex=c("Male","Female"),weight=1:10,Flood1=0,
       Flood2=1,Flood3=1,Flood4=0,Flood5=0,Flood6=0,td2=0,td3=c(0,1),
       td4=c(0,1),td5=c(0,1),td6=c(0,1),td7=c(0,1)) 
 reals=predict(model,newdata=newdipper,se=TRUE) 
-library(ggplot2)
 reals$Phi$Flood=factor(reals$Phi$Flood,labels=c("Non-flood","Flood"))
 ggplot(reals$Phi,aes(weight,estimate,ymin=lcl,ymax=ucl))+
        geom_errorbar(width=0.2)+geom_point()+geom_line()+

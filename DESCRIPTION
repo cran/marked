@@ -1,6 +1,6 @@
 Package: marked
-Version: 1.1.10
-Date: 2015-08-20
+Version: 1.1.11
+Date: 2016-3-7
 Title: Mark-Recapture Analysis for Survival and Abundance Estimation
 Author: Jeff Laake <jeff.laake@noaa.gov>, Devin Johnson
     <devin.johnson@noaa.gov>, Paul Conn <paul.conn@noaa.gov>
@@ -12,14 +12,16 @@ Description: Functions for fitting various models to capture-recapture data
     for tag loss. Hidden Markov model (HMM) implementations of CJS and
     multistate models with and without state uncertainty.
 Depends: R (>= 2.15.0), lme4, methods, parallel
-Imports: graphics, stats, utils, R2admb, truncnorm, coda, ggplot2,
-        Matrix, numDeriv, expm, Rcpp (>= 0.9.13), optimx (>= 2013.8.6)
+Imports: graphics, stats, utils, R2admb, truncnorm, coda, Matrix,
+        numDeriv, expm, Rcpp (>= 0.9.13), optimx (>= 2013.8.6)
+Suggests: ggplot2
 LinkingTo: Rcpp
 SystemRequirements: ADMB version 11 (http://admb-project.org/) for
         use.admb=TRUE; see readme.txt
 LazyLoad: yes
 License: GPL (>= 2)
+RoxygenNote: 5.0.1
 NeedsCompilation: yes
-Packaged: 2015-08-20 14:41:31 UTC; JLaake
+Packaged: 2016-03-07 18:50:53 UTC; JLaake
 Repository: CRAN
-Date/Publication: 2015-08-20 19:24:01
+Date/Publication: 2016-03-07 22:31:49
