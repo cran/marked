@@ -119,27 +119,29 @@
 #' be included.
 #' 
 #' To use ADMB (use.admb=TRUE), you need to install: 1) the R package R2admb, 2) ADMB, and 3) a C++ compiler (I recommend gcc compiler).
-#' The following are instructions for installation with Windows. For other operating systems see (http://www.admb-project.org/downloads) and 
-#'  (http://www.admb-project.org/tools/gcc/). 
+#' The following are instructions for installation with Windows. For other operating systems see (\url{http://www.admb-project.org/downloads}) and 
+#'  (\url{http://www.admb-project.org/tools/gcc/}). 
 #' 
 #' Windows Instructions:
 #'
 #'  1) In R use install.packages function or choose Packages/Install Packages from menu and select R2admb.
 #' 
-#'  2) Install ADMB 11: http://admb-project.googlecode.com/files/admb-11-mingw-gcc4.5-32bit.exe. Put the software in C:/admb to
+#'  2) Install ADMB 11: \url{http://www.admb-project.org/downloads}. Put the software in C:/admb to
 #'  avoid problems with spaces in directory name and for the function below to work.
 #' 
-#'  3) Install gcc 4.5 from: http://www.admb-project.org/tools/gcc/gcc452-win32.zip/view. Put in c:/MinGW
+#'  3) Install gcc compiler from: \url{http://www.admb-project.org/tools/gcc/}. Put in c:/MinGW
 #' 
 #' I use the following function in R to setup R2admb to access ADMB rather than adding to my path so gcc versions
 #' with Rtools don't conflict. 
 #' 
+#' \preformatted{
 #' prepare_admb=function()
 #' {
 #'   Sys.setenv(PATH = paste("c:/admb/bin;c:admb/utilities;c:/MinGW/bin;", 
 #'         Sys.getenv("PATH"), sep = ";"))
 #'     Sys.setenv(ADMB_HOME = "c:/admb")
 #'     invisible()
+#' }
 #' }
 #' To use different locations you'll need to change the values used above
 #' 
@@ -177,6 +179,7 @@
 #' @param burnin number of iterations for mcmc burnin; specified default not realistic for actual use
 #' @param iter number of iterations after burnin for mcmc (not realistic default)
 #' @param use.admb if TRUE creates data file for cjs.tpl and runs admb optimizer
+#' @param use.tmb if TRUE runs TMB for cjs
 #' @param crossed if TRUE it uses cjs.tpl or cjs_reml.tpl if reml=FALSE or TRUE respectively; if FALSE, then it uses cjsre which can use Gauss-Hermite integration
 #' @param reml if TRUE uses restricted maximum likelihood
 #' @param compile if TRUE forces re-compilation of tpl file
@@ -185,12 +188,14 @@
 #' @param clean if TRUE, deletes the tpl and executable files for amdb if use.admb=T
 #' @param save.matrices for HMM models this option controls whether the gamma,dmat and delta matrices are saved in the model object
 #' @param simplify if TRUE, design matrix is simplified to unique valus including fixed values
+#' @param getreals if TRUE, compute real values and std errors for TMB models; may want to set as FALSE until model selection is complete
+#' @param check if TRUE values of gamma, dmat and delta are checked to make sure the values are valid with initial parameter values.
 #' @param ... optional arguments passed to js or cjs and optimx
 #' @importFrom graphics boxplot par
 #' @importFrom stats as.formula binomial coef density
 #'             glm.fit median model.frame model.matrix optim
 #'              plogis pnorm predict rgamma rmultinom
-#'              rnorm sd
+#'              rnorm sd nlminb
 #' @importFrom utils capture.output flush.console
 #'             read.delim
 #' @return crm model object with class=("crm",submodel) where submodel is
@@ -257,8 +262,8 @@
 #' }
 crm <- function(data,ddl=NULL,begin.time=1,model="CJS",title="",model.parameters=list(),design.parameters=list(),initial=NULL,
  groups = NULL, time.intervals = NULL,debug=FALSE, method="BFGS", hessian=FALSE, accumulate=TRUE,chunk_size=1e7, 
- control=list(),refit=1,itnmax=5000,scale=NULL,run=TRUE,burnin=100,iter=1000,use.admb=FALSE,crossed=NULL,reml=FALSE,compile=FALSE,extra.args=NULL,
- strata.labels=NULL,clean=TRUE,save.matrices=TRUE,simplify=FALSE,...)
+ control=list(),refit=1,itnmax=5000,scale=NULL,run=TRUE,burnin=100,iter=1000,use.admb=FALSE,use.tmb=FALSE,crossed=NULL,reml=FALSE,compile=FALSE,extra.args=NULL,
+ strata.labels=NULL,clean=NULL,save.matrices=TRUE,simplify=FALSE,getreals=FALSE,check=FALSE,...)
 {
 model=toupper(model)
 ptm=proc.time()
@@ -304,14 +309,39 @@ for (i in 1:length(parameters))
 {
 	if(is.null(parameters[[i]]$formula)) parameters[[i]]$formula=~1
 	mlist=proc.form(parameters[[i]]$formula)
-	if(!is.null(mlist$re.model))re=TRUE
+	
+	if(!is.null(mlist$re.model))
+	{
+		re_names=sub("^\\s+", "",sapply(strsplit(names(mlist$re.model),"\\|"),function(x)x[2]))
+		if(length(re_names)>1 | !"id" %in% re_names) crossed=TRUE  
+		if((length(re_names)> 1 || re_names[1]!="time" ||  use.admb ) & any(data.proc$freq>1)) 
+			stop("\n data cannot be accumulated (freq>1) except with temporal random effects only; set accumulate=FALSE\n")	
+#		else
+#            if(use.tmb & any(data.proc$freq>1))
+#			{
+#				re_names=re_names[re_names!="time"]
+#				if(!all(re_names %in% names(data.proc$data)))
+#				{
+#					cat("\n data cannot be accumulated (freq>1) unless the following fields are in the data\n")
+#					cat(paste(re_names),"\n")
+#					stop()
+#				}
+#			}
+		re=TRUE
+	}
 	if(parameters[[i]]$nointercept)parameters[[i]]$remove.intercept=TRUE
 }
-# currently if re, then set use.admb to TRUE
-if(re) use.admb=TRUE
-if(use.admb & !re) crossed=FALSE
-# if re and accumulate=T, stop with message to use accumulate=FALSE
-if(re & any(data.proc$freq>1)) stop("\n data cannot be accumulated (freq>1) with random effects; set accumulate=FALSE\n")
+# currently if re, then set use.admb to TRUE unless use.tmb=T
+if(re&!use.tmb) {
+	use.admb=TRUE
+	if(is.null(clean))clean=TRUE
+}
+if(use.admb)
+{
+	if( !re) crossed=FALSE
+	if(is.null(clean))clean=TRUE
+}
+if(use.tmb&is.null(clean))clean=FALSE
 #
 # If the design data have not been constructed, do so now
 #
@@ -334,10 +364,60 @@ if(is.null(ddl))
 	design.parameters=ddl$design.parameters
 }
 ddl=set.fixed(ddl,parameters) #   setup fixed values if old way used
-if(simplify & !(substr(model,1,3)=="HMM"|(nchar(model)>=4 &substr(model,1,4)=="MVMS")))
+if(model=="MSCJS"| (substr(model,1,4)=="MVMS" &use.admb)) 
+	ddl=simplify_ddl(ddl,parameters) # add indices to ddl and reduce ddl to unique values used
+if(substr(model,1,4)=="MVMS")
+{
+	if(is.null(ddl$pi$fix))
+		message("\n No values provided for fix for pi. At least need to set a reference cell")
+	else
+	{
+		bad_pi=sapply(split(ddl$pi$fix,ddl$pi$id),function(x){ifelse(any(is.na(x))&!(any(x[!is.na(x)]==1)),TRUE,FALSE)})
+		if(any(bad_pi))message("\n Check values of fix for pi. Reference cell (fix=1) should be set if any are estimated (fix=NA)")
+	}
+	if(is.null(ddl$delta$fix))
+	{
+		message("\n No values provided for fix for delta. At least need to set a reference cell")
+	}else
+	{
+		bad_delta=sapply(split(ddl$delta$fix,list(ddl$delta$id,ddl$delta$occ,ddl$delta$stratum)),function(x){ifelse(any(is.na(x))&!(any(x[!is.na(x)]==1)),TRUE,FALSE)})
+	    if(any(bad_delta))message("\n Check values of fix for delta. Reference cell (fix=1) should be set if any are estimated (fix=NA)")
+	}
+	if(is.null(ddl$Psi$fix))
+	{
+		message("\n No values provided for fix for delta. At least need to set a reference cell")
+	}else
+	{
+		bad_Psi=sapply(split(ddl$Psi$fix,list(ddl$Psi$id,ddl$Psi$occ,ddl$Psi$stratum)),function(x){ifelse(any(is.na(x))&!(any(x[!is.na(x)]==1)),TRUE,FALSE)})
+		if(any(bad_Psi))message("\n Check values of fix for Psi. Reference cell (fix=1) should be set if any are estimated (fix=NA)")
+	}
+}
+if(simplify)
 {
 	simplify=FALSE
-	message("Can only use simplify with HMM models. simplify set to FALSE")
+	message("simplify argument has been disabled")
+}
+#if(simplify & !(substr(model,1,3)=="HMM"|(nchar(model)>=4 &substr(model,1,4)=="MVMS")))
+#{
+#	simplify=FALSE
+#	message("Can only use simplify with HMM models. simplify set to FALSE")
+#}
+# check to see if all values for a parameter have been fixed.  If so, then set formula to ~0
+for (i in 1:length(parameters))
+{
+	if(!is.null(ddl[[i]]$fix))
+	{
+		if(all(!is.na(ddl[[i]]$fix)))
+		{
+			message(paste("All values for",names(parameters)[i],"have been fixed. Setting formula to ~0"))
+			parameters[[i]]$formula=~0
+		} else {
+			if(parameters[[i]]$formula==~0)
+				stop(paste("Cannot use formula ~0 for",names(parameters)[i],"when some of the parameters must be estimated"))
+		}
+	} else
+	   if(parameters[[i]]$formula==~0)
+		   stop(paste("Cannot use formula ~0 for",names(parameters)[i],"when some of the parameters must be estimated"))
 }
 # Create design matrices for each parameter
 dml=create.dml(ddl,model.parameters=parameters,design.parameters=design.parameters,chunk_size=chunk_size,simplify=simplify,use.admb=use.admb)
@@ -364,14 +444,19 @@ if("nlminb"%in%method)
 # Call estimation function which depends on the model
 message("Fitting model\n")
 if(model=="CJS")
-    runmodel=cjs(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
+	if(use.tmb)
+	{
+		runmodel=cjs_tmb(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
+				refit=refit,control=control,itnmax=itnmax,scale=scale,crossed=crossed,compile=compile,extra.args=extra.args,reml=reml,clean=clean,getreals=getreals,...)
+	} else
+		runmodel=cjs(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
 		          refit=refit,control=control,itnmax=itnmax,scale=scale,use.admb=use.admb,crossed=crossed,compile=compile,extra.args=extra.args,reml=reml,clean=clean,...)
 if(model=="JS")
     runmodel=js(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=FALSE,chunk_size=chunk_size,
 		          refit=refit,control=control,itnmax=itnmax,scale=scale,...)
 if(model=="MSCJS")
 	runmodel=mscjs(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
-				   refit=refit,control=control,itnmax=itnmax,scale=scale,use.admb=use.admb,re=re,compile=compile,extra.args=extra.args,clean=clean,...)
+				   refit=refit,control=control,itnmax=itnmax,scale=scale,re=re,compile=compile,extra.args=extra.args,clean=clean,...)
 if(model=="PROBITCJS")
 {
 	if(is.null(initial))
@@ -386,61 +471,81 @@ if(model=="PROBITCJS")
 if(substr(model,1,3)=="HMM"|(nchar(model)>=4 &substr(model,1,4)=="MVMS"))
 {
 	if(substr(model,1,4)=="MVMS")
-	{
-		obslevels=data.proc$ObsLevels
-		sup=data.proc$fct_sup(list(obslevels=obslevels))
-	} else
+		sup=data.proc$fct_sup(list(obslevels=data.proc$ObsLevels))
+	else
 		sup=NULL
 	if(is.null(data.proc$strata.list) | substr(model,1,4)=="MVMS"){
 		mx=data.proc$m
 	}else{
 		mx=list(ns=length(data.proc$strata.list$states),na=length(data.proc$strata.list[[names(data.proc$strata.list)[names(data.proc$strata.list)!="states"]]]))
 	}
-	runmodel=optimx(unlist(initial.list$par),HMMLikelihood,method=method,debug=debug,hessian=hessian,itnmax=itnmax,xx=data.proc$ehmat,mx=mx,
-			        type=initial.list$ptype,T=data.proc$nocc,xstart=data.proc$start,freq=data.proc$freq,control=control,
-				    fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,
-					parameters=parameters,sup=sup)
-	par <- coef(runmodel, order="value")[1, ]
-	runmodel=list(optim.details=as.list(summary(runmodel, order="value",par.select=FALSE)[1, ]))
-	if(hessian)runmodel$hessian=attr(runmodel$optim.details,"details")$nhatend
-	runmodel$convergence=runmodel$optim.details$convcode
-	runmodel$options=list(accumulate=accumulate,initial=initial.list$par,method=method,
-	                		chunk_size=chunk_size,itnmax=itnmax,control=control)
- 	if(save.matrices)
+	if(use.admb & model=="MVMSCJS") 
 	{
-		runmodel$mat=HMMLikelihood(par=par,type=initial.list$ptype,xx=data.proc$ehmat,mx=mx,T=data.proc$nocc,xstart=data.proc$start,freq=data.proc$freq,
-			fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,parameters=parameters,return.mat=TRUE,sup=sup)
-	    if(model=="HMMCJS")
+		# call HMMlikelihood to check for problems in setup
+		xx=HMMLikelihood(par=unlist(initial.list$par),xx=data.proc$ehmat,mx=mx,
+				type=initial.list$ptype,T=data.proc$nocc,xstart=data.proc$start,freq=data.proc$freq,
+				fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,
+				parameters=parameters,sup=sup,check=TRUE)
+		# call mvmscjs to run admb program
+		runmodel=mvmscjs(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
+				refit=refit,control=control,itnmax=itnmax,scale=scale,re=re,compile=compile,extra.args=extra.args,clean=clean,sup=sup,...)
+		par=coef(runmodel)[,1]
+		runmodel$options=c(runmodel$options,list(accumulate=accumulate,initial=initial.list$par,method=method,
+				chunk_size=chunk_size,itnmax=itnmax,control=control))
+		
+	} else
+	{
+		xx=HMMLikelihood(par=unlist(initial.list$par),xx=data.proc$ehmat,mx=mx,
+				type=initial.list$ptype,T=data.proc$nocc,xstart=data.proc$start,freq=data.proc$freq,
+				fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,
+				parameters=parameters,sup=sup,check=TRUE)
+		runmodel=optimx(unlist(initial.list$par),HMMLikelihood,method=method,debug=debug,hessian=hessian,itnmax=itnmax,xx=data.proc$ehmat,mx=mx,
+				type=initial.list$ptype,T=data.proc$nocc,xstart=data.proc$start,freq=data.proc$freq,control=control,
+				fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,
+				parameters=parameters,sup=sup,check=FALSE)
+		par=coef(runmodel, order="value")[1, ]
+		runmodel=list(optim.details=as.list(summary(runmodel, order="value",par.select=FALSE)[1, ]))
+		if(hessian)runmodel$hessian=attr(runmodel$optim.details,"details")$nhatend
+		runmodel$convergence=runmodel$optim.details$convcode
+		runmodel$options=list(accumulate=accumulate,initial=initial.list$par,method=method,
+				chunk_size=chunk_size,itnmax=itnmax,control=control)
+	}
+		if(save.matrices)
 		{
-			dimnames(runmodel$mat$gamma)[3:4]=list(c("Alive","Dead"),c("Alive","Dead"))
-			dimnames(runmodel$mat$dmat)[3:4]=list(c("Missed","Seen"),c("Alive","Dead"))
-		}else
-		{
-			dimnames(runmodel$mat$gamma)[3:4]=list(c(data.proc$strata.labels,"Dead"),c(data.proc$strata.labels,"Dead"))
-			dimnames(runmodel$mat$dmat)[3:4]=list(data.proc$ObsLevels,c(data.proc$strata.labels,"Dead"))
+			runmodel$mat=HMMLikelihood(par=par,type=initial.list$ptype,xx=data.proc$ehmat,mx=mx,T=data.proc$nocc,xstart=data.proc$start,freq=data.proc$freq,
+					fct_dmat=data.proc$fct_dmat,fct_gamma=data.proc$fct_gamma,fct_delta=data.proc$fct_delta,ddl=ddl,dml=dml,parameters=parameters,return.mat=TRUE,sup=sup)
+			if(model=="HMMCJS")
+			{
+				dimnames(runmodel$mat$gamma)[3:4]=list(c("Alive","Dead"),c("Alive","Dead"))
+				dimnames(runmodel$mat$dmat)[3:4]=list(c("Missed","Seen"),c("Alive","Dead"))
+			}else
+			{
+				dimnames(runmodel$mat$gamma)[3:4]=list(c(data.proc$strata.labels,"Dead"),c(data.proc$strata.labels,"Dead"))
+				dimnames(runmodel$mat$dmat)[3:4]=list(data.proc$ObsLevels,c(data.proc$strata.labels,"Dead"))
+			}
+			names(dimnames(runmodel$mat$gamma))=c("Id","Occasion","From_state","To_state")
+			names(dimnames(runmodel$mat$dmat))=c("Id","Occasion","Observation","State")
 		}
-		names(dimnames(runmodel$mat$gamma))=c("Id","Occasion","From_state","To_state")
-		names(dimnames(runmodel$mat$dmat))=c("Id","Occasion","Observation","State")
-    }
-	parlist=split(par,initial.list$ptype)
-	par=vector("list",length=length(names(initial.list$par)))
-	names(par)=names(initial.list$par)
-	for(p in names(parlist))
-	{
-		par[[p]]=parlist[[p]]
-		names(par[[p]])=colnames(dml[[p]]$fe)	
-	}
-	runmodel$beta=par
-	runmodel$par=NULL
-	runmodel$neg2lnl=2*runmodel$optim.details$value
-	runmodel$AIC=runmodel$neg2lnl+2*sum(sapply(runmodel$beta,length))
-	if(!is.null(runmodel$hessian))
-	{
-		runmodel$beta.vcv=solvecov(runmodel$hessian)$inv
-		colnames(runmodel$beta.vcv)=names(unlist(runmodel$beta))
-		rownames(runmodel$beta.vcv)=colnames(runmodel$beta.vcv)
-	}
-	class(runmodel)=c("crm","mle",model)
+		parlist=split(par,initial.list$ptype)
+		par=vector("list",length=length(names(initial.list$par)))
+		names(par)=names(initial.list$par)
+		for(p in names(parlist))
+		{
+			par[[p]]=parlist[[p]]
+			names(par[[p]])=colnames(dml[[p]]$fe)	
+		}
+		runmodel$beta=par
+		runmodel$par=NULL
+		if(is.null(runmodel$neg2lnl)) 
+			runmodel$neg2lnl=2*runmodel$optim.details$value
+		runmodel$AIC=runmodel$neg2lnl+2*sum(sapply(runmodel$beta,length))
+		if(!is.null(runmodel$hessian))
+		{
+			runmodel$beta.vcv=solvecov(runmodel$hessian)$inv
+			colnames(runmodel$beta.vcv)=names(unlist(runmodel$beta))
+			rownames(runmodel$beta.vcv)=colnames(runmodel$beta.vcv)
+		}
+		class(runmodel)=c("crm","mle",model)
 }
 #
 # Return fitted MARK model object or if external, return character string with same class and save file
@@ -460,7 +565,7 @@ cat(paste("\nElapsed time in minutes: ",round((proc.time()[3]-ptm[3])/60,digits=
 return(object)
 }
 # solvecov code was taken from package fpc: Christian
-# Hennig chrish@@stats.ucl.ac.uk http://www.homepages.ucl.ac.uk/~ucakche/
+# Hennig <chrish@@stats.ucl.ac.uk> \url{http://www.homepages.ucl.ac.uk/~ucakche/}
 solvecov=function (m, cmax = 1e+10)
 # from package fpc
 {

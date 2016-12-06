@@ -87,6 +87,9 @@ create.dm=function(x, formula, time.bins=NULL, cohort.bins=NULL, age.bins=NULL, 
       x$age=facage
    }
 #  Create design matrix from formula and data; do so based on chunks of data to reduce space requirements
+   vars=all.vars(formula)
+   for(i in seq_along(vars))
+	   if(!vars[i]%in%colnames(x)) stop(paste("\n",vars[i]," variable used in formula, not found in data\n"))
    mm=model.matrix(formula,x[1:(nrow(x)/10),,drop=FALSE])
    npar=ncol(mm)
    nrows=nrow(x)
@@ -106,28 +109,46 @@ create.dm=function(x, formula, time.bins=NULL, cohort.bins=NULL, age.bins=NULL, 
 		  if(i==1)
 		  {
 			  dm=as(model.matrix(formula,x[lower:upper,,drop=FALSE]),"sparseMatrix") 
-#			  dm[lower:upper,]=mm
-		  } else
-		dm=rBind(dm,as(model.matrix(formula,x[lower:upper,,drop=FALSE]),"sparseMatrix"))
-#		dm[lower:upper,]=as(model.matrix(formula,x[lower:upper,,drop=FALSE]),"sparseMatrix") 
+			  if(!is.null(x$fix)&&any(!is.na(x$fix)))
+				  dm[!is.na(x$fix[lower:upper]),]=0
+			  drop=apply(dm,2,function(x) all(x==0))
+		  } else {
+			  dm1=as(model.matrix(formula,x[lower:upper,,drop=FALSE]),"sparseMatrix")
+			  if(!is.null(x$fix)&&any(!is.na(x$fix)))
+				  dm1[!is.na(x$fix[lower:upper]),]=0
+			  drop=drop&apply(dm1,2,function(x) all(x==0))
+			  dm=rBind(dm,dm1)
+		  }
 	  }
    }
    if(upper<nrow(x))
 	   if(is.null(dm))
+	   {
 		   dm=as(model.matrix(formula,x[(upper+1):nrow(x),,drop=FALSE]),"sparseMatrix")
+		   if(!is.null(x$fix)&&any(!is.na(x$fix)))
+			   dm[!is.na(x$fix[(upper+1):nrow(x)]),]=0
+		   drop=apply(dm,2,function(x) all(x==0))
+	   }
 	   else
-	      dm=rBind(dm,as(model.matrix(formula,x[(upper+1):nrow(x),,drop=FALSE]),"sparseMatrix")) 
+	   {
+		   dm1=as(model.matrix(formula,x[(upper+1):nrow(x),,drop=FALSE]),"sparseMatrix")
+		   if(!is.null(x$fix)&&any(!is.na(x$fix)))
+			   dm1[!is.na(x$fix[(upper+1):nrow(x)]),]=0
+		   drop=drop&apply(dm1,2,function(x) all(x==0))
+		   dm=rBind(dm,dm1) 
+	   }
 #   dm[(upper+1):nrow(x),]=as(model.matrix(formula,x[(upper+1):nrow(x),,drop=FALSE]),"sparseMatrix")    
    colnames(dm)=colnames(mm)
 #  Remove any unused columns; this is slower but uses less memory
    if(remove.unused.columns)
    {
-	   select=vector("logical",length=npar)
-	   for (i in 1:npar)
-		   select[i]=any(dm[,i]!=0)
-	   if(!is.null(remove.intercept)&&remove.intercept)select[1]=FALSE 
+#	   select=vector("logical",length=npar)
+#	   for (i in 1:npar)
+#		   select[i]=any(dm[,i]!=0)
+	   if(!is.null(remove.intercept)&&remove.intercept)drop[1]=TRUE 
 #      Return dm with selected columns
-	   return(dm[,select,drop=FALSE])
+       return(dm[,!drop,drop=FALSE])
+#	   return(dm[,select,drop=FALSE])
    } else
    {
 	   return(dm)
@@ -150,30 +171,42 @@ create.dml=function(ddl,model.parameters,design.parameters,restrict=FALSE,chunk_
 			dml[[i]]=list(fe=NULL,re=NULL)
 		    next
 		}
-		dml[[i]]$fe=create.dm(dd,as.formula(mlist$fix.model),design.parameters[[pn]]$time.bins,
-				design.parameters[[pn]]$cohort.bins,design.parameters[[pn]]$age.bins,chunk_size=chunk_size,model.parameters[[i]]$remove.intercept,
-			    remove.unused.columns=remove.unused.columns)
-		if(simplify)
+		if(as.formula(mlist$fix.model)!=~0)
 		{
-			dml[[i]]$indices=realign.pims(dml[[i]]$fe)
-			dml[[i]]$fe=dml[[i]]$fe[dml[[i]]$indices,,drop=FALSE]
-		} 
-		# if some reals are fixed, assign 0 to rows of dm and then
-		# remove any columns (parameters) that are all 0.
-		if(!is.null(dd$fix)&&any(!is.na(dd$fix)))
-		{
-#			dml[[i]]$fe[!is.na(dd$fix),]=0
-			zeros=Matrix(rep(as.numeric(is.na(dd$fix)),each=ncol(dml[[i]]$fe)),byrow=T,ncol=ncol(dml[[i]]$fe),nrow=nrow(dml[[i]]$fe))
-			dml[[i]]$fe=dml[[i]]$fe*zeros
-			dml[[i]]$fe=dml[[i]]$fe[,apply(dml[[i]]$fe,2,function(x) any(x!=0)),drop=FALSE]
-		}
-		if(!is.null(mlist$re.model))
-		{
-			if(use.admb)
-				dml[[i]]$re=mixed.model.admb(model.parameters[[i]]$formula,dd)
+			dml[[i]]$fe=create.dm(dd,as.formula(mlist$fix.model),design.parameters[[pn]]$time.bins,
+					design.parameters[[pn]]$cohort.bins,design.parameters[[pn]]$age.bins,chunk_size=chunk_size,model.parameters[[i]]$remove.intercept,
+					remove.unused.columns=remove.unused.columns)
+#			if(simplify)
+#			{
+#				dml[[i]]$indices=realign.pims(dml[[i]]$fe)
+#				dml[[i]]$fe=dml[[i]]$fe[dml[[i]]$indices,,drop=FALSE]
+#			} 
+			# if some reals are fixed, assign 0 to rows of dm and then
+			# remove any columns (parameters) that are all 0.
+#			if(!is.null(dd$fix)&&any(!is.na(dd$fix)))
+#			{
+#  			    dml[[i]]$fe[!is.na(dd$fix),]=0
+#				zeros=Matrix(rep(as.numeric(is.na(dd$fix)),each=ncol(dml[[i]]$fe)),byrow=T,ncol=ncol(dml[[i]]$fe),nrow=nrow(dml[[i]]$fe))
+#				dml[[i]]$fe=dml[[i]]$fe*zeros
+#			    drop=rep(FALSE,ncol(dml[[i]]$fe))
+#			    for(j in 1:ncol(dml[[i]]$fe))
+#					drop[j]=all(dml[[i]]$fe[,j]==0)
+#				dml[[i]]$fe=dml[[i]]$fe[,!drop,drop=FALSE]
+#				
+#				dml[[i]]$fe=dml[[i]]$fe[,apply(dml[[i]]$fe,2,function(x) any(x!=0)),drop=FALSE]
+#			}
+			if(!is.null(mlist$re.model))
+			{
+				if(use.admb)
+					dml[[i]]$re=mixed.model.admb(model.parameters[[i]]$formula,dd)
+				else
+					dml[[i]]$re=mixed.model(model.parameters[[i]]$formula,dd)
+			}	
+		} else
+			if(!is.null(dd))
+			   dml[[i]]=list(fe=matrix(NA,nrow=nrow(dd),ncol=0),re=NULL)
 		    else
-				dml[[i]]$re=mixed.model(model.parameters[[i]]$formula,dd)
-		}
+			   dml[[i]]=NA
 	}
 	return(dml)
 }

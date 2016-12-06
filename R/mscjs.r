@@ -32,13 +32,12 @@
 #' @param itnmax maximum number of iterations
 #' @param control control string for optimization functions
 #' @param scale vector of scale values for parameters
-#' @param use.admb if TRUE creates data file for admbcjs.tpl and runs admb optimizer
 #' @param re if TRUE creates random effect model admbcjsre.tpl and runs admb optimizer
 #' @param compile if TRUE forces re-compilation of tpl file
-#' @param extra.args optional character string that is passed to admb if use.admb==TRUE
-#' @param clean if TRUE, deletes the tpl and executable files for amdb if use.admb=T
-#' @param ... any remaining arguments are passed to additional parameters
-#' passed to \code{optim} or \code{\link{cjs.lnl}}
+#' @param extra.args optional character string that is passed to admb 
+#' @param clean if TRUE, deletes the tpl and executable files for amdb 
+#' @param ... not currently used
+#' @export
 #' @import R2admb
 #' @return The resulting value of the function is a list with the class of
 #' crm,cjs such that the generic functions print and coef can be used.
@@ -51,10 +50,85 @@
 #' \item{vcv}{var-cov matrix of betas if hessian=TRUE was set}
 #' @author Jeff Laake <jeff.laake@@noaa.gov>
 #' @references Ford, J. H., M. V. Bravington, and J. Robbins. 2012. Incorporating individual variability into mark-recapture models. Methods in Ecology and Evolution 3:1047-1054.
-#' 
+#' @examples 
+#' \donttest{
+#' # this example requires admb
+#' # The same example is in the RMark package and it is included here to
+#' # illustrate the differences in the handling of mlogit parameters between RMark 
+#' # and marked.  The MARK software handles parameters like Psi which must sum to 1
+#' # by excluding one of the cells that is used as a reference cell and is computed by
+#' # subtracting the other cell values from 1 so the total sums to 1.  This is often
+#' # handled with an mlogit parameter in which the cell values are exp(beta) and the
+#' # reference cell is set to 1 and the values are divided by the sum across the cells
+#' # so the resulting values are probabilities that sum to 1. In marked, instead of removing
+#' # one of the cells, all are included and the user must select which should be the
+#' # reference cell by setting the value fix=1 for that cell and others are NA so they are
+#' # estimated. For transition parameters like Psi, the default design data is setup so 
+#' # that the probability of remaining in the cell (stratum=tostratum) is the reference cell
+#' # and fix set to 1.  Thus, this means 2 changes are needed to the script in RMark.
+#' # The first is to remove the statement skagit.ddl$Psi$fix=NA because that over-rides
+#' # the default fix values.  The other is to add
+#' # skagit.ddl$Psi$fix[skagit.ddl$Psi$stratum=="B"&skagit.ddl$Psi$tostratum=="B"&
+#' #  skagit.ddl$Psi$time==5]=0
+#' # to change the value from 1 to 0 which forces movement from B to A in the interval 5 to 6. If
+#' # this is not done then Psi B to B=Psi B to A=0.5 because each is 1 and when they are normalized
+#' # they are divided by the sum which is 2 (1/2).
+#' if(class(try(setup_admb("mscjs")))!="try-error")
+#' {
+#' data(skagit)
+#' skagit.processed=process.data(skagit,model="Mscjs",groups=c("tag"),strata.labels=c("A","B"))
+#'skagit.ddl=make.design.data(skagit.processed)
+#'#
+#'# p
+#'#
+#'# Can't be seen at 5A or 2B,6B (the latter 2 don't exist)
+#'skagit.ddl$p$fix=ifelse((skagit.ddl$p$stratum=="A"&skagit.ddl$p$time==5) | 
+#' (skagit.ddl$p$stratum=="B"&skagit.ddl$p$time%in%c(2,6)),0,NA)
+#'# Estimated externally from current data to allow estimation of survival at last interval
+#'skagit.ddl$p$fix[skagit.ddl$p$tag=="v7"&skagit.ddl$p$time==6&skagit.ddl$p$stratum=="A"]=0.687
+#'skagit.ddl$p$fix[skagit.ddl$p$tag=="v9"&skagit.ddl$p$time==6&skagit.ddl$p$stratum=="A"]=0.975
+#'#
+#'# Psi
+#'#
+#'# only 3 possible transitions are A to B at time interval 2 to 3 and 
+#'# for time interval 3 to 4 from A to B and from B to A
+#'# rest are fixed values
+#'############ change for RMark to marked; remove next line
+#'#skagit.ddl$Psi$fix=NA
+#'# stay in A for intervals 1-2, 4-5 and 5-6
+#'skagit.ddl$Psi$fix[skagit.ddl$Psi$stratum=="A"&
+#'  skagit.ddl$Psi$tostratum=="B"&skagit.ddl$Psi$time%in%c(1,4,5)]=0
+#'# stay in B for interval 4-5
+#'skagit.ddl$Psi$fix[skagit.ddl$Psi$stratum=="B"&skagit.ddl$Psi$tostratum=="A"
+#'  &skagit.ddl$Psi$time==4]=0
+#'# leave B to go to A for interval 5-6
+#'skagit.ddl$Psi$fix[skagit.ddl$Psi$stratum=="B"&skagit.ddl$Psi$tostratum=="A"&
+#' skagit.ddl$Psi$time==5]=1
+#'############ change for RMark to marked; add next line to set B to B to 0 otherwise it has
+#'############ been set to 1 by default which would make psi B to B = psi B to A = 0.5
+#'skagit.ddl$Psi$fix[skagit.ddl$Psi$stratum=="B"&skagit.ddl$Psi$tostratum=="B"&
+#' skagit.ddl$Psi$time==5]=0
+#'# "stay" in B for interval 1-2 and 2-3 because none will be in B
+#'skagit.ddl$Psi$fix[skagit.ddl$Psi$stratum=="B"&skagit.ddl$Psi$tostratum=="A"&
+#' skagit.ddl$Psi$time%in%1:2]=0
+#'# 
+#'# S
+#'#
+#'# None in B, so fixing S to 1
+#'skagit.ddl$S$fix=ifelse(skagit.ddl$S$stratum=="B"&skagit.ddl$S$time%in%c(1,2),1,NA)
+#'skagit.ddl$S$fix[skagit.ddl$S$stratum=="A"&skagit.ddl$S$time==4]=1
+#'# fit model
+#'p.timexstratum.tag=list(formula=~time:stratum+tag,remove.intercept=TRUE)
+#'Psi.sxtime=list(formula=~-1+stratum:time)
+#'S.stratumxtime=list(formula=~-1+stratum:time)
+#'#
+#'mod1=crm(skagit.processed,skagit.ddl,
+#' model.parameters=list(S=S.stratumxtime,p= p.timexstratum.tag,Psi=Psi.sxtime),hessian=TRUE)
+#' if(class(mod1)[1]!="try-error") mod1
+#'} }
 mscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL,method,
 		hessian=FALSE,debug=FALSE,chunk_size=1e7,refit,itnmax=NULL,control=NULL,scale,
-		use.admb=FALSE,re=FALSE,compile=FALSE,extra.args="",clean=TRUE,...)
+		re=FALSE,compile=FALSE,extra.args="",clean=TRUE,...)
 {
 	accumulate=FALSE
 	nocc=x$nocc
@@ -67,8 +141,6 @@ mscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL
 		time.intervals=matrix(x$time.intervals,nrow=nrow(x$data),ncol=nocc-1,byrow=TRUE)
 	else
 		time.intervals=x$time.intervals
-#  Create fixed matrices in parameters
-	parameters=create.fixed.matrix(ddl,parameters)
 #  Store data from x$data into x
 	strata.labels=x$strata.labels
 	uS=x$unobserved
@@ -107,40 +179,17 @@ mscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL
 #   p.links=create.links(p.dm)
 #   p.links=which(p.links==1)
 #  Scale the design matrices and parameters with either input scale or computed scale
-    use.admb=TRUE
     scale=1
 	scale=set.scale(names(dml),model_data,scale)
 	model_data=scale.dm(model_data,scale)
-	if(R.Version()$os=="mingw32")
-		ext=".exe"
-	else
-		ext=""
-	# see if admb can be found; this is not a complete test but should catch the novice user who has
-	# not setup admb at all
-    if(Sys.which(paste("tpl2cpp",ext,sep=""))=="") 
-	    stop("admb not found; setup links to admb and c++ compiler with environment variables or put in path")
-	sdir=system.file(package="marked")
-	# if multistate.tpl is not available copy from the package directory
+	# setup tpl to be multistate.tpl 
 	if(!re)
 		tpl="multistate"
 	else
-	{
-		tpl="notdone"
-		if(!hessian)message("ignoring hessian setting; set to TRUE")
-		hessian=TRUE
-	}
-    # cleanup any leftover admbcjs files
-	clean_admb(tpl)
-	# if argument clean is TRUE, delete exe and TPL files as well
-	if(clean)
-	{
-		if(file.exists(paste(tpl,".tpl",sep=""))) unlink(paste(tpl,".tpl",sep=""))
-		if(file.exists(paste(tpl,ext,sep=""))) unlink(paste(tpl,ext,sep=""))
-	}
-	if(!file.exists(paste(tpl,".tpl",sep="")))
-		file.copy(file.path(sdir,paste(tpl,".tpl",sep="")),file.path(getwd(),paste(tpl,".tpl",sep="")),overwrite=TRUE)
-	if(!file.exists(paste(tpl,ext,sep=""))|compile)
-		compile_admb(tpl,re=re)
+		stop("random effect portion not completed for this model")
+	# setup admb exe and cleanup old files and previous tpl; checks for exe 
+	# in package directory and if found uses it otherwise compiles tpl file
+	setup_admb(tpl,compile,clean,re=FALSE)
 	# create .dat file to write its contents 
 	con=file(paste(tpl,".dat",sep=""),open="wt")
 	# Number of observations
@@ -150,9 +199,8 @@ mscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL
 	nocc=model_data$imat$nocc
 	write(nocc,con,append=TRUE)
 	# Number of states
-	write(length(strata.labels),con,append=TRUE)
-	# Number of unobserved states
-	write(uS,con,append=TRUE)
+    nS=length(strata.labels)
+	write(nS,con,append=TRUE)
 	# capture history matrix
 	write(t(chmat),con,ncolumns=nocc,append=TRUE)
 	# first occasions seen 
@@ -167,30 +215,40 @@ mscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL
 	}
 	write(t(model_data$time.intervals),con,ncolumns=nocc-1,append=TRUE)
 	# S design matrix
-	write(ncol(model_data$S.dm),con,append=TRUE)
-	write(t(model_data$S.dm),con,ncolumns=ncol(model_data$S.dm),append=TRUE)
-	# p design matrix
-    # zero out dm if any unobserved stratum; only done to remove unneeded columns
-    if(uS>0)
-	{
-		model_data$p.dm[as.numeric(ddl$p$stratum)>=(length(strata.labels)-uS),]=0
-		select=vector("logical",length=ncol(model_data$p.dm))
-		for (i in 1:ncol(model_data$p.dm))
-			select[i]=any(model_data$p.dm[,i]!=0)
-		model_data$p.dm=model_data$p.dm[,select,drop=FALSE]
-	}
-    write(ncol(model_data$p.dm),con,append=TRUE)
-	write(t(model_data$p.dm),con,ncolumns=ncol(model_data$p.dm),append=TRUE)
-	# Psi design matrix
-	# zero out subtracted stratum and remove any unneeded columns
-    model_data$Psi.dm[!is.na(ddl$Psi$fix),]=0
-	select=vector("logical",length=ncol(model_data$Psi.dm))
-	for (i in 1:ncol(model_data$Psi.dm))
-		select[i]=any(model_data$Psi.dm[,i]!=0)
-	model_data$Psi.dm=model_data$Psi.dm[,select,drop=FALSE]
-	write(ncol(model_data$Psi.dm),con,append=TRUE)
-	write(t(model_data$Psi.dm),con,ncolumns=ncol(model_data$Psi.dm),append=TRUE)
+    phidm=as.matrix(model_data$S.dm)
+    phifix=rep(-1,nrow(phidm))
+	if(!is.null(ddl$S$fix))
+	   phifix[!is.na(ddl$S$fix)]=ddl$S$fix[!is.na(ddl$S$fix)]
+    slist=simplify_indices(cbind(phidm,phifix))
+    write(ncol(phidm),con,append=TRUE)
+    write(length(slist$set),con,append=TRUE)
+    write(t(phidm[slist$set,,drop=FALSE]),con,ncolumns=ncol(phidm),append=TRUE)
+    write(phifix[slist$set],con,append=TRUE)
+    write(slist$indices[ddl$S.indices],con,append=TRUE)
+ 	# p design matrix
+	pdm=as.matrix(model_data$p.dm)
+	pfix=rep(-1,nrow(pdm))
+	if(!is.null(ddl$p$fix))
+		pfix[!is.na(ddl$p$fix)]=ddl$p$fix[!is.na(ddl$p$fix)]
+	slist=simplify_indices(cbind(pdm,pfix))
+	write(ncol(pdm),con,append=TRUE)
+	write(length(slist$set),con,append=TRUE)
+	write(t(pdm[slist$set,,drop=FALSE]),con,ncolumns=ncol(pdm),append=TRUE)
+	write(pfix[slist$set],con,append=TRUE)
+	write(slist$indices[ddl$p.indices],con,append=TRUE)
+	#Psi design matrix
+	psidm=as.matrix(model_data$Psi.dm)
+	psifix=rep(-1,nrow(psidm))
+	if(!is.null(ddl$Psi$fix))
+	psifix[!is.na(ddl$Psi$fix)]=ddl$Psi$fix[!is.na(ddl$Psi$fix)]
+    slist=simplify_indices(cbind(psidm,psifix))
+    write(ncol(psidm),con,append=TRUE)
+    write(length(slist$set),con,append=TRUE)
+    write(t(psidm[slist$set,,drop=FALSE]),con,ncolumns=ncol(psidm),append=TRUE)
+    write(psifix[slist$set],con,append=TRUE)
+    write(slist$indices[ddl$Psi.indices],con,append=TRUE)
 	close(con)
+#   write out initial values for betas
 	con=file(paste(tpl,".pin",sep=""),open="wt")
 	write(par$S,con,ncolumns=length(par$S),append=FALSE)
 	write(par$p,con,ncolumns=length(par$p),append=TRUE)

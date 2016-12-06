@@ -1,3 +1,55 @@
+marked 1.1.13 5 December 2016
+-----------------
+BUG FIXES
+
+* patched mvms.f for non-admb version of MVMSCJS. Code had an incorrect index that only worked if delta did not vary by individual.
+
+* patched mvmscjs.r so that it allows ~0 for delta (all fixed values) in the ADMB version. Also, now all Psi can be fixed as well.
+
+CHANGES
+
+* added returns to output when debug=T for MVMS so warning about last line incomplete should not appear.
+
+* added checks HMMLikelihood to outline errors when dmat, gamma or delta are not formed correctly. Typically this will be due to fix values being set incorrectly. Also, HMMLikelihood is now called prior to mvmscjs to check for those errors to avoid putting checks in ADMB code as well.
+
+marked 1.1.12 26 September 2016
+-----------------
+NEW FEATURES
+
+* parameter pi has been added to MVMSCJS model. Including pi allows the initial 
+state at release to be uncertain. See ?initiate_pi for more details. initiate_pi is called
+from make.design.data for MVMSCJS models so existing code can be run without modification.
+
+* modified mscjs and multistate.tpl file so fixed parameters can be included and design
+matrix can be simplified to speed up execution times.
+
+* added function setup_admb to simplify calling code like cjs and mscjs and standardize handling
+of compile, clean arguments and use of existing admb executables in the marked package directory.
+
+* created an ADMB version of the mvms model with simplified design matrix to speed up execution times. The sealion example runs in 1/10 of the time if use.admb=TRUE is set.
+
+* created a TMB version of cjs models that provides real predictions with std errors and is much faster fitting random effects.  It allows accumulation of capture histories for time random effects or if group effects included in data.
+
+CHANGES
+
+
+* pull request merged from Brett McClintock for probit.cjs. Changes Bayesian updating.
+
+* all values for a parameter can be fixed (e.g., S=1 or delta=1). This used to cause problems but now if
+all values are fixed, a message is given that the formula is being reset to ~0 which has no parameters. Likewise,
+if formula is ~0 and not all values are fixed then an error is generated. 
+
+* The above change made it possible to allow an mvmscjs specification in which all states are certain. In which case,
+no design data is generated for the delta parameter.
+
+* global_decode now requires ddl argument to be specified and does not compute on the fly.
+
+* changed AIC calculation for models with random effects to use only number of fixed effect estimates plus number of random effect sigma values.
+
+BUG FIXES
+
+* patched mvms.f which had a bad index. Only worked if delta did not vary by individual. 
+
 marked 1.1.11 7 March 2016
 -----------------
 
@@ -7,7 +59,7 @@ NEW FEATURES
 
 BUG FIXES
 
-* patched create.dm which was leaving out one record when chunking through design data. This cased failure when using splines.
+* patched create.dm which was leaving out one record when chunking through design data. This caused failure when using splines.
 
 * beta v-c matrix not being properly stored on CJS with use.admb=TRUE
 

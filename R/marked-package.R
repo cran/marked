@@ -127,7 +127,7 @@ NULL
 #' # parameter the intercept is removed automatically. Also tag loss is independent in this
 #' # model.
 #' mod0=crm(dp,ddl,model.parameters=list(tau=list(formula=~I(tag1+tag2))),
-#'         initial=list(Phi=2,p=.3,tau=c(-2)),hessian=TRUE)
+#'         initial=list(Phi=2,p=.3,tau=c(-1)),hessian=TRUE)
 #' # now fit a model allowing different loss rates for each tag but still independent
 #' mod1=crm(dp,ddl,model.parameters=list(tau=list(formula=~tag1+tag2)),
 #'         initial=list(Phi=2,p=.3,tau=c(-2,-1)),hessian=TRUE)
@@ -286,10 +286,49 @@ NULL
 #' Phi.1=list(formula=~sex*bs(Age)+pup:weight+area)
 #' 
 #' # Fit model - commented out because it takes >1hr to run
-#' # mod=crm(dp,ddl,model.parameters=list(Psi=Psi.1,p=p.1,delta=delta.1,Phi=Phi.1,hessian=TRUE)
+#' # mod=crm(dp,ddl,model.parameters=list(Psi=Psi.1,p=p.1,delta=delta.1,Phi=Phi.1),hessian=TRUE)
 #' }
 NULL
 
-
+#' An example of the Mulstistrata (multi-state) model in which states are routes taken by migrating fish.
+#' 
+#' @name skagit
+#' @docType data
+#' @format A data frame with 100 observations on the following 2 variables.
+#' \describe{ \item{ch}{capture history} 
+#'  \item{tag}{tag type v7 or v9}
+#' }
+#' @keywords datasets
+#' @author Megan Moore <megan.moore at noaa.gov> 
+#' @examples
+#'# There are just two states which correspond to route A and route B. There are 6 occasions
+#'# which are the locations rather than times. After release at 1=A there is no movement 
+#'# between states for the first segment, fish are migrating downriver together and all pass 2A. 
+#'# Then after occasion 2, migrants go down the North Fork (3A) or the South Fork (3B), 
+#'# which both empty into Skagit Bay. Once in saltwater, they can go north to Deception Pass (4A)
+#'# or South to a receiver array exiting South Skagit Bay (4B). Fish in route A can then only go
+#'# to the Strait of Juan de Fuca, while fish in route B must pass by Admiralty Inlet (5B). 
+#'# Then both routes end with the array at the Strait of Juan de Fuca.
+#'#
+#'#       1A
+#'#        |
+#'#        2A
+#'#      /     \
+#'#    3A        3B
+#'#   /  \      /  \ 
+#'# 4A   4B    4A  4B       
+#'#  |     \    /   |
+#'#   5A    5B  5A   5B
+#'#      \   \   /    /
+#'#            6
+#'# 
+#'# from 3A and 3B they can branch to either 4A or 4B; branches merge at 6  
+#'# 5A does not exist so p=0; only survival from 4A to 6 can be 
+#'# estimated which is done by setting survival from 4A to 5A to 1 and
+#'# estimating survival from 5A to 6 which is then total survival from 4A to 6.
+#' 
+#'# See help for mscjs for an example that explains difference between marked and RMark
+#'# with regard to treatment of mlogit parameters like Psi.
+NULL
 
 
