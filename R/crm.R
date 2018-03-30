@@ -12,11 +12,9 @@
 #' in the specified model, 3) \code{\link{create.dm}} to create the design
 #' matrices for each parameter based on the formula provided for each
 #' parameter, 4) call to the specific function for model fitting (now either
-#' \code{\link{cjs}} or \code{\link{js}}). As with \code{mark} the calling
+#' \code{\link{cjs_admb}} or \code{\link{js}}). As with \code{mark} the calling
 #' arguments for \code{crm} are a compilation of the calling arguments for each
-#' of the functions it calls (with some arguments renamed to avoid conflicts).
-#' If data is a processed dataframe (see \code{\link{process.data}}) then it
-#' expects to find a value for \code{ddl}.  Likewise, if the data have not been
+#' of the functions it calls (with some arguments renamed to avoid conflicts).#' expects to find a value for \code{ddl}.  Likewise, if the data have not been
 #' processed, then \code{ddl} should be NULL.  This dual calling structure
 #' allows either a single call approach for each model or alternatively for the
 #' data to be processed and the design data (\code{ddl}) to be created once and
@@ -26,7 +24,7 @@
 #' control other aspects of the optimization.  The optimization is done with
 #' the R package/function \code{optimx} and the arguments \code{method} and
 #' \code{hessian} are described with the help for that function.  In addition,
-#' any arguments not matching those for \code{cjs} (the ...) are passed to
+#' any arguments not matching those for \code{cjs_admb} (the ...) are passed to
 #' \code{optimx} allowing any of the other parameters to be set.  If you set
 #' \code{debug=TRUE}, then at each function evaluation (\code{\link{cjs.lnl}}
 #' the current values of the parameters and -2*log-likelihood value are output.
@@ -190,6 +188,8 @@
 #' @param simplify if TRUE, design matrix is simplified to unique valus including fixed values
 #' @param getreals if TRUE, compute real values and std errors for TMB models; may want to set as FALSE until model selection is complete
 #' @param check if TRUE values of gamma, dmat and delta are checked to make sure the values are valid with initial parameter values.
+#' @param prior if TRUE will expect vectors of prior values in list prior.list; currently only implemented for cjsre_tmb
+#' @param prior.list which contains list of prior parameters that will be model dependent
 #' @param ... optional arguments passed to js or cjs and optimx
 #' @importFrom graphics boxplot par
 #' @importFrom stats as.formula binomial coef density
@@ -203,8 +203,8 @@
 #' @author Jeff Laake
 #' @export crm
 #' @import optimx Matrix Rcpp numDeriv
-#' @useDynLib marked
-#' @seealso \code{\link{cjs}}, \code{\link{js}},
+#' @useDynLib marked,  .registration = TRUE
+#' @seealso \code{\link{cjs_admb}}, \code{\link{js}},
 #' \code{\link{make.design.data}},\code{\link{process.data}}
 #' @keywords models
 #' @examples
@@ -263,7 +263,7 @@
 crm <- function(data,ddl=NULL,begin.time=1,model="CJS",title="",model.parameters=list(),design.parameters=list(),initial=NULL,
  groups = NULL, time.intervals = NULL,debug=FALSE, method="BFGS", hessian=FALSE, accumulate=TRUE,chunk_size=1e7, 
  control=list(),refit=1,itnmax=5000,scale=NULL,run=TRUE,burnin=100,iter=1000,use.admb=FALSE,use.tmb=FALSE,crossed=NULL,reml=FALSE,compile=FALSE,extra.args=NULL,
- strata.labels=NULL,clean=NULL,save.matrices=TRUE,simplify=FALSE,getreals=FALSE,check=FALSE,...)
+ strata.labels=NULL,clean=NULL,save.matrices=TRUE,simplify=FALSE,getreals=FALSE,check=FALSE,prior=FALSE,prior.list=NULL,...)
 {
 model=toupper(model)
 ptm=proc.time()
@@ -336,9 +336,9 @@ if(re&!use.tmb) {
 	use.admb=TRUE
 	if(is.null(clean))clean=TRUE
 }
-if(use.admb)
+if(use.admb | (!use.tmb &toupper(model)=="MSCJS"))
 {
-	if( !re) crossed=FALSE
+	if(!re) crossed=FALSE
 	if(is.null(clean))clean=TRUE
 }
 if(use.tmb&is.null(clean))clean=FALSE
@@ -364,33 +364,36 @@ if(is.null(ddl))
 	design.parameters=ddl$design.parameters
 }
 ddl=set.fixed(ddl,parameters) #   setup fixed values if old way used
-if(model=="MSCJS"| (substr(model,1,4)=="MVMS" &use.admb)) 
-	ddl=simplify_ddl(ddl,parameters) # add indices to ddl and reduce ddl to unique values used
 if(substr(model,1,4)=="MVMS")
 {
 	if(is.null(ddl$pi$fix))
-		message("\n No values provided for fix for pi. At least need to set a reference cell")
+		message("\n Warning: No values provided for fix for pi. Must have a reference cell via formula.")
 	else
 	{
-		bad_pi=sapply(split(ddl$pi$fix,ddl$pi$id),function(x){ifelse(any(is.na(x))&!(any(x[!is.na(x)]==1)),TRUE,FALSE)})
-		if(any(bad_pi))message("\n Check values of fix for pi. Reference cell (fix=1) should be set if any are estimated (fix=NA)")
+		bad_pi=sapply(split(ddl$pi$fix,ddl$pi$id),function(x){ifelse(!is.null(x) && any(is.na(x))&!(any(x[!is.na(x)]==1)),TRUE,FALSE)})
+		if(any(bad_pi))message("\n Warning: Check values of fix for pi. Reference cell (fix=1) should be set if any are estimated (fix=NA)")
 	}
 	if(is.null(ddl$delta$fix))
 	{
-		message("\n No values provided for fix for delta. At least need to set a reference cell")
+		message("\n Warning: No values provided for fix for delta. Must have a reference cell via formula.")
 	}else
 	{
-		bad_delta=sapply(split(ddl$delta$fix,list(ddl$delta$id,ddl$delta$occ,ddl$delta$stratum)),function(x){ifelse(any(is.na(x))&!(any(x[!is.na(x)]==1)),TRUE,FALSE)})
-	    if(any(bad_delta))message("\n Check values of fix for delta. Reference cell (fix=1) should be set if any are estimated (fix=NA)")
+		bad_delta=sapply(split(ddl$delta$fix,list(ddl$delta$id,ddl$delta$occ,ddl$delta$stratum)),function(x){ifelse(!is.null(x) &&any(is.na(x))&!(any(x[!is.na(x)]==1)),TRUE,FALSE)})
+	    if(any(bad_delta))message("\n Warning: Check values of fix for delta. Reference cell (fix=1) should be set if any are estimated (fix=NA). Must have a reference cell via formula.")
 	}
 	if(is.null(ddl$Psi$fix))
 	{
-		message("\n No values provided for fix for delta. At least need to set a reference cell")
+		message("\n Warning: No values provided for fix for delta. Must have a reference cell via formula.")
 	}else
 	{
-		bad_Psi=sapply(split(ddl$Psi$fix,list(ddl$Psi$id,ddl$Psi$occ,ddl$Psi$stratum)),function(x){ifelse(any(is.na(x))&!(any(x[!is.na(x)]==1)),TRUE,FALSE)})
-		if(any(bad_Psi))message("\n Check values of fix for Psi. Reference cell (fix=1) should be set if any are estimated (fix=NA)")
+		bad_Psi=sapply(split(ddl$Psi$fix,list(ddl$Psi$id,ddl$Psi$occ,ddl$Psi$stratum)),function(x){ifelse(!is.null(x) &&any(is.na(x))&!(any(x[!is.na(x)]==1)),TRUE,FALSE)})
+		if(any(bad_Psi))message("\n Warning: Check values of fix for Psi. Reference cell (fix=1) should be set if any are estimated (fix=NA). Must have a reference cell via formula.")
 	}
+}
+if(model=="MSCJS"| (substr(model,1,4)=="MVMS" &use.admb)) 
+{
+	fullddl=ddl
+	ddl=simplify_ddl(ddl,parameters) # add indices to ddl and reduce ddl to unique values used
 }
 if(simplify)
 {
@@ -407,7 +410,7 @@ for (i in 1:length(parameters))
 {
 	if(!is.null(ddl[[i]]$fix))
 	{
-		if(all(!is.na(ddl[[i]]$fix)))
+		if(!is.null(ddl[[i]]$fix) && all(!is.na(ddl[[i]]$fix)))
 		{
 			message(paste("All values for",names(parameters)[i],"have been fixed. Setting formula to ~0"))
 			parameters[[i]]$formula=~0
@@ -447,16 +450,23 @@ if(model=="CJS")
 	if(use.tmb)
 	{
 		runmodel=cjs_tmb(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
-				refit=refit,control=control,itnmax=itnmax,scale=scale,crossed=crossed,compile=compile,extra.args=extra.args,reml=reml,clean=clean,getreals=getreals,...)
+				refit=refit,control=control,itnmax=itnmax,scale=scale,crossed=crossed,compile=compile,extra.args=extra.args,reml=reml,clean=clean,getreals=getreals,
+				prior=prior,prior.list=prior.list,...)
 	} else
-		runmodel=cjs(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
+		runmodel=cjs_admb(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
 		          refit=refit,control=control,itnmax=itnmax,scale=scale,use.admb=use.admb,crossed=crossed,compile=compile,extra.args=extra.args,reml=reml,clean=clean,...)
 if(model=="JS")
     runmodel=js(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=FALSE,chunk_size=chunk_size,
 		          refit=refit,control=control,itnmax=itnmax,scale=scale,...)
 if(model=="MSCJS")
-	runmodel=mscjs(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
+	if(use.tmb)
+	{
+		runmodel=mscjs_tmb(data.proc,ddl,fullddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
+				refit=refit,control=control,itnmax=itnmax,scale=scale,re=re,compile=compile,extra.args=extra.args,clean=clean,...)
+    }else{
+	    runmodel=mscjs(data.proc,ddl,dml,parameters=parameters,initial=initial,method=method,hessian=hessian,debug=debug,accumulate=accumulate,chunk_size=chunk_size,
 				   refit=refit,control=control,itnmax=itnmax,scale=scale,re=re,compile=compile,extra.args=extra.args,clean=clean,...)
+    }
 if(model=="PROBITCJS")
 {
 	if(is.null(initial))

@@ -89,7 +89,10 @@ create.dm=function(x, formula, time.bins=NULL, cohort.bins=NULL, age.bins=NULL, 
 #  Create design matrix from formula and data; do so based on chunks of data to reduce space requirements
    vars=all.vars(formula)
    for(i in seq_along(vars))
+   {
 	   if(!vars[i]%in%colnames(x)) stop(paste("\n",vars[i]," variable used in formula, not found in data\n"))
+	   if(any(is.na(x[,vars[i]]))) stop (paste("\n",vars[i]," variable used in formula contains NA in data\n"))
+   }
    mm=model.matrix(formula,x[1:(nrow(x)/10),,drop=FALSE])
    npar=ncol(mm)
    nrows=nrow(x)
@@ -117,7 +120,7 @@ create.dm=function(x, formula, time.bins=NULL, cohort.bins=NULL, age.bins=NULL, 
 			  if(!is.null(x$fix)&&any(!is.na(x$fix)))
 				  dm1[!is.na(x$fix[lower:upper]),]=0
 			  drop=drop&apply(dm1,2,function(x) all(x==0))
-			  dm=rBind(dm,dm1)
+			  dm=rbind(dm,dm1)
 		  }
 	  }
    }
@@ -135,7 +138,7 @@ create.dm=function(x, formula, time.bins=NULL, cohort.bins=NULL, age.bins=NULL, 
 		   if(!is.null(x$fix)&&any(!is.na(x$fix)))
 			   dm1[!is.na(x$fix[(upper+1):nrow(x)]),]=0
 		   drop=drop&apply(dm1,2,function(x) all(x==0))
-		   dm=rBind(dm,dm1) 
+		   dm=rbind(dm,dm1) 
 	   }
 #   dm[(upper+1):nrow(x),]=as(model.matrix(formula,x[(upper+1):nrow(x),,drop=FALSE]),"sparseMatrix")    
    colnames(dm)=colnames(mm)
