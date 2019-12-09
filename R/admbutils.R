@@ -65,48 +65,51 @@ invisible()
 #' 
 #' @param tpl character string for admb template file
 #' @param clean if TRUE, deletes the tpl (.cpp) and executable files in local directory and copies from package directory
+#' @param debug if TRUE, writes out debug line values in code
 #' @export 
-setup_tmb=function(tpl,clean=FALSE)
+setup_tmb=function(tpl,clean=FALSE,debug=FALSE)
 {
+  if(debug)message("TMB program setup\n")
 	sdir=system.file(package="marked")
 #   if argument clean is TRUE, delete dll and cpp files as well
 	if(clean)
 	{
-		cat("\n deleting old TMB program and rebuilding")
+		if(debug)message("deleting old TMB program and rebuilding\n")
 		if(file.exists(paste(tpl,".cpp",sep=""))) unlink(paste(tpl,".cpp",sep=""))
-		if(is.loaded(dynlib(tpl)))dyn.unload(dynlib(tpl))
-		if(file.exists(paste(tpl,".dll",sep=""))) unlink(paste(tpl,".dll",sep=""))
+		if(tpl%in%names(getLoadedDLLs()))dyn.unload(dynlib(tpl))
+	  if(file.exists(dynlib(tpl))) unlink(dynlib(tpl))
 		file.copy(file.path(sdir,paste(tpl,".cpp",sep="")),file.path(getwd(),paste(tpl,".cpp",sep="")),overwrite=TRUE)
-		cat("\n compiling and linking TMB program\n")
+		if(debug)message("compiling and linking TMB program\n")
 		compile(paste(tpl,".cpp",sep=""))               # Compile the C++ file
 		dyn.load(dynlib(tpl))                           # Dynamically link the C++ code
 	} else
 	{
-# if cpp is not available, copy from the package directory
-		if(!file.exists(paste(tpl,".cpp",sep="")))
+	  # if dll is available load it
+	  if(file.exists(dynlib(tpl)))
+	  {
+	    if(debug)message("loading existing TMB program\n")
+	    if(!tpl%in%names(getLoadedDLLs())) {
+	      dyn.load(dynlib(tpl))
+	    }
+	  } else
+    # check for cpp file in directory; if it doesn't exist then copy from package directory
+	  if(!file.exists(paste(tpl,".cpp",sep="")))
 		{
 			file.copy(file.path(sdir,paste(tpl,".cpp",sep="")),file.path(getwd(),paste(tpl,".cpp",sep="")),overwrite=TRUE)
-			if(is.loaded(dynlib(tpl)))dyn.unload(dynlib(tpl))
-			if(file.exists(paste(tpl,".dll",sep=""))) unlink(paste(tpl,".dll",sep=""))
-			cat("\n compiling and linking TMB program\n")
-			compile(paste(tpl,".cpp",sep=""))               # Compile the C++ file
+			if(tpl%in%names(getLoadedDLLs()))dyn.unload(dynlib(tpl))
+			if(file.exists(dynlib(tpl))) unlink(dynlib(tpl))
+	    if(debug)message("compiling and linking TMB program\n")
+		  compile(paste(tpl,".cpp",sep=""))               # Compile the C++ file
 			dyn.load(dynlib(tpl))          # Dynamically link the C++ code
 		} else
-		{
-			if(file.exists(paste(tpl,".dll",sep="")))
-			{
-				if(!is.loaded(dynlib(tpl))) {
-					dyn.load(dynlib(tpl))
-				}
-			} else
 			{
 				if(file.exists(paste(tpl,".o",sep=""))) unlink(paste(tpl,".o",sep=""))
-				cat("\n compiling and linking TMB program\n")
+			  if(debug)message("compiling and linking TMB program\n")
 				compile(paste(tpl,".cpp",sep=""))               # Compile the C++ file
 				if(is.loaded(dynlib(tpl)))dyn.unload(dynlib(tpl))
 				dyn.load(dynlib(tpl))          # Dynamically link the C++ code
 			}	
-		}
 	  }
 	  invisible()
 }
+

@@ -4,11 +4,31 @@
 \alias{mscjs_tmb}
 \title{Fitting function for Multistate CJS models with TMB}
 \usage{
-mscjs_tmb(x, ddl, fullddl, dml, model_data = NULL, parameters,
-  accumulate = TRUE, initial = NULL, method, hessian = FALSE,
-  debug = FALSE, chunk_size = 1e+07, refit, itnmax = NULL,
-  control = NULL, scale, re = FALSE, compile = FALSE, extra.args = "",
-  clean = TRUE, ...)
+mscjs_tmb(
+  x,
+  ddl,
+  fullddl,
+  dml,
+  model_data = NULL,
+  parameters,
+  accumulate = TRUE,
+  initial = NULL,
+  method,
+  hessian = FALSE,
+  debug = FALSE,
+  chunk_size = 1e+07,
+  refit,
+  itnmax = NULL,
+  control = NULL,
+  scale,
+  re = FALSE,
+  compile = FALSE,
+  extra.args = "",
+  clean = TRUE,
+  getreals = FALSE,
+  useHess = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{processed dataframe created by process.data}
@@ -30,7 +50,7 @@ using autoscale or re-starting with initial values.  It is stored with returned 
 \item{parameters}{equivalent to \code{model.parameters} in \code{\link{crm}}}
 
 \item{accumulate}{if TRUE will accumulate capture histories with common
-value and with a common design matrix for S and p to speed up execution}
+value and with a common design matrix all parameters to speed up execution}
 
 \item{initial}{list of initial values for parameters if desired; if each is a named vector
 from previous run it will match to columns with same name}
@@ -56,9 +76,13 @@ histories; amount used is 8*chunk_size/1e6 MB (default 80MB)}
 
 \item{compile}{if TRUE forces re-compilation of tpl file}
 
-\item{extra.args}{optional character string that is passed to admb}
+\item{extra.args}{optional character string that is passed to tmb}
 
-\item{clean}{if TRUE, deletes the tpl and executable files for amdb}
+\item{clean}{if TRUE, deletes the dll and recompiles}
+
+\item{getreals}{if TRUE, compute real values and std errors for TMB models; may want to set as FALSE until model selection is complete}
+
+\item{useHess}{if TRUE, the TMB hessian function is used for optimization; using hessian is typically slower with many parameters but can result in a better solution}
 
 \item{...}{not currently used}
 }

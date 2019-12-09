@@ -73,7 +73,7 @@
 #' # to change the value from 1 to 0 which forces movement from B to A in the interval 5 to 6. If
 #' # this is not done then Psi B to B=Psi B to A=0.5 because each is 1 and when they are normalized
 #' # they are divided by the sum which is 2 (1/2).
-#' if(class(try(setup_admb("mscjs")))!="try-error")
+#' if(!is(try(setup_admb("mscjs")),"try-error"))
 #' {
 #' data(skagit)
 #' skagit.processed=process.data(skagit,model="Mscjs",groups=c("tag"),strata.labels=c("A","B"))
@@ -124,7 +124,7 @@
 #'#
 #'mod1=crm(skagit.processed,skagit.ddl,
 #' model.parameters=list(S=S.stratumxtime,p= p.timexstratum.tag,Psi=Psi.sxtime),hessian=TRUE)
-#' if(class(mod1)[1]!="try-error") mod1
+#' if(!is(mod1,"try-error")) mod1
 #'} }
 mscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL,method,
 		hessian=FALSE,debug=FALSE,chunk_size=1e7,refit,itnmax=NULL,control=NULL,scale,
@@ -135,7 +135,7 @@ mscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL
 #  Time intervals has been changed to a matrix (columns=intervals,rows=animals)
 #  so that the initial time interval can vary by animal; use x$intervals if none are in ddl$Phi
 	if(!is.null(ddl$Phi$time.interval))
-		time.intervals=matrix(ddl$Phi$time.interval,nrow(x$data),ncol=nocc-1,byrow=TRUE)
+	  time.intervals=matrix(ddl$Phi$time.interval[ddl$Phi$stratum==x$strata.labels[1]],nrow(x$data),ncol=nocc-1,byrow=TRUE)
 	else
 	if(is.vector(x$time.intervals))
 		time.intervals=matrix(x$time.intervals,nrow=nrow(x$data),ncol=nocc-1,byrow=TRUE)
@@ -222,7 +222,8 @@ mscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL
     slist=simplify_indices(cbind(phidm,phifix))
     write(ncol(phidm),con,append=TRUE)
     write(length(slist$set),con,append=TRUE)
-    write(t(phidm[slist$set,,drop=FALSE]),con,ncolumns=ncol(phidm),append=TRUE)
+    if(ncol(phidm)>0)
+       write(t(phidm[slist$set,,drop=FALSE]),con,ncolumns=ncol(phidm),append=TRUE)
     write(phifix[slist$set],con,append=TRUE)
     write(slist$indices[ddl$S.indices],con,append=TRUE)
  	# p design matrix
@@ -233,7 +234,8 @@ mscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL
 	slist=simplify_indices(cbind(pdm,pfix))
 	write(ncol(pdm),con,append=TRUE)
 	write(length(slist$set),con,append=TRUE)
-	write(t(pdm[slist$set,,drop=FALSE]),con,ncolumns=ncol(pdm),append=TRUE)
+	if(ncol(pdm)>0)
+	   write(t(pdm[slist$set,,drop=FALSE]),con,ncolumns=ncol(pdm),append=TRUE)
 	write(pfix[slist$set],con,append=TRUE)
 	write(slist$indices[ddl$p.indices],con,append=TRUE)
 	#Psi design matrix
@@ -241,18 +243,22 @@ mscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL
 	psifix=rep(-1,nrow(psidm))
 	if(!is.null(ddl$Psi$fix))
 	psifix[!is.na(ddl$Psi$fix)]=ddl$Psi$fix[!is.na(ddl$Psi$fix)]
-    slist=simplify_indices(cbind(psidm,psifix))
-    write(ncol(psidm),con,append=TRUE)
-    write(length(slist$set),con,append=TRUE)
-    write(t(psidm[slist$set,,drop=FALSE]),con,ncolumns=ncol(psidm),append=TRUE)
-    write(psifix[slist$set],con,append=TRUE)
-    write(slist$indices[ddl$Psi.indices],con,append=TRUE)
+  slist=simplify_indices(cbind(psidm,psifix))
+  write(ncol(psidm),con,append=TRUE)
+  write(length(slist$set),con,append=TRUE)
+  if(ncol(psidm)>0)
+     write(t(psidm[slist$set,,drop=FALSE]),con,ncolumns=ncol(psidm),append=TRUE)
+  write(psifix[slist$set],con,append=TRUE)
+  write(slist$indices[ddl$Psi.indices],con,append=TRUE)
 	close(con)
 #   write out initial values for betas
 	con=file(paste(tpl,".pin",sep=""),open="wt")
-	write(par$S,con,ncolumns=length(par$S),append=FALSE)
-	write(par$p,con,ncolumns=length(par$p),append=TRUE)
-	write(par$Psi,con,ncolumns=length(par$Psi),append=FALSE)
+	if(ncol(phidm)>0)
+	  write(par$S,con,ncolumns=length(par$S),append=FALSE)
+	if(ncol(pdm)>0)
+	  write(par$p,con,ncolumns=length(par$p),append=TRUE)
+	if(ncol(psidm)>0)
+	  write(par$Psi,con,ncolumns=length(par$Psi),append=FALSE)
 	close(con)   
 	if(hessian)
 		xx=run_admb(tpl,extra.args=extra.args)

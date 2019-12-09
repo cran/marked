@@ -296,7 +296,8 @@
 #' 
 #' @param x processed dataframe created by process.data
 #' @param ddl list of dataframes for design data; created by call to
-#' \code{\link{make.design.data}}
+#' \code{\link{make.design.data}} and then simplified
+#' @param fullddl list of dataframes for design data prior to simplification
 #' @param dml list of design matrices created by \code{\link{create.dm}} from
 #' formula and design data
 #' @param model_data a list of all the relevant data for fitting the model including
@@ -336,7 +337,7 @@
 #' \item{vcv}{var-cov matrix of betas if hessian=TRUE was set}
 #' @author Jeff Laake 
 #' @references Johnson, D. S., J. L. Laake, S. R. Melin, and DeLong, R.L. 2015. Multivariate State Hidden Markov Models for Mark-Recapture Data. 31:233-244.
-mvmscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL,method,
+mvmscjs=function(x,ddl,fullddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL,method,
 		hessian=FALSE,debug=FALSE,chunk_size=1e7,refit,itnmax=NULL,control=NULL,scale,
 		re=FALSE,compile=FALSE,extra.args="",clean=TRUE,sup,...)
 {
@@ -346,7 +347,7 @@ mvmscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NU
 #  Time intervals has been changed to a matrix (columns=intervals,rows=animals)
 #  so that the initial time interval can vary by animal; use x$intervals if none are in ddl$Phi
 	if(!is.null(ddl$Phi$time.interval))
-		time.intervals=matrix(ddl$Phi$time.interval,nrow(x$data),ncol=nocc-1,byrow=TRUE)
+	  time.intervals=matrix(fullddl$Phi$time.interval[fullddl$Phi$stratum==x$strata.labels[1]],nrow(x$data),ncol=nocc-1,byrow=TRUE)
 	else
 	if(is.vector(x$time.intervals))
 		time.intervals=matrix(x$time.intervals,nrow=nrow(x$data),ncol=nocc-1,byrow=TRUE)
@@ -571,12 +572,12 @@ mvmscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NU
 		write(par$Phi,con,ncolumns=length(par$Phi),append=FALSE)
 	if(ncol(dml$p$fe)>0) 
 		write(par$p,con,ncolumns=length(par$p),append=TRUE)
+	if(ncol(dml$delta$fe)>0) 
+	  write(par$delta,con,ncolumns=length(par$delta),append=TRUE)
 	if(ncol(dml$Psi$fe)>0) 
 		write(par$Psi,con,ncolumns=length(par$Psi),append=TRUE)
 	if(ncol(dml$pi$fe)>0) 
 		write(par$pi,con,ncolumns=length(par$pi),append=TRUE)
-	if(ncol(dml$delta$fe)>0) 
-	    write(par$delta,con,ncolumns=length(par$delta),append=TRUE)
 	close(con)   
 	if(hessian)
 		xx=run_admb(tpl,extra.args=extra.args)
@@ -607,6 +608,7 @@ mvmscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NU
 	res$cor=NULL
 	res$maxgrad=NULL
 	results=c(beta=beta,neg2lnl=-2*res$loglik,AIC=-2*res$loglik+2*res$npar,convergence=convergence)
+	results$hessian=res$hes
 	results$optim.details=optim.details
 	results$options=options
 	results$coeflist=res$coeflist
@@ -616,7 +618,7 @@ mvmscjs=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NU
 #  Restore non-accumulated, non-scaled dm's etc
 	res$model_data=model_data.save
 #  Assign S3 class values and return
-	class(res)=c("crm","admb","mle","mscjs")
+	class(res)=c("crm","admb","mle","mvmscjs")
 	return(res)
 }
 

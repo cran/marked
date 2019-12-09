@@ -4,16 +4,48 @@
 \alias{crm}
 \title{Capture-recapture model fitting function}
 \usage{
-crm(data, ddl = NULL, begin.time = 1, model = "CJS", title = "",
-  model.parameters = list(), design.parameters = list(), initial = NULL,
-  groups = NULL, time.intervals = NULL, debug = FALSE, method = "BFGS",
-  hessian = FALSE, accumulate = TRUE, chunk_size = 1e+07,
-  control = list(), refit = 1, itnmax = 5000, scale = NULL,
-  run = TRUE, burnin = 100, iter = 1000, use.admb = FALSE,
-  use.tmb = FALSE, crossed = NULL, reml = FALSE, compile = FALSE,
-  extra.args = NULL, strata.labels = NULL, clean = NULL,
-  save.matrices = TRUE, simplify = FALSE, getreals = FALSE,
-  check = FALSE, prior = FALSE, prior.list = NULL, ...)
+crm(
+  data,
+  ddl = NULL,
+  begin.time = 1,
+  model = "CJS",
+  title = "",
+  model.parameters = list(),
+  design.parameters = list(),
+  initial = NULL,
+  groups = NULL,
+  time.intervals = NULL,
+  debug = FALSE,
+  method = NULL,
+  hessian = FALSE,
+  accumulate = TRUE,
+  chunk_size = 1e+07,
+  control = list(),
+  refit = 1,
+  itnmax = 5000,
+  scale = NULL,
+  run = TRUE,
+  burnin = 100,
+  iter = 1000,
+  use.admb = FALSE,
+  use.tmb = FALSE,
+  crossed = NULL,
+  reml = FALSE,
+  compile = FALSE,
+  extra.args = NULL,
+  strata.labels = NULL,
+  clean = NULL,
+  save.matrices = FALSE,
+  simplify = FALSE,
+  getreals = FALSE,
+  real.ids = NULL,
+  check = FALSE,
+  prior = FALSE,
+  prior.list = NULL,
+  useHess = FALSE,
+  optimize = TRUE,
+  ...
+)
 }
 \arguments{
 \item{data}{Either the raw data which is a dataframe with at least one
@@ -43,7 +75,7 @@ named from previous analysis only relevant values are used}
 
 \item{debug}{if TRUE, shows optimization output}
 
-\item{method}{optimization method for function \code{optimx}}
+\item{method}{optimization method}
 
 \item{hessian}{if TRUE, computes v-c matrix using hessian}
 
@@ -68,9 +100,9 @@ histories and design matrices; amount used is 8*chunk_size/1e6 MB (default
 
 \item{iter}{number of iterations after burnin for mcmc (not realistic default)}
 
-\item{use.admb}{if TRUE creates data file for cjs.tpl and runs admb optimizer}
+\item{use.admb}{if TRUE uses ADMB for cjs, mscjs or mvms models}
 
-\item{use.tmb}{if TRUE runs TMB for cjs}
+\item{use.tmb}{if TRUE runs TMB for cjs, mscjs or mvms models}
 
 \item{crossed}{if TRUE it uses cjs.tpl or cjs_reml.tpl if reml=FALSE or TRUE respectively; if FALSE, then it uses cjsre which can use Gauss-Hermite integration}
 
@@ -90,11 +122,17 @@ histories and design matrices; amount used is 8*chunk_size/1e6 MB (default
 
 \item{getreals}{if TRUE, compute real values and std errors for TMB models; may want to set as FALSE until model selection is complete}
 
+\item{real.ids}{vector of id values for which real parameters should be output with std error information for TMB models; if NULL all ids used}
+
 \item{check}{if TRUE values of gamma, dmat and delta are checked to make sure the values are valid with initial parameter values.}
 
 \item{prior}{if TRUE will expect vectors of prior values in list prior.list; currently only implemented for cjsre_tmb}
 
 \item{prior.list}{which contains list of prior parameters that will be model dependent}
+
+\item{useHess}{if TRUE, the TMB hessian function is used for optimization; using hessian is typically slower with many parameters but can result in a better solution}
+
+\item{optimize}{if TRUE, optimizes to get parameter estimates; set to FALSE to extract estimates of ADREPORTed values only}
 
 \item{...}{optional arguments passed to js or cjs and optimx}
 }
@@ -118,7 +156,8 @@ matrices for each parameter based on the formula provided for each
 parameter, 4) call to the specific function for model fitting (now either
 \code{\link{cjs_admb}} or \code{\link{js}}). As with \code{mark} the calling
 arguments for \code{crm} are a compilation of the calling arguments for each
-of the functions it calls (with some arguments renamed to avoid conflicts).#' expects to find a value for \code{ddl}.  Likewise, if the data have not been
+of the functions it calls (with some arguments renamed to avoid conflicts).
+expects to find a value for \code{ddl}.  Likewise, if the data have not been
 processed, then \code{ddl} should be NULL.  This dual calling structure
 allows either a single call approach for each model or alternatively for the
 data to be processed and the design data (\code{ddl}) to be created once and
@@ -206,7 +245,7 @@ as a template:
 \code{fixed=cbind(1:nrow(dipper),rep(2,nrow(dipper)),rep(1,nrow(dipper)))))}
 
 The above sets \code{Phi} to 1 for the interval between occasions 2 and 3
-for all animals.
+for all animals. 
 
 Alternatively, you could do as follows:
 
@@ -222,19 +261,19 @@ be included.
 
 To use ADMB (use.admb=TRUE), you need to install: 1) the R package R2admb, 2) ADMB, and 3) a C++ compiler (I recommend gcc compiler).
 The following are instructions for installation with Windows. For other operating systems see (\url{http://www.admb-project.org/downloads}) and 
- (\url{http://www.admb-project.org/tools/gcc/}).
+ (\url{http://www.admb-project.org/tools/gcc/}). 
 
 Windows Instructions:
 
-1) In R use install.packages function or choose Packages/Install Packages from menu and select R2admb.
+ 1) In R use install.packages function or choose Packages/Install Packages from menu and select R2admb.
 
-2) Install ADMB 11: \url{http://www.admb-project.org/downloads}. Put the software in C:/admb to
+ 2) Install ADMB 11: \url{http://www.admb-project.org/downloads}. Put the software in C:/admb to
  avoid problems with spaces in directory name and for the function below to work.
 
-3) Install gcc compiler from: \url{http://www.admb-project.org/tools/gcc/}. Put in c:/MinGW
+ 3) Install gcc compiler from: \url{http://www.admb-project.org/tools/gcc/}. Put in c:/MinGW
 
 I use the following function in R to setup R2admb to access ADMB rather than adding to my path so gcc versions
-with Rtools don't conflict.
+with Rtools don't conflict. 
 
 \preformatted{
 prepare_admb=function()

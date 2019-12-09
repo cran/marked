@@ -1,3 +1,68 @@
+marked 1.2.6  7 December 2019
+-----------------
+BUG FIXES
+
+* more changes to FORTRAN files to avoid warnings.
+
+* process.data will now change any data.table to a data.frame. Caused issues with second vignette in RWildbook.
+
+
+marked 1.2.5  6 December 2019
+-----------------
+BUG FIXES
+
+* more changes to FORTRAN files to avoid warnings on use of multiple DO's to a single continue and tabs. 
+
+
+marked 1.2.4  5 December 2019
+-----------------
+BUG FIXES
+
+* changes to FORTRAN files to avoid warnings on use of multiple DO's to a single continue and tabs. 
+
+* changes to use is() function instead of class which can always return more than one value which can cause problems.
+
+
+marked 1.2.3  29 November 2019
+-----------------
+BUG FIXES
+
+* Fixed lit cited in vignette to remove DOI and URLs which were causing issues on CRAN. Problem with optimx on Debian Linux remains until optimx is patched.
+
+marked 1.2.2  27 November 2019
+-----------------
+NEW
+* added TMB version of mvmscjs in mvmscjs_tmb R code and mvmscjs_tmb.cpp code. It is an order of magnitude faster than ADMB code for the sealion example. For this model, the default method is nlminb for optimization because it performs better in general.  Setting method can over-ride the default.
+
+* added model MSLD for multistate live recapture and dead recovery in TMB.
+
+* added simulated annealing method (SANN) with optim for MSLD, MSCJS and MVMSCJS models. Note that this method does not implement a convergence criterion and simply runs until itnmax iterations are completed. You can get a report of iteration results using control=list(trace=1). You can also set the temp with control.  See ?optim for complete help on SANN.
+
+BUG FIXES
+
+* In mvmscjs the parameters were not in the correct order so the admb code did not work with the sealions example because the hessian was not in the expected order.  Thanks to Jaume Forcada for reporting the problem.
+
+* fixed bug in make.design.data that was preventing use of newdata in predict.crm and using subtract.stratum for some models.
+
+CHANGES
+
+* for models hmmmscjs and mscjs, all parameter values can be fixed (eg, ddl$p$fix=1). Previously this resulted in R errors.
+
+* in crm.wrapper with external=TRUE, if file already exists code will be stopped unless new argument replace=TRUE is specified.
+
+* Change was made in create.dmdf. For model mvmscjs, previously if there were no uncertain states, the design data for delta was set to NULL.  This doesn't work with the admb code so the design data is created and to make all states certain you need to set fix=1 for all records in the design data. The example for mstrata has been expanded to indclude a model for straight multistate data without uncertainty that uses admb code for mvmscjs.
+
+* code in simplify_ddl was modified to use package data.table which substantially sped up the simplification of the ddl for any given model.
+
+* in global_decode, if ddl is not specified and list of dmat, gamma, delta matrices are in object$results$mat it will use those values.
+
+* added argument useHess to TMB versions of code; if TRUE uses hessian in optimization.  This is typically slower but can be more precise in finding max.
+
+* default value for save.matrices has been changed to FALSE for HMM and MVMS models.
+
+* in make.design.data rownames are reset so they are in numeric order; should not affect code and more for readability for some parameters.
+
+
 marked 1.2.1 29 March 2018
 -----------------
 CHANGES

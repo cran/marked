@@ -22,7 +22,7 @@
 #' using autoscale or re-starting with initial values.  It is stored with returned model object.
 #' @param parameters equivalent to \code{model.parameters} in \code{\link{crm}}
 #' @param accumulate if TRUE will accumulate capture histories with common
-#' value and with a common design matrix for S and p to speed up execution
+#' value and with a common design matrix all parameters to speed up execution
 #' @param initial list of initial values for parameters if desired; if each is a named vector
 #' from previous run it will match to columns with same name
 #' @param method method to use for optimization; see \code{optim}
@@ -36,8 +36,10 @@
 #' @param scale vector of scale values for parameters
 #' @param re if TRUE creates random effect model admbcjsre.tpl and runs admb optimizer
 #' @param compile if TRUE forces re-compilation of tpl file
-#' @param extra.args optional character string that is passed to admb 
-#' @param clean if TRUE, deletes the tpl and executable files for amdb 
+#' @param extra.args optional character string that is passed to tmb
+#' @param clean if TRUE, deletes the dll and recompiles 
+#' @param getreals if TRUE, compute real values and std errors for TMB models; may want to set as FALSE until model selection is complete
+#' @param useHess if TRUE, the TMB hessian function is used for optimization; using hessian is typically slower with many parameters but can result in a better solution
 #' @param ... not currently used
 #' @export
 #' @return The resulting value of the function is a list with the class of
@@ -53,14 +55,14 @@
 #' @references Ford, J. H., M. V. Bravington, and J. Robbins. 2012. Incorporating individual variability into mark-recapture models. Methods in Ecology and Evolution 3:1047-1054.
 mscjs_tmb=function(x,ddl,fullddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL,method,
 		hessian=FALSE,debug=FALSE,chunk_size=1e7,refit,itnmax=NULL,control=NULL,scale,
-		re=FALSE,compile=FALSE,extra.args="",clean=TRUE,...)
+		re=FALSE,compile=FALSE,extra.args="",clean=TRUE,getreals=FALSE, useHess=FALSE,...)
 {
 	accumulate=FALSE
 	nocc=x$nocc
 #  Time intervals has been changed to a matrix (columns=intervals,rows=animals)
 #  so that the initial time interval can vary by animal; use x$intervals if none are in ddl$Phi
-	if(!is.null(ddl$S$time.interval))
-		time.intervals=matrix(ddl$S$time.interval,nrow(x$data),ncol=nocc-1,byrow=TRUE)
+	if(!is.null(ddl$S$time.interval))		
+	  time.intervals=matrix(fullddl$S$time.interval[fullddl$S$stratum==x$strata.labels[1]],nrow(x$data),ncol=nocc-1,byrow=TRUE)
 	else
 	if(is.vector(x$time.intervals))
 		time.intervals=matrix(x$time.intervals,nrow=nrow(x$data),ncol=nocc-1,byrow=TRUE)
@@ -110,7 +112,6 @@ mscjs_tmb=function(x,ddl,fullddl,dml,model_data=NULL,parameters,accumulate=TRUE,
 	scale=set.scale(names(dml),model_data,scale)
 	model_data=scale.dm(model_data,scale)
 	setup_tmb("multistate_tmb",clean=clean)
-	cat("\nbuilding TMB program\n")
 
 	# S design matrix
 	phidm=as.matrix(model_data$S.dm)
@@ -214,47 +215,60 @@ mscjs_tmb=function(x,ddl,fullddl,dml,model_data=NULL,parameters,accumulate=TRUE,
 	
 	f = MakeADFun(data=list(n=length(model_data$imat$freq),m=model_data$imat$nocc,nS=length(strata.labels),
 					ch=chmat,frst=model_data$imat$first,freq=model_data$imat$freq,tint=model_data$time.intervals,
-					kphi=ncol(phidm),nrowphi=length(phi_slist$set),	phidm=phidm[phi_slist$set,,drop=FALSE],
+					nrowphi=length(phi_slist$set),	phidm=phidm[phi_slist$set,,drop=FALSE],
 					phifix=phifix[phi_slist$set],phiindex=phi_slist$indices[ddl$S.indices],
 					phi_nre=phi_nre,phi_krand=phi_krand,phi_randDM=phi_randDM,
 					phi_randIndex=phi_randIndex,phi_counts=phi_counts,phi_idIndex=phi_idIndex,
-					kp=ncol(pdm),nrowp=length(p_slist$set),pdm=pdm[p_slist$set,,drop=FALSE],
+					nrowp=length(p_slist$set),pdm=pdm[p_slist$set,,drop=FALSE],
 					pfix=pfix[p_slist$set],pindex=p_slist$indices[ddl$p.indices],
 					p_nre=p_nre,p_krand=p_krand,p_randDM=p_randDM,
 					p_randIndex=p_randIndex,p_counts=p_counts,p_idIndex=p_idIndex,
-					kpsi=ncol(psidm),nrowpsi=length(psi_slist$set),	psidm=psidm[psi_slist$set,,drop=FALSE],
+					nrowpsi=length(psi_slist$set),	psidm=psidm[psi_slist$set,,drop=FALSE],
 					psifix=psifix[psi_slist$set],psiindex=psi_slist$indices[ddl$Psi.indices],
 					psi_nre=psi_nre,psi_krand=psi_krand,psi_randDM=psi_randDM,
-					psi_randIndex=psi_randIndex,psi_counts=psi_counts,psi_idIndex=psi_idIndex),
+					psi_randIndex=psi_randIndex,psi_counts=psi_counts,psi_idIndex=psi_idIndex,getreals=as.integer(getreals)),
 			        parameters=list(phibeta=par$S,pbeta=par$p,psibeta=par$Psi,log_sigma_phi=rep(-1,nphisigma),
 					log_sigma_p=rep(-1,npsigma),log_sigma_psi=rep(-1,npsisigma),u_phi=rep(0,phi_nre),
 					u_p=rep(0,p_nre),u_psi=rep(0,psi_nre)),random=c("u_phi","u_p","u_psi"),DLL="multistate_tmb")
 	cat("\nrunning TMB program\n")                         
 	if(method=="nlminb")
 	{
-		mod=nlminb(f$par,f$fn,f$gr,control=control,itnmax=itnmax,...)
+	  if(!useHess)
+		   mod=nlminb(f$par,f$fn,f$gr,control=control,...)
+	  else
+	    mod=nlminb(f$par,f$fn,f$gr,f$he,control=control,...)
 		lnl=mod$objective
 		par=mod$par
 		convergence=mod$convergence
 	} else
 	{
-		control$starttests=FALSE
-		mod=optimx(f$par,f$fn,f$gr,hessian=FALSE,control=control,itnmax=itnmax,method=method,...)
-		par <- coef(mod, order="value")[1, ]
-		mod=as.list(summary(mod, order="value")[1, ])
+	  if(method=="SANN")
+	  {		  
+	    control$maxit=itnmax
+	    mod=optim(f$par,f$fn,hessian=FALSE,control=control,itnmax=itnmax,method=method,...)
+	    par=mod$par
+	    convergence=mod$convergence
+	  } else
+	  {
+	    control$starttests=FALSE
+ 		  if(!useHess)
+		     mod=optimx(f$par,f$fn,f$gr,hessian=FALSE,control=control,itnmax=itnmax,method=method,...)
+		  else
+		     mod=optimx(f$par,f$fn,f$gr,f$he,hessian=FALSE,control=control,itnmax=itnmax,method=method,...)
+		  par <- coef(mod, order="value")[1, ]
+		  mod=as.list(summary(mod, order="value")[1, ])
 	    convergence=mod$convcode
-		lnl=mod$value		
+	  }
+	  lnl=mod$value
 	}
 	fixed.npar=ncol(phidm)+ncol(pdm)+ncol(psidm)
 	
-	getreals=FALSE
+	if(getreals)
+	  par_summary=sdreport(f,getReportCovariance=FALSE)
+	else
+	  par_summary=sdreport(f,getJointPrecision=TRUE)
 	if(p_nre+phi_nre>0)
 	{
-		if(getreals) 
-			par_summary=sdreport(f,getReportCovariance=FALSE)
-		else
-			par_summary=sdreport(f,getJointPrecision=TRUE)
-		
 	 	par=par_summary$par.fixed[1:fixed.npar]
 		cjs.beta.fixed=unscale.par(par,scale)
 		cjs.beta.sigma=par_summary$par.fixed[-(1:fixed.npar)]
@@ -292,10 +306,22 @@ mscjs_tmb=function(x,ddl,fullddl,dml,model_data=NULL,parameters,accumulate=TRUE,
 			beta.vcv=NULL
 	}	
 	# Create results list 
-	if(getreals&p_nre+phi_nre>0)
+	if(getreals)
 	{
 		reals=split(par_summary$value,names(par_summary$value))
 		reals.se=split(par_summary$sd,names(par_summary$value))	
+		names(reals)=c("p","S","Psi")
+		names(reals.se)=c("p","S","Psi")
+		reals$S[fullddl$S$Time<fullddl$S$Cohort]=NA
+		reals.se$S[fullddl$S$Time<fullddl$S$Cohort]=NA
+		reals$p[fullddl$p$Time<fullddl$p$Cohort]=NA
+		reals.se$p[fullddl$p$Time<fullddl$p$Cohort]=NA
+		reals$Psi=as.vector(aperm(array(reals$Psi,dim=c(model_data$imat$nocc-1,length(strata.labels),length(strata.labels),length(model_data$imat$freq))),c(3,2,1,4)))
+		reals.se$Psi=as.vector(aperm(array(reals.se$Psi,dim=c(model_data$imat$nocc-1,length(strata.labels),length(strata.labels),length(model_data$imat$freq))),c(3,2,1,4)))
+#		reals$Psi=as.vector(aperm(array(reals$Psi,dim=c(model_data$imat$nocc-1,(length(strata.labels))^2,length(model_data$imat$freq))),c(2,1,3)))
+#		reals.se$Psi=as.vector(aperm(array(reals.se$Psi,dim=c(model_data$imat$nocc-1,(length(strata.labels))^2,length(model_data$imat$freq))),c(2,1,3)))
+		reals$Psi[fullddl$Psi$Time<fullddl$Psi$Cohort]=NA
+		reals.se$Psi[fullddl$Psi$Time<fullddl$Psi$Cohort]=NA
 	}
 	else
 	{

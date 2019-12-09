@@ -5,16 +5,17 @@
 \title{Compute estimates of real parameters}
 \usage{
 \method{predict}{crm}(object,newdata=NULL,ddl=NULL,parameter=NULL,unique=TRUE,
-                   vcv=FALSE,se=FALSE,chat=1,subset,select,...)
+                   vcv=FALSE,se=FALSE,chat=1,subset=NULL,select=NULL,
+                   real.ids=NULL,merge=FALSE,...)
 }
 \arguments{
 \item{object}{model object;}
 
 \item{newdata}{a dataframe for crm}
 
-\item{ddl}{list of dataframes for design data; created by call to make.design.data}
+\item{ddl}{list of dataframes for design data}
 
-\item{parameter}{name of real parameter to be computed (eg "Phi" or "p")}
+\item{parameter}{name of real parameter to be computed (eg "Phi")}
 
 \item{unique}{TRUE if only unique values should be returned}
 
@@ -28,6 +29,10 @@
 
 \item{select}{character vector of field names in real that you want to include}
 
+\item{real.ids}{animal ids passed to TMB code for computation of real parameter values}
+
+\item{merge}{default FALSE but if TRUE, the ddl for the parameter is merged (cbind) to the estimates}
+
 \item{...}{generic arguments not used here}
 }
 \value{
@@ -39,7 +44,12 @@ real estimates}
 }
 \description{
 Computes real estimates and their var-cov for a particular subset of 
-parameters.
+parameters. The argument newdata may not work with all models. A better approach to 
+compute real estimates for a subset of values or a new set of values is to specify a limited 
+range of the values in ddl for each parameter. Make sure to include a complete set of values that spans
+the factor levels and individual covariates used in the formulas for the model object or you will receive an
+error that the number of columns in the design matrix does not match the number of beta parameters.  You cannot 
+change the levels of any factor variable or modify the design data in anyway that changes the design matrix.
 }
 \examples{
 data(dipper)

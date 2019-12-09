@@ -51,6 +51,7 @@
 #' 3) mu_p_prior: vector of mu values for p_beta, 4) sigma_p_prior: vector of sigma values for p_beta, 5) random_mu_phi_prior: vector of mu values for ln sigma of random effects, 
 #' 6) random_sigma_phi_prior: vector of sigma values for ln sigma_phi, 7) random_mu_p_prior: vector of mu values for ln sigma_p, 8) random_sigma_p_prior: vector of sigma values for ln sigma_p. 
 #' @param tmbfct either "f1" - default or "f2" - any random effects treated as fixed effects or "f3" fixed effects fixed at mode and no random effects.
+#' @param useHess if TRUE, the TMB hessian function is used for optimization; using hessian is typically slower with many parameters but can result in a better solution
 #' @param ... any remaining arguments are passed to additional parameters
 #' passed to \code{optim} or \code{\link{cjs.lnl}}
 #' @import R2admb optimx TMB
@@ -68,7 +69,7 @@
 cjs_tmb=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NULL,method,
 		hessian=FALSE,debug=FALSE,chunk_size=1e7,refit,itnmax=NULL,control=NULL,scale,
 		crossed=TRUE,compile=TRUE,extra.args=NULL,reml,clean=FALSE,getreals=FALSE,prior=FALSE,
-		prior.list=NULL,tmbfct="f1",...)
+		prior.list=NULL,tmbfct="f1",useHess=FALSE,...)
 {
 	accumulate=FALSE
 	nocc=x$nocc
@@ -281,7 +282,6 @@ cjs_tmb=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NU
 		   random_sigma_p_prior=vector("numeric",length=0)
 	   }	
 		setup_tmb("cjsre_tmb",clean=clean)
-		cat("\nbuilding TMB program\n")                         
 		# Create AD function with data and parameters
         # With INLA type approach will need to run MakeADFun 3x. 
         # f1 - function with random= u's - optimize
@@ -305,27 +305,32 @@ cjs_tmb=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NU
 		      cat("\nrunning TMB program\n")                         
 		      if(method=="nlminb")
 		      {
-			      mod=nlminb(f$par,f$fn,f$gr,control=control,itnmax=itnmax,...)
-			      lnl=mod$objective
+		        if(!useHess)
+			         mod=nlminb(f$par,f$fn,f$gr,control=control,...)
+		        else
+		          mod=nlminb(f$par,f$fn,f$gr,f$he,control=control,...)
+		        lnl=mod$objective
 			      par=mod$par
 			      convergence=mod$convergence
 		      } else
 		      {
 			     control$starttests=FALSE
-  		         mod=optimx(f$par,f$fn,f$gr,hessian=FALSE,control=control,itnmax=itnmax,method=method,...)
+			     if(!useHess)
+			       mod=optimx(f$par,f$fn,f$gr,hessian=FALSE,control=control,itnmax=itnmax,method=method,...)
+			     else
+			       mod=optimx(f$par,f$fn,f$gr,f$he,hessian=FALSE,control=control,itnmax=itnmax,method=method,...)
 			     par <- coef(mod, order="value")[1, ]
 			     mod=as.list(summary(mod, order="value")[1, ])
 			     convergence=mod$convcode
 			     lnl=mod$value		
 		       }
 		       fixed.npar=(ncol(phidm)+ncol(pdm)-2)
+		       if(getreals) 
+		         par_summary=sdreport(f,getReportCovariance=FALSE)
+		       else
+		         par_summary=sdreport(f,getJointPrecision=TRUE)
 		       if(p_nre+phi_nre>0)
 		       {
-			       if(getreals) 
-				      par_summary=sdreport(f,getReportCovariance=FALSE)
-			       else
-				      par_summary=sdreport(f,getJointPrecision=TRUE)
-
 			        par=par_summary$par.fixed[1:fixed.npar]
 			        cjs.beta.fixed=unscale.par(par,scale)
 			        cjs.beta.sigma=par_summary$par.fixed[-(1:fixed.npar)]
@@ -357,28 +362,34 @@ cjs_tmb=function(x,ddl,dml,model_data=NULL,parameters,accumulate=TRUE,initial=NU
 			            beta.vcv=NULL
 		       }	
 		       # Create results list 
-               if(getreals&p_nre+phi_nre>0)
+           if(getreals)
 		       {
 			           reals=split(par_summary$value,names(par_summary$value))
-			           reals.se=split(par_summary$sd,names(par_summary$value))	
+			           reals.se=split(par_summary$sd,names(par_summary$value))		
+			           names(reals)=c("p","Phi")
+			           names(reals.se)=c("p","Phi")
+			           reals$Phi[ddl$S$Time<ddl$Phi$Cohort]=NA
+			           reals.se$Phi[ddl$S$Time<ddl$Phi$Cohort]=NA
+			           reals$p[ddl$p$Time<ddl$p$Cohort]=NA
+			           reals.se$p[ddl$p$Time<ddl$p$Cohort]=NA
 		        }
 		        else
 		        {
-			          reals=NULL
+  			          reals=NULL
 		              reals.se=NULL
 		        }
 		        res=list(beta=cjs.beta,neg2lnl=2*lnl,AIC=2*lnl+2*sum(sapply(cjs.beta,length)),
-				beta.vcv=beta.vcv,reals=reals,reals.se=reals.se,convergence=convergence,optim.details=mod,
-				model_data=model_data,
-				options=list(scale=scale,accumulate=accumulate,initial=initial,method=method,
-						chunk_size=chunk_size,itnmax=itnmax,control=control))		
+				    beta.vcv=beta.vcv,reals=reals,reals.se=reals.se,convergence=convergence,optim.details=mod,
+				    model_data=model_data,
+				    options=list(scale=scale,accumulate=accumulate,initial=initial,method=method,
+						              chunk_size=chunk_size,itnmax=itnmax,control=control))		
 		
-#               Restore non-accumulated, non-scaled dm's etc
-	            res$model_data=model_data.save
-				res$tmbfct=f
-#               Assign S3 class values and return
-	            class(res)=c("crm","mle","cjs")
-	            return(res)
+#           Restore non-accumulated, non-scaled dm's etc
+	          res$model_data=model_data.save
+				    res$tmbfct=f
+#           Assign S3 class values and return
+	          class(res)=c("crm","mle","cjs")
+	          return(res)
 		}
 		if(tmbfct=="f2")
 		{

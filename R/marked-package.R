@@ -127,20 +127,20 @@ NULL
 #' # parameter the intercept is removed automatically. Also tag loss is independent in this
 #' # model.
 #' mod0=crm(dp,ddl,model.parameters=list(tau=list(formula=~I(tag1+tag2))),
-#'         initial=list(Phi=2,p=.3,tau=c(-1)),hessian=TRUE)
+#'         initial=list(Phi=2,p=.3,tau=c(-1)),hessian=TRUE,save.matrices=TRUE)
 #' # now fit a model allowing different loss rates for each tag but still independent
 #' mod1=crm(dp,ddl,model.parameters=list(tau=list(formula=~tag1+tag2)),
-#'         initial=list(Phi=2,p=.3,tau=c(-2,-1)),hessian=TRUE)
+#'         initial=list(Phi=2,p=.3,tau=c(-2,-1)),hessian=TRUE,save.matrices=TRUE)
 #' # now fit the model that was used to generate the data with dependence
 #' mod2=crm(dp,ddl,model.parameters=list(tau=list(formula=~tag1+tag2+tag1:tag2)),
-#'         initial=list(Phi=2,p=.3,tau=c(-2,-1,3)),hessian=TRUE)
+#'         initial=list(Phi=2,p=.3,tau=c(-2,-1,3)),hessian=TRUE,save.matrices=TRUE)
 #' # Now treat all as not permanently marked
 #' tagloss$ch=gsub("--","0",tagloss$ch)
 #' dp=process.data(tagloss,model="hmmcjs2tl")
 #' ddl=make.design.data(dp)
 #' ddl$p$fix[ddl$p$tag1==1&ddl$p$tag2==1]=0
 #' mod3=crm(dp,ddl,model.parameters=list(tau=list(formula=~tag1+tag2)),
-#'         initial=list(Phi=2,p=.3,tau=c(-2,-1)),hessian=TRUE)
+#'         initial=list(Phi=2,p=.3,tau=c(-2,-1)),hessian=TRUE,save.matrices=TRUE)
 #' # Model 2 is the best model but note that even though the tag loss model is
 #' # incorrect in models 0 and 1 which assume independence, the survival estimate is
 #' # only slightly less than for model 2. The model compensates by increasing the indiviudal
@@ -207,19 +207,34 @@ NULL
 #' ms1.ddl=make.design.data(ms1)
 #' ms2.ddl=make.design.data(ms2)
 #' ms3.ddl=make.design.data(ms3)
-#' 
+#' ms3.ddl$delta$fix=1
 #' # following requires ADMB or the exe constructed from ADMB and links set for ADMB
-#' mod1=try(crm(ms1,ms1.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
-#'       p=list(formula=~time)),hessian=TRUE))
-#' if(class(mod1)[1]!="try-error") mod1
-#' 
+#' # remove comments if you have admb
+#' #mod1=try(crm(ms1,ms1.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
+#' #                                               p=list(formula=~time)),hessian=TRUE))
+#' #mod1
+#' # file.remove("multistate.std")
 #' mod2=crm(ms2,ms2.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
-#'       p=list(formula=~time)),hessian=TRUE)
+#'                                            p=list(formula=~time)),hessian=TRUE)
 #' mod2
-#' 
+#' # uses R/Fortran code with MSCJS
 #' mod3=crm(ms3,ms3.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
-#'       p=list(formula=~time)),hessian=TRUE)
+#'                                            p=list(formula=~time)),hessian=TRUE)
 #' mod3
+#' # requires admb; remove comments if you have admb
+#' #mod4=crm(ms3,ms3.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
+#' #                                           p=list(formula=~time)),hessian=TRUE,use.admb=TRUE)
+#' #mod4
+#' #file.remove("mvms.std")
+#' 
+#' # uses TMB with mvmscjs
+#' mod5=crm(ms3,ms3.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
+#'                                            p=list(formula=~time)),hessian=TRUE,use.tmb=TRUE)
+#' mod5
+#' # uses R/FORTAN code with mvmscjs
+#' mod6=crm(ms3,ms3.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
+#'                                            p=list(formula=~time)),hessian=TRUE)
+#' mod6
 #' }
 NULL
 
@@ -281,12 +296,13 @@ NULL
 #' # formulas
 #' Psi.1=list(formula=~-1+ AtoS:sex + AtoS:sex:bs(Age) + StoA:sex + StoA:sex:bs(Age) + 
 #'                      I(lpm+rpm) +I(lpm+rpm):Age + lpm:rpm)
-#' p.1=list(formula=~time*area)
+#' p.1=list(formula=~-1+time:area)
 #' delta.1=list(formula= ~ -1 + obs.ltag.u + obs.rtag.u + obs.ltag.u:obs.rtag.u)
 #' Phi.1=list(formula=~sex*bs(Age)+pup:weight+area)
 #' 
-#' # Fit model - commented out because it takes >1hr to run
-#' # mod=crm(dp,ddl,model.parameters=list(Psi=Psi.1,p=p.1,delta=delta.1,Phi=Phi.1),hessian=TRUE)
+#' # Fit model with TMB
+#'  mod=crm(dp,ddl,model.parameters=list(Psi=Psi.1,p=p.1,delta=delta.1,Phi=Phi.1),
+#'  use.tmb=TRUE,method="nlminb",hessian=TRUE)
 #' }
 NULL
 
@@ -329,6 +345,75 @@ NULL
 #' 
 #'# See help for mscjs for an example that explains difference between marked and RMark
 #'# with regard to treatment of mlogit parameters like Psi.
+NULL
+
+#'  Mulstistate Live-Dead Paradise Shelduck Data
+#'  
+#' @name Paradise_shelduck
+#' @docType data
+#' @aliases ps
+#' @description Paradise shelduck recapture and recovery data in multistrata provided by Richard Barker and Gary White.
+#' @format  A data frame with 1704 observations of 3 variables 
+#'  \describe{ 
+#'  \item{ch}{a character vector containing the capture history (each is 2 character positions LD) for 6 occasions}
+#'  \item{freq}{capture history frequency} 
+#'  \item{sex}{Male or Female}
+#'  }
+#' @keywords datasets
+#' @author Jeff Laake
+#' @references Barker, R.J, White,G.C, and M. McDougall. 2005. MOVEMENT OF PARADISE SHELDUCK BETWEEN MOLT SITES: 
+#' A JOINT MULTISTATE-DEAD RECOVERY MARK–RECAPTURE MODEL. JOURNAL OF WILDLIFE MANAGEMENT 69(3):1194–1201.
+#' @examples
+#' \donttest{
+#' # In the referenced article, there are 3 observable strata (A,B,C) and 3 unobservable 
+#' # strata (D,E,F). This example is setup by default to use only the 3 observable strata
+#' # to avoid problems with multiple modes in the likelihood.
+#' # Code that uses all 6 strata are provided but commented out. 
+#' # With unobservable strata, simulated annealing should
+#' # be used (options="SIMANNEAL")
+#' data("Paradise_shelduck")
+#' # change sex reference level to Male to match design matrix used in MARK
+#' ps$sex=relevel(ps$sex,"Male")
+#' # Process data with MSLiveDead model using sex groups and specify only observable strata
+#' ps_dp=process.data(ps,model="MSLD",groups="sex",strata.labels=c("A","B","C"))
+#' # Process data with MSLiveDead model using sex groups and specify observable and 
+#' # unboservable strata
+#' # ps_dp=process.data(ps,model="MSLD",groups="sex",strata.labels=c("A","B","C","D","E","F"))
+#' # Make design data and specify constant PIM for Psi to reduce parameter space. No time 
+#' #variation was allowed in Psi in the article.
+#' ddl=make.design.data(ps_dp)
+#' # Fix p to 0 for unobservable strata (only needed if they are included)
+#' ddl$p$fix=NA
+#' ddl$p$fix[ddl$p$stratum%in%c("D","E","F")]=0
+#' # Fix p to 0 for last occasion
+#' ddl$p$fix[ddl$p$time%in%6:7]=0.0
+#' # Fix survival to 0.5 for last interval to match MARK file (to avoid confounding)
+#' ddl$S$fix=NA
+#' ddl$S$fix[ddl$S$time==6]=0.5
+#' # create site variable for survival which matches A with D, B with E and C with F 
+#' ddl$S$site="A"
+#' ddl$S$site[ddl$S$stratum%in%c("B","C")]=as.character(ddl$S$stratum[ddl$S$stratum%in%c("B","C")])
+#' ddl$S$site[ddl$S$stratum%in%c("E")]="B"
+#' ddl$S$site[ddl$S$stratum%in%c("F")]="C"
+#' ddl$S$site=as.factor(ddl$S$site)
+#' # create same site variable for recovery probability (r)
+#' ddl$r$site="A"
+#' ddl$r$site[ddl$r$stratum%in%c("B","C")]=as.character(ddl$r$stratum[ddl$r$stratum%in%c("B","C")])
+#' ddl$r$site[ddl$r$stratum%in%c("E")]="B"
+#' ddl$r$site[ddl$r$stratum%in%c("F")]="C"
+#' ddl$r$site=as.factor(ddl$r$site)
+#' # Specify formula used in MARK model
+#' S.1=list(formula=~-1+sex+time+site)
+#' p.1=list(formula=~-1+stratum:time)
+#' r.1=list(formula=~-1+time+sex+site)
+#' Psi.1=list(formula=~-1+stratum:tostratum)
+#' # Run top model from paper but only for observable strata
+#' crmmod=crm(ps_dp,ddl,model.parameters=list(S=S.1,p=p.1,r=r.1,Psi=Psi.1),
+#'               method="nlminb",hessian=TRUE)
+#' # Run top model from paper for all strata using simulated annealing (commented out)
+#' # crmmod=crm(ps_dp,ddl,model.parameters=list(S=S.1,p=p.1,r=r.1,Psi=Psi.1),
+#' #                     method="SANN",itnmax=6e6,hessian=TRUE)
+#'}
 NULL
 
 

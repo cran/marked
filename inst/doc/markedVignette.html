@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Jeff L. Laake, Devin S. Johnson, and Paul B. Conn" />
+
+<meta name="date" content="2019-12-08" />
+
+<title>marked Package Vignette</title>
+
+<script>$(document).ready(function(){
+    if (typeof $('[data-toggle="tooltip"]').tooltip === 'function') {
+        $('[data-toggle="tooltip"]').tooltip();
+    }
+    if ($('[data-toggle="popover"]').popover === 'function') {
+        $('[data-toggle="popover"]').popover();
+    }
+});
+</script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">marked Package Vignette</h1>
+<h4 class="author">Jeff L. Laake, Devin S. Johnson, and Paul B. Conn</h4>
+<h4 class="date">2019-12-08</h4>
+
+
+
+<div id="summary" class="section level1 unnumbered">
+<h1>Summary</h1>
+<p>We describe an R package called <code>marked</code> for analysis of mark-recapture data. Currently, the package is capable of fitting Cormack-Jolly-Seber (CJS) models with maximum likelihood estimation (MLE) and Bayesian Markov Chain Monte Carlo (MCMC) methods. In addition, Jolly-Seber (JS) models can be fitted with MLE. Additional models will be added as the package is updated. We provide some example analyses with the well-known dipper data and compare run timing and results with MARK. For analysis with several thousand or more capture histories and several time-varying covariates, the run times with <code>marked</code> are substantially less. By providing this open source software, we hope to expand the analyst’s toolbox and enble the knowledgeable user
+to understand fully the models and software.</p>
+</div>
+<div id="introduction" class="section level1 unnumbered">
+<h1>Introduction</h1>
+<p>Currently the most comprehensive software for analysis of capture-recapture
+data is MARK <span class="citation">(White and Burnham 1999)</span>. MARK is a FORTRAN program for
+fitting capture-recapture models that are manually constructed with
+a graphical user interface. RMark <span class="citation">(Laake and Rexstad 2008)</span> is an R package
+that constructs models for MARK with user-specified formulas to replace
+the manual model creation. With RMark and MARK most currently available
+capture-recapture models can be fitted and manipulated in R. Additional
+R packages for analysis of capture-recapture data have been made available
+including Rcapture <span class="citation">(Baillargeon and Rivest 2007)</span>, mra <span class="citation">(McDonald et al. 2005)</span>,
+secr <span class="citation">(Borchers and Efford 2008)</span>, BTSPAS <span class="citation">(Schwarz et al. 2009)</span>, SPACECAP
+<span class="citation">(Royle et al. 2009)</span>, and BaSTA <span class="citation">(Colchero, Jones, and Rebke 2012)</span>. Rcapture
+fits closed and open models in a log-linear framework. The mra package
+fits Cormack-Jolly-Seber (CJS) and the Huggins closed model with a
+``regression approach’’ to model specification. The secr and SPACECAP
+packages provide spatially explicit modeling of closed capture-recapture
+data and BTSPAS fits time-stratified Petersen models in a Bayesian
+framework. BaSTA estimates survival with covariates from capture-recapture/recovery
+data in a Bayesian framework when many individuals are of unknown
+age. Each package is designed for a unique niche or structure. We
+believe these alternative packages in R are useful because they expand
+the analyst’s toolbox and the code is open source which enables the
+knowledgeable user to understand fully what the software is doing.
+Also, this independent innovation provides testing for existing software
+and potential gains in developer knowledge to improve existing software.</p>
+<p>We developed this R package we named <code>marked</code> for analysis with
+marked animals in contrast to the R package unmarked <span class="citation">(Fiske and Chandler 2011)</span>
+that focuses on analysis with unmarked animals. The original impetus
+for the package was to implement the CJS model using the hierarchical
+likelihood construction described by <span class="citation">Pledger, Pollock, and Norris (2003)</span> and to improve
+on execution times with RMark/MARK <span class="citation">(White and Burnham 1999; Laake and Rexstad 2008)</span>
+for analysis of our own large data sets with many time-varying individual
+(animal-specific) covariates. Subsequently, we implemented the Jolly-Seber
+model with the <span class="citation">Schwarz and Arnason (1996)</span> POPAN structure where the hierarchical
+likelihood construction idea extended to the entry of animals into
+the population. We also added a Bayesian Markov Chain Monte Carlo
+(MCMC) implementation of the CJS model based on the approach used
+by <span class="citation">Albert and Chib (1993)</span> for analyzing binary data with a probit
+regression model.</p>
+</div>
+<div id="background" class="section level1 unnumbered">
+<h1>Background</h1>
+<p>We assume you know and understand mark-recapture terminology and models.
+For background material on capture-recapture and MARK refer to <a href="http://www.phidot.org/software/mark/docs/book/" class="uri">http://www.phidot.org/software/mark/docs/book/</a>.
+In the appendix, we provide a comparison of the MARK and <code>marked</code>
+data and model structures and details on likelihood construction for
+the CJS and JS models. Our focus in the vignette will be to provide
+examples on the use of <code>marked</code>.</p>
+</div>
+<div id="dipper-data-example" class="section level1 unnumbered">
+<h1>Dipper data example</h1>
+<p>Anyone who has used RMark will find it easy to use <code>marked</code>
+because it has nearly identical syntax and structure with a few minor
+differences. The structure of the input dataframe for <code>marked</code>
+is also identical to RMark. Any dataframe with a character field named
+<code>ch</code> containing the capture history will work with <code>marked</code>.
+If the capture history represents more than one animal then the dataframe
+should contain the additional numeric field named <code>freq</code>, which
+is the number of animals represented by that capture history. However,
+it is not necessary to accumulate capture histories in the input data
+because the <code>process.data</code> step will accumulate duplicated
+records by default. There can be any number of additional fields,
+some of which can be used as covariates in the analysis. Some of the
+functions in <code>marked</code> and RMark have the same name (e.g., <code>process.data</code>,
+<code>make.design.data</code>), so only one of the packages should be
+loaded in R to avoid aliasing and resulting errors.</p>
+<p>We will start by fitting the simplest CJS model with constant <span class="math inline">\(\phi\)</span>
+and <span class="math inline">\(p\)</span>. The dipper data contain 294 records with the capture history
+(<code>ch</code>) and a factor variable <code>sex</code> with values Female
+or Male. Models are fitted with the function <code>crm</code> ([<em>c</em>]apture-[<em>r</em>]ecapture
+[<em>m</em>]odel). After a call to library to attach the package, and
+data to retrieve the dipper data from the package, the model is fitted
+with <code>crm</code> and assigned to the object named <code>model</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(marked) </a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(dipper)</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="op">&gt;</span><span class="st"> </span>model=<span class="kw">crm</span>(dipper)</a></code></pre></div>
+<p>For this example, we are using the default CJS model and
+a default formula of <code>~ 1</code> (constant) for each parameter.
+The function <code>crm</code> calls three functions in turn: 1) <code>process.data</code>
+to process the data, 2) <code>make.design.data</code> to create the list
+of parameter-specific dataframes, and 3) <code>cjs</code>, to fit the
+CJS model with the defined formulas. The code reports progress and
+some results as it executes. We’ll suppress these messages in later
+examples but show them here to explain some of the messages. When
+it processes the data, it collapses the 294 rows into 55 which are
+the unique number of rows in the data including <code>ch</code> and <code>sex</code>.
+After processing, it creates the design data and the design matrices
+for each parameter. Prior to the optimization, it also collapses the
+histories further from 55 to 32 which it can do here because <code>sex</code>
+is not used in either formula. The final steps are to compute initial
+values for the parameters and find the MLEs with the selected optimization
+method(s). As it progresses, the value of -2log-likelihood is reported
+every 100 evaluations of the objective function. It is not shown above
+because there were fewer than 100 function evaluations for this example.
+A brief listing of the model results is obtained by typing model which
+invokes the function <code>print.crm</code> because <code>class(model)=&quot;crm&quot;</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="op">&gt;</span><span class="st"> </span>model</a>
+<a class="sourceLine" id="cb2-2" title="2"></a>
+<a class="sourceLine" id="cb2-3" title="3">crm Model Summary</a>
+<a class="sourceLine" id="cb2-4" title="4"></a>
+<a class="sourceLine" id="cb2-5" title="5">Npar <span class="op">:</span><span class="st">  </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="op">-</span>2lnL<span class="op">:</span><span class="st">  </span><span class="fl">666.8377</span></a>
+<a class="sourceLine" id="cb2-7" title="7">AIC  <span class="op">:</span><span class="st">  </span><span class="fl">670.8377</span></a>
+<a class="sourceLine" id="cb2-8" title="8"></a>
+<a class="sourceLine" id="cb2-9" title="9">Beta</a>
+<a class="sourceLine" id="cb2-10" title="10">                 Estimate</a>
+<a class="sourceLine" id="cb2-11" title="11"><span class="kw">Phi.</span>(Intercept) <span class="fl">0.2420302</span></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="kw">p.</span>(Intercept)   <span class="fl">2.2270627</span></a></code></pre></div>
+<p>The output includes the number of parameters (<code>npar</code>),
+-2log-likelihood, Akaike’s Information Criterion (<code>AIC</code>), and
+the estimates for <span class="math inline">\(\phi\)</span> and <span class="math inline">\(p\)</span>.</p>
+<p>Estimates of precision are not shown because the default is <code>hessian=FALSE</code>
+and it must be set to TRUE to get estimates of precision. This default
+was chosen because the <code>marked</code> package does not count parameters
+from the hessian, so there is no need to compute it for each model
+as with MARK. The hessian may never be needed if the model is clearly
+inferior. Also, this allows the model to be fitted again from the
+final or different estimates to check for convergence without the
+penalty of computing the hessian at the final values each time. Separate
+functions (<code>cjs.hessian</code> and <code>js.hessian</code>) are provided
+to compute and store in the model the variance-covariance matrix from
+the hessian at the final estimates as shown below:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="op">&gt;</span><span class="st"> </span>model=<span class="kw">cjs.hessian</span>(model)</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="op">&gt;</span><span class="st"> </span>model</a>
+<a class="sourceLine" id="cb3-3" title="3"></a>
+<a class="sourceLine" id="cb3-4" title="4">crm Model Summary</a>
+<a class="sourceLine" id="cb3-5" title="5"></a>
+<a class="sourceLine" id="cb3-6" title="6">Npar <span class="op">:</span><span class="st">  </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="op">-</span>2lnL<span class="op">:</span><span class="st">  </span><span class="fl">666.8377</span></a>
+<a class="sourceLine" id="cb3-8" title="8">AIC  <span class="op">:</span><span class="st">  </span><span class="fl">670.8377</span></a>
+<a class="sourceLine" id="cb3-9" title="9"></a>
+<a class="sourceLine" id="cb3-10" title="10">Beta</a>
+<a class="sourceLine" id="cb3-11" title="11">                 Estimate        se        lcl       ucl</a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="kw">Phi.</span>(Intercept) <span class="fl">0.2420302</span> <span class="fl">0.1020079</span> <span class="fl">0.04209475</span> <span class="fl">0.4419656</span></a>
+<a class="sourceLine" id="cb3-13" title="13"><span class="kw">p.</span>(Intercept)   <span class="fl">2.2270627</span> <span class="fl">0.3252176</span> <span class="fl">1.58963625</span> <span class="fl">2.8644892</span></a></code></pre></div>
+<p>Once the hessian has been computed, printing the model will
+display the standard errors and 95% normal confidence intervals for
+the parameter estimates on the link scale (e.g., logit for <span class="math inline">\(\phi\)</span>
+and <span class="math inline">\(p\)</span>). You can set <code>hessian=TRUE</code> in the call to <code>crm</code>
+if you want to compute it when the model is fitted.</p>
+<p>You’ll never fit only one model to data, so the most efficient approach
+is to call <code>process.data</code> and <code>make.design.data</code> separately
+and pass the results to <code>crm</code> so they can be used for each
+fitted model as shown below:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="op">&gt;</span><span class="st"> </span>dipper.proc=<span class="kw">process.data</span>(dipper)</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="dv">255</span> capture histories collapsed into <span class="dv">53</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="op">&gt;</span><span class="st"> </span>dipper.ddl=<span class="kw">make.design.data</span>(dipper.proc)</a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="op">&gt;</span><span class="st"> </span>Phi.sex=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>sex)</a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="op">&gt;</span><span class="st"> </span>model=<span class="kw">crm</span>(dipper.proc,dipper.ddl,<span class="dt">model.parameters=</span><span class="kw">list</span>(<span class="dt">Phi=</span>Phi.sex),</a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="op">+</span><span class="st">           </span><span class="dt">accumulate=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb4-7" title="7">Computing initial parameter estimates</a>
+<a class="sourceLine" id="cb4-8" title="8">Starting optimization <span class="cf">for</span> <span class="dv">3</span> parameters...</a>
+<a class="sourceLine" id="cb4-9" title="9"></a>
+<a class="sourceLine" id="cb4-10" title="10">Elapsed time <span class="cf">in</span> minutes<span class="op">:</span><span class="st">  </span><span class="fl">0.0023</span> </a></code></pre></div>
+<p>Collapsing capture history records is controlled by the
+<code>accumulate</code> arguments in <code>process.data</code> and <code>crm</code>.
+In the above example, <code>accumulate</code> was TRUE for the <code>process.data</code>
+step but it was turned off for the model fit because it would have
+not resulted in any accumulation with the sex term in the model. Typically
+the default values are optimal but if you are fitting many models
+and most are complex models, then it may save time to accumulate in
+the <code>process.data</code> step but not for the model fitting step.</p>
+<p>If you fit more than a few models, use <code>crm.wrapper</code> rather
+than <code>crm</code>. It fits a set of models and returns a list with
+a model selection table that summarizes the fit of all the models.
+By default, <code>crm.wrapper</code> stores the model results externally
+and in the list it only stores the names of the files containing the
+models. If you set <code>external=FALSE</code>, then it will store the
+model results in the list as shown in the example below.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="op">&gt;</span><span class="st"> </span>dipper.proc=<span class="kw">process.data</span>(dipper)</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="op">&gt;</span><span class="st"> </span>dipper.ddl=<span class="kw">make.design.data</span>(dipper.proc)</a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="op">&gt;</span><span class="st"> </span>fit.models=<span class="cf">function</span>()</a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="op">+</span><span class="st"> </span>{</a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="op">+</span><span class="st">   </span>Phi.sex=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>sex)</a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="op">+</span><span class="st">   </span>Phi.time=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>time)</a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="op">+</span><span class="st">   </span>p.sex=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>sex)</a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="op">+</span><span class="st">   </span>p.dot=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="op">+</span><span class="st">   </span>cml=<span class="kw">create.model.list</span>(<span class="kw">c</span>(<span class="st">&quot;Phi&quot;</span>,<span class="st">&quot;p&quot;</span>))</a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="op">+</span><span class="st">   </span>results=<span class="kw">crm.wrapper</span>(cml,<span class="dt">data=</span>dipper.proc, <span class="dt">ddl=</span>dipper.ddl,</a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="op">+</span><span class="st">                       </span><span class="dt">external=</span><span class="ot">FALSE</span>,<span class="dt">accumulate=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb5-12" title="12"><span class="op">+</span><span class="st">   </span><span class="kw">return</span>(results)</a>
+<a class="sourceLine" id="cb5-13" title="13"><span class="op">+</span><span class="st"> </span>}</a>
+<a class="sourceLine" id="cb5-14" title="14"><span class="op">&gt;</span><span class="st"> </span>dipper.models=<span class="kw">fit.models</span>()</a></code></pre></div>
+<p>The model selection table is displayed with:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="op">&gt;</span><span class="st"> </span>dipper.models</a>
+<a class="sourceLine" id="cb6-2" title="2">              model npar      AIC DeltaAIC    weight  neg2lnl convergence</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="dv">1</span>    <span class="kw">Phi</span>(<span class="op">~</span>sex)<span class="kw">p</span>(<span class="op">~</span><span class="dv">1</span>)    <span class="dv">3</span> <span class="fl">672.6762</span> <span class="fl">0.000000</span> <span class="fl">0.4241510</span> <span class="fl">666.6762</span>           <span class="dv">0</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="dv">3</span>   <span class="kw">Phi</span>(<span class="op">~</span>time)<span class="kw">p</span>(<span class="op">~</span><span class="dv">1</span>)    <span class="dv">7</span> <span class="fl">673.7301</span> <span class="fl">1.053881</span> <span class="fl">0.2504224</span> <span class="fl">659.7301</span>           <span class="dv">0</span></a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="dv">2</span>  <span class="kw">Phi</span>(<span class="op">~</span>sex)<span class="kw">p</span>(<span class="op">~</span>sex)    <span class="dv">4</span> <span class="fl">674.1518</span> <span class="fl">1.475609</span> <span class="fl">0.2028131</span> <span class="fl">666.1518</span>           <span class="dv">0</span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="dv">4</span> <span class="kw">Phi</span>(<span class="op">~</span>time)<span class="kw">p</span>(<span class="op">~</span>sex)    <span class="dv">8</span> <span class="fl">675.1583</span> <span class="fl">2.482104</span> <span class="fl">0.1226135</span> <span class="fl">659.1583</span>           <span class="dv">0</span></a></code></pre></div>
+<p>A non-zero value for convergence means the model did not
+converge. If the models are not stored externally, an individual model
+can be extracted from the list with either the model number which
+is listed in the model table or with the model name which is the model
+formula specifications pasted together as shown below:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="op">&gt;</span><span class="st"> </span>dipper.models[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb7-2" title="2"></a>
+<a class="sourceLine" id="cb7-3" title="3">crm Model Summary</a>
+<a class="sourceLine" id="cb7-4" title="4"></a>
+<a class="sourceLine" id="cb7-5" title="5">Npar <span class="op">:</span><span class="st">  </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="op">-</span>2lnL<span class="op">:</span><span class="st">  </span><span class="fl">666.6762</span></a>
+<a class="sourceLine" id="cb7-7" title="7">AIC  <span class="op">:</span><span class="st">  </span><span class="fl">672.6762</span></a>
+<a class="sourceLine" id="cb7-8" title="8"></a>
+<a class="sourceLine" id="cb7-9" title="9">Beta</a>
+<a class="sourceLine" id="cb7-10" title="10">                 Estimate</a>
+<a class="sourceLine" id="cb7-11" title="11"><span class="kw">Phi.</span>(Intercept) <span class="fl">0.2036416</span></a>
+<a class="sourceLine" id="cb7-12" title="12">Phi.sexMale     <span class="fl">0.0792854</span></a>
+<a class="sourceLine" id="cb7-13" title="13"><span class="kw">p.</span>(Intercept)   <span class="fl">2.2274858</span></a>
+<a class="sourceLine" id="cb7-14" title="14"><span class="op">&gt;</span><span class="st"> </span>dipper.models[[<span class="st">&quot;Phi.sex.p.dot&quot;</span>]]</a>
+<a class="sourceLine" id="cb7-15" title="15"></a>
+<a class="sourceLine" id="cb7-16" title="16">crm Model Summary</a>
+<a class="sourceLine" id="cb7-17" title="17"></a>
+<a class="sourceLine" id="cb7-18" title="18">Npar <span class="op">:</span><span class="st">  </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb7-19" title="19"><span class="op">-</span>2lnL<span class="op">:</span><span class="st">  </span><span class="fl">666.6762</span></a>
+<a class="sourceLine" id="cb7-20" title="20">AIC  <span class="op">:</span><span class="st">  </span><span class="fl">672.6762</span></a>
+<a class="sourceLine" id="cb7-21" title="21"></a>
+<a class="sourceLine" id="cb7-22" title="22">Beta</a>
+<a class="sourceLine" id="cb7-23" title="23">                 Estimate</a>
+<a class="sourceLine" id="cb7-24" title="24"><span class="kw">Phi.</span>(Intercept) <span class="fl">0.2036416</span></a>
+<a class="sourceLine" id="cb7-25" title="25">Phi.sexMale     <span class="fl">0.0792854</span></a>
+<a class="sourceLine" id="cb7-26" title="26"><span class="kw">p.</span>(Intercept)   <span class="fl">2.2274858</span></a></code></pre></div>
+<p>If the models are stored externally (by setting <code>external=TRUE</code> in the <code>crm.wrapper</code> call), they can be retrieved
+with the function <code>load.model</code> as shown below:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="op">&gt;</span><span class="st"> </span>model=<span class="kw">load.model</span>(dipper.models[[<span class="dv">1</span>]])</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="op">&gt;</span><span class="st"> </span>model</a>
+<a class="sourceLine" id="cb8-3" title="3"></a>
+<a class="sourceLine" id="cb8-4" title="4">crm Model Summary</a>
+<a class="sourceLine" id="cb8-5" title="5"></a>
+<a class="sourceLine" id="cb8-6" title="6">Npar <span class="op">:</span><span class="st">  </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="op">-</span>2lnL<span class="op">:</span><span class="st">  </span><span class="fl">666.6762</span></a>
+<a class="sourceLine" id="cb8-8" title="8">AIC  <span class="op">:</span><span class="st">  </span><span class="fl">672.6762</span></a>
+<a class="sourceLine" id="cb8-9" title="9"></a>
+<a class="sourceLine" id="cb8-10" title="10">Beta</a>
+<a class="sourceLine" id="cb8-11" title="11">                 Estimate</a>
+<a class="sourceLine" id="cb8-12" title="12"><span class="kw">Phi.</span>(Intercept) <span class="fl">0.2036416</span></a>
+<a class="sourceLine" id="cb8-13" title="13">Phi.sexMale     <span class="fl">0.0792854</span></a>
+<a class="sourceLine" id="cb8-14" title="14"><span class="kw">p.</span>(Intercept)   <span class="fl">2.2274858</span></a></code></pre></div>
+<p>To make the analysis more interesting, we will add some covariates
+for <span class="math inline">\(\phi\)</span> and p. For <span class="math inline">\(\phi\)</span>, we will add a static covariate <code>weight</code>
+which is a random value between 1 and 10. For <span class="math inline">\(\phi\)</span>, we also add
+a time-varying covariate <code>Flood</code> which is the same for all
+dippers but varies by time with a 0 value for times 1,4,5,6 and a
+value of 1 for times 2 and 3. For p, we will add a time-varying individual
+covariate <code>td</code> (trap dependence) which is the 0/1 value of
+the capture from the previous occasion. Static covariates are entered
+in the dataframe in a single column and time-varying covariates have
+a column and name for each occasion with the appropriate time appended
+at the end of each name. In this case, <code>Flood</code> will be <code>Flood1,...,Flood6</code>
+and for <code>td</code> it will be <code>td2,...,td7</code> because time for
+<span class="math inline">\(\phi\)</span> is based on the time at the beginning of the interval and
+for <code>p</code> it is the time for the capture occasion. Below the
+names of the covariates in the dataframe are shown after they are
+created:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(dipper)</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Add a dummy weight field which are random values from 1 to 10</span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="er">&gt;</span><span class="st"> </span><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="op">&gt;</span><span class="st"> </span>dipper<span class="op">$</span>weight=<span class="kw">round</span>(<span class="kw">runif</span>(<span class="kw">nrow</span>(dipper),<span class="dv">0</span>,<span class="dv">9</span>),<span class="dv">0</span>)<span class="op">+</span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb9-5" title="5"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Add Flood covariate</span></a>
+<a class="sourceLine" id="cb9-6" title="6"><span class="er">&gt;</span><span class="st"> </span>Flood=<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dt">each=</span><span class="kw">nrow</span>(dipper)),<span class="dt">ncol=</span><span class="dv">6</span>)</a>
+<a class="sourceLine" id="cb9-7" title="7"><span class="op">&gt;</span><span class="st"> </span><span class="kw">colnames</span>(Flood)=<span class="kw">paste</span>(<span class="st">&quot;Flood&quot;</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>,<span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
+<a class="sourceLine" id="cb9-8" title="8"><span class="op">&gt;</span><span class="st"> </span>dipper=<span class="kw">cbind</span>(dipper,Flood)</a>
+<a class="sourceLine" id="cb9-9" title="9"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Add td covariate, but exclude first release as a capture</span></a>
+<a class="sourceLine" id="cb9-10" title="10"><span class="er">&gt;</span><span class="st"> </span><span class="co"># splitCH and process.ch are functions in the marked package</span></a>
+<a class="sourceLine" id="cb9-11" title="11"><span class="er">&gt;</span><span class="st"> </span>td=<span class="kw">splitCH</span>(dipper<span class="op">$</span>ch)</a>
+<a class="sourceLine" id="cb9-12" title="12"><span class="op">&gt;</span><span class="st"> </span>td=td[,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</a>
+<a class="sourceLine" id="cb9-13" title="13"><span class="op">&gt;</span><span class="st"> </span>releaseocc=<span class="kw">process.ch</span>(dipper<span class="op">$</span>ch)<span class="op">$</span>first</a>
+<a class="sourceLine" id="cb9-14" title="14"><span class="op">&gt;</span><span class="st"> </span>releaseocc=<span class="kw">cbind</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(releaseocc),releaseocc)</a>
+<a class="sourceLine" id="cb9-15" title="15"><span class="op">&gt;</span><span class="st"> </span>releaseocc=releaseocc[releaseocc[,<span class="dv">2</span>]<span class="op">&lt;</span><span class="kw">nchar</span>(dipper<span class="op">$</span>ch[<span class="dv">1</span>]),]</a>
+<a class="sourceLine" id="cb9-16" title="16"><span class="op">&gt;</span><span class="st"> </span>td[releaseocc]=<span class="dv">0</span></a>
+<a class="sourceLine" id="cb9-17" title="17"><span class="op">&gt;</span><span class="st"> </span><span class="kw">colnames</span>(td)=<span class="kw">paste</span>(<span class="st">&quot;td&quot;</span>,<span class="dv">2</span><span class="op">:</span><span class="dv">7</span>,<span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
+<a class="sourceLine" id="cb9-18" title="18"><span class="op">&gt;</span><span class="st"> </span>dipper=<span class="kw">cbind</span>(dipper,td)</a>
+<a class="sourceLine" id="cb9-19" title="19"><span class="op">&gt;</span><span class="st"> </span><span class="co"># show names</span></a>
+<a class="sourceLine" id="cb9-20" title="20"><span class="er">&gt;</span><span class="st"> </span><span class="kw">names</span>(dipper)</a>
+<a class="sourceLine" id="cb9-21" title="21"> [<span class="dv">1</span>] <span class="st">&quot;ch&quot;</span>     <span class="st">&quot;sex&quot;</span>    <span class="st">&quot;weight&quot;</span> <span class="st">&quot;Flood1&quot;</span> <span class="st">&quot;Flood2&quot;</span> <span class="st">&quot;Flood3&quot;</span> <span class="st">&quot;Flood4&quot;</span> <span class="st">&quot;Flood5&quot;</span></a>
+<a class="sourceLine" id="cb9-22" title="22"> [<span class="dv">9</span>] <span class="st">&quot;Flood6&quot;</span> <span class="st">&quot;td2&quot;</span>    <span class="st">&quot;td3&quot;</span>    <span class="st">&quot;td4&quot;</span>    <span class="st">&quot;td5&quot;</span>    <span class="st">&quot;td6&quot;</span>    <span class="st">&quot;td7&quot;</span>   </a></code></pre></div>
+<p>Next we process the data with the default CJS model and make the design
+data with parameters that identify which covariates to use for each
+parameter. By default, each covariate in the dataframe is added to
+the design data of each parameter but the argument static can be used
+to limit the variables appended and the time-varying argument is needed
+to identify which covariates vary by time and should be collapsed
+into a single column. If we did not include the static argument for
+<span class="math inline">\(\phi\)</span>, then <code>weight</code> and each of the <code>td</code> columns
+would also be included and for <code>p</code>, weight and each of the
+<code>Flood</code> columns would be included. If <code>td</code> was added
+to the time-varying argument for <span class="math inline">\(\phi\)</span> and <code>Flood</code> was added
+for <code>p</code>, then we would have also needed to add <code>td1</code>
+and <code>Flood7</code> due to the different time labels for <span class="math inline">\(\phi\)</span> and
+<code>p</code>. We have no intention to use those variables so it is best
+to specify what is needed. After specifying the design lists for <span class="math inline">\(\phi\)</span>
+and <code>p</code>, they are used in the call to <code>make.design.data</code>
+and the resulting dataframe names are shown below:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Process data</span></a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="er">&gt;</span><span class="st"> </span>dipper.proc=<span class="kw">process.data</span>(dipper)</a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="dv">255</span> capture histories collapsed into <span class="dv">171</span></a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Create design data with static and time varying covariates</span></a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="er">&gt;</span><span class="st"> </span>design.Phi=<span class="kw">list</span>(<span class="dt">static=</span><span class="kw">c</span>(<span class="st">&quot;weight&quot;</span>),<span class="dt">time.varying=</span><span class="kw">c</span>(<span class="st">&quot;Flood&quot;</span>))</a>
+<a class="sourceLine" id="cb10-6" title="6"><span class="op">&gt;</span><span class="st"> </span>design.p=<span class="kw">list</span>(<span class="dt">static=</span><span class="kw">c</span>(<span class="st">&quot;sex&quot;</span>),<span class="dt">time.varying=</span><span class="kw">c</span>(<span class="st">&quot;td&quot;</span>),</a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="op">+</span><span class="st">                         </span><span class="dt">age.bins=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">20</span>))</a>
+<a class="sourceLine" id="cb10-8" title="8"><span class="op">&gt;</span><span class="st"> </span>design.parameters=<span class="kw">list</span>(<span class="dt">Phi=</span>design.Phi,<span class="dt">p=</span>design.p)</a>
+<a class="sourceLine" id="cb10-9" title="9"><span class="op">&gt;</span><span class="st"> </span>ddl=<span class="kw">make.design.data</span>(dipper.proc,<span class="dt">parameters=</span>design.parameters)</a>
+<a class="sourceLine" id="cb10-10" title="10"><span class="op">&gt;</span><span class="st"> </span><span class="kw">names</span>(ddl<span class="op">$</span>Phi)</a>
+<a class="sourceLine" id="cb10-11" title="11"><span class="op">&gt;</span><span class="st"> </span><span class="kw">names</span>(ddl<span class="op">$</span>p)</a></code></pre></div>
+<p>Next we define the models for <span class="math inline">\(\phi\)</span> and <span class="math inline">\(p\)</span> that we want
+to fit and call crm.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="op">&gt;</span><span class="st"> </span>Phi.sfw=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>Flood<span class="op">+</span>weight)</a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="op">&gt;</span><span class="st"> </span>p.ast=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>age<span class="op">+</span>sex<span class="op">+</span>td)</a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="op">&gt;</span><span class="st"> </span>model=<span class="kw">crm</span>(dipper.proc,ddl,<span class="dt">hessian=</span><span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="op">+</span><span class="st">            </span><span class="dt">model.parameters=</span><span class="kw">list</span>(<span class="dt">Phi=</span>Phi.sfw,<span class="dt">p=</span>p.ast))</a>
+<a class="sourceLine" id="cb11-5" title="5">Computing initial parameter estimates</a>
+<a class="sourceLine" id="cb11-6" title="6">Starting optimization <span class="cf">for</span> <span class="dv">7</span> parameters...</a>
+<a class="sourceLine" id="cb11-7" title="7">Computing hessian...</a>
+<a class="sourceLine" id="cb11-8" title="8"></a>
+<a class="sourceLine" id="cb11-9" title="9">Elapsed time <span class="cf">in</span> minutes<span class="op">:</span><span class="st">  </span><span class="fl">0.0052</span> </a></code></pre></div>
+<p>Below we create a range of data values to compute predicted <span class="math inline">\(\phi\)</span>
+values and then plot the results for Flood and non-Flood years for
+a range of weights. Not surprising that the slope for weight is nearly
+0 because the weight values were generated randomly.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="op">&gt;</span><span class="st"> </span>newdipper=<span class="kw">expand.grid</span>(<span class="dt">sex=</span><span class="kw">c</span>(<span class="st">&quot;Female&quot;</span>,<span class="st">&quot;Male&quot;</span>),<span class="dt">weight=</span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,<span class="dt">Flood1=</span><span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="op">+</span><span class="st">       </span><span class="dt">Flood2=</span><span class="dv">1</span>,<span class="dt">Flood3=</span><span class="dv">1</span>,<span class="dt">Flood4=</span><span class="dv">0</span>,<span class="dt">Flood5=</span><span class="dv">0</span>,<span class="dt">Flood6=</span><span class="dv">0</span>,<span class="dt">td2=</span><span class="dv">0</span>,<span class="dt">td3=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="op">+</span><span class="st">       </span><span class="dt">td4=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="dt">td5=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="dt">td6=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="dt">td7=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)) </a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="op">&gt;</span><span class="st"> </span>reals=<span class="kw">predict</span>(model,<span class="dt">newdata=</span>newdipper,<span class="dt">se=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb12-5" title="5"><span class="op">&gt;</span><span class="st"> </span>reals<span class="op">$</span>Phi<span class="op">$</span>Flood=<span class="kw">factor</span>(reals<span class="op">$</span>Phi<span class="op">$</span>Flood,<span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;Non-flood&quot;</span>,<span class="st">&quot;Flood&quot;</span>))</a>
+<a class="sourceLine" id="cb12-6" title="6"><span class="op">&gt;</span><span class="st"> </span><span class="kw">ggplot</span>(reals<span class="op">$</span>Phi,<span class="kw">aes</span>(weight,estimate,<span class="dt">ymin=</span>lcl,<span class="dt">ymax=</span>ucl))<span class="op">+</span></a>
+<a class="sourceLine" id="cb12-7" title="7"><span class="op">+</span><span class="st">       </span><span class="kw">geom_errorbar</span>(<span class="dt">width=</span><span class="fl">0.2</span>)<span class="op">+</span><span class="kw">geom_point</span>()<span class="op">+</span><span class="kw">geom_line</span>()<span class="op">+</span></a>
+<a class="sourceLine" id="cb12-8" title="8"><span class="op">+</span><span class="st">       </span><span class="kw">xlab</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">Weight&quot;</span>)<span class="op">+</span><span class="kw">ylab</span>(<span class="st">&quot;Survival</span><span class="ch">\n</span><span class="st">&quot;</span>)<span class="op">+</span><span class="kw">facet_grid</span>(Flood<span class="op">~</span>.)   </a></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Fitting an MCMC CJS model (<code>probitCJS</code>) to the dipper data
+is quite similar to the MLE models with the added arguments <code>burnin</code>
+and <code>iter</code> to control the number of burnin iterations
+and the number of iterations to perform after the burnin
+process. The following fits <code>Phi(~Flood) p(~sex+time)</code>
+with low values set for <code>burnin</code> and <code>iter</code> to reduce
+the vignette build time.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(dipper)</a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Add Flood covariate</span></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="er">&gt;</span><span class="st"> </span>Flood=<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dt">each=</span><span class="kw">nrow</span>(dipper)),<span class="dt">ncol=</span><span class="dv">6</span>)</a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="op">&gt;</span><span class="st"> </span><span class="kw">colnames</span>(Flood)=<span class="kw">paste</span>(<span class="st">&quot;Flood&quot;</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>,<span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="op">&gt;</span><span class="st"> </span>dipper=<span class="kw">cbind</span>(dipper,Flood)</a>
+<a class="sourceLine" id="cb13-6" title="6"><span class="op">&gt;</span><span class="st"> </span>design.parameters=<span class="kw">list</span>(<span class="dt">Phi=</span><span class="kw">list</span>(<span class="dt">time.varying=</span><span class="st">&quot;Flood&quot;</span>))</a>
+<a class="sourceLine" id="cb13-7" title="7"><span class="op">&gt;</span><span class="st"> </span>model.parameters=<span class="kw">list</span>(<span class="dt">Phi=</span><span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>Flood),</a>
+<a class="sourceLine" id="cb13-8" title="8"><span class="op">+</span><span class="st">                      </span><span class="dt">p=</span><span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>time<span class="op">+</span>sex))</a>
+<a class="sourceLine" id="cb13-9" title="9"><span class="op">&gt;</span><span class="st"> </span>MCMCfit=<span class="kw">crm</span>(dipper,<span class="dt">model=</span><span class="st">&quot;probitCJS&quot;</span>,</a>
+<a class="sourceLine" id="cb13-10" title="10"><span class="op">+</span><span class="st">             </span><span class="dt">model.parameters=</span>model.parameters,</a>
+<a class="sourceLine" id="cb13-11" title="11"><span class="op">+</span><span class="st">             </span><span class="dt">design.parameters=</span>design.parameters,</a>
+<a class="sourceLine" id="cb13-12" title="12"><span class="op">+</span><span class="st">             </span><span class="dt">burnin=</span><span class="dv">1000</span>,<span class="dt">iter=</span><span class="dv">5000</span>) </a>
+<a class="sourceLine" id="cb13-13" title="13">Computing initial parameter estimates</a>
+<a class="sourceLine" id="cb13-14" title="14">probitCJS MCMC beginning...</a>
+<a class="sourceLine" id="cb13-15" title="15">p model =<span class="st"> </span><span class="er">~</span>time <span class="op">+</span><span class="st"> </span>sex</a>
+<a class="sourceLine" id="cb13-16" title="16">phi model =<span class="st"> </span><span class="er">~</span>Flood</a>
+<a class="sourceLine" id="cb13-17" title="17">MCMC complete, processing output...</a>
+<a class="sourceLine" id="cb13-18" title="18"></a>
+<a class="sourceLine" id="cb13-19" title="19">Elapsed time <span class="cf">in</span> minutes<span class="op">:</span><span class="st">  </span><span class="fl">0.4968</span> </a></code></pre></div>
+<p>The results shown are the mode,mean,standard deviation, and 95% highest
+posterior density interval for the beta parameters and unique <span class="math inline">\(\phi\)</span>
+and <span class="math inline">\(p\)</span> real values.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="co"># beta estimates</span></a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="er">&gt;</span><span class="st"> </span>MCMCfit</a>
+<a class="sourceLine" id="cb14-3" title="3"></a>
+<a class="sourceLine" id="cb14-4" title="4">crm Model Summary</a>
+<a class="sourceLine" id="cb14-5" title="5"></a>
+<a class="sourceLine" id="cb14-6" title="6">Npar <span class="op">:</span><span class="st">  </span><span class="dv">9</span></a>
+<a class="sourceLine" id="cb14-7" title="7"></a>
+<a class="sourceLine" id="cb14-8" title="8">Beta</a>
+<a class="sourceLine" id="cb14-9" title="9">                      mode       mean        sd   CI.lower   CI.upper</a>
+<a class="sourceLine" id="cb14-10" title="10"><span class="kw">Phi.</span>(Intercept)  <span class="fl">0.2218764</span>  <span class="fl">0.1394034</span> <span class="fl">0.1988469</span> <span class="fl">-0.3236473</span>  <span class="fl">0.3973615</span></a>
+<a class="sourceLine" id="cb14-11" title="11">Phi.Flood       <span class="fl">-0.3032873</span> <span class="fl">-0.2177971</span> <span class="fl">0.2362796</span> <span class="fl">-0.5935488</span>  <span class="fl">0.3281377</span></a>
+<a class="sourceLine" id="cb14-12" title="12"><span class="kw">p.</span>(Intercept)    <span class="fl">0.6436777</span>  <span class="fl">0.7313005</span> <span class="fl">0.4823417</span> <span class="fl">-0.1948946</span>  <span class="fl">1.6849869</span></a>
+<a class="sourceLine" id="cb14-13" title="13">p.time3          <span class="fl">0.5352586</span>  <span class="fl">0.6701687</span> <span class="fl">0.6953046</span> <span class="fl">-0.6100731</span>  <span class="fl">2.0952347</span></a>
+<a class="sourceLine" id="cb14-14" title="14">p.time4          <span class="fl">0.4407369</span>  <span class="fl">0.5294992</span> <span class="fl">0.6049279</span> <span class="fl">-0.7215044</span>  <span class="fl">1.6491366</span></a>
+<a class="sourceLine" id="cb14-15" title="15">p.time5          <span class="fl">0.6660732</span>  <span class="fl">0.9236156</span> <span class="fl">0.9841979</span> <span class="fl">-0.5919596</span>  <span class="fl">3.2741951</span></a>
+<a class="sourceLine" id="cb14-16" title="16">p.time6          <span class="fl">0.8411414</span>  <span class="fl">1.2338615</span> <span class="fl">1.3159079</span> <span class="fl">-0.6319253</span>  <span class="fl">4.5546328</span></a>
+<a class="sourceLine" id="cb14-17" title="17">p.time7          <span class="fl">4.5265041</span>  <span class="fl">4.5959475</span> <span class="fl">3.2243378</span> <span class="fl">-0.6258622</span> <span class="fl">10.7480427</span></a>
+<a class="sourceLine" id="cb14-18" title="18">p.sexMale        <span class="fl">0.2456669</span>  <span class="fl">0.2932974</span> <span class="fl">0.4073129</span> <span class="fl">-0.5176629</span>  <span class="fl">1.0738007</span></a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="co"># real estimates</span></a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="er">&gt;</span><span class="st"> </span>MCMCfit<span class="op">$</span>results<span class="op">$</span>reals</a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="op">$</span>Phi</a>
+<a class="sourceLine" id="cb15-4" title="4">  Flood occ      mode      mean         sd  CI.lower  CI.upper</a>
+<a class="sourceLine" id="cb15-5" title="5"><span class="dv">1</span>     <span class="dv">0</span>   <span class="dv">6</span> <span class="fl">0.5885365</span> <span class="fl">0.5549285</span> <span class="fl">0.07805424</span> <span class="fl">0.3731025</span> <span class="fl">0.6544496</span></a>
+<a class="sourceLine" id="cb15-6" title="6"><span class="dv">2</span>     <span class="dv">1</span>   <span class="dv">3</span> <span class="fl">0.4743363</span> <span class="fl">0.4689535</span> <span class="fl">0.04400546</span> <span class="fl">0.3831628</span> <span class="fl">0.5551082</span></a>
+<a class="sourceLine" id="cb15-7" title="7"></a>
+<a class="sourceLine" id="cb15-8" title="8"><span class="op">$</span>p</a>
+<a class="sourceLine" id="cb15-9" title="9">   time    sex occ      mode      mean         sd  CI.lower  CI.upper</a>
+<a class="sourceLine" id="cb15-10" title="10"><span class="dv">1</span>     <span class="dv">7</span> Female   <span class="dv">7</span> <span class="fl">0.9996926</span> <span class="fl">0.9669530</span> <span class="fl">0.07626647</span> <span class="fl">0.7779231</span> <span class="fl">1.0000000</span></a>
+<a class="sourceLine" id="cb15-11" title="11"><span class="dv">2</span>     <span class="dv">7</span>   Male   <span class="dv">7</span> <span class="fl">0.9998341</span> <span class="fl">0.9785297</span> <span class="fl">0.05306793</span> <span class="fl">0.8578692</span> <span class="fl">1.0000000</span></a>
+<a class="sourceLine" id="cb15-12" title="12"><span class="dv">3</span>     <span class="dv">6</span> Female   <span class="dv">6</span> <span class="fl">0.9945257</span> <span class="fl">0.9351462</span> <span class="fl">0.05447770</span> <span class="fl">0.8309172</span> <span class="fl">1.0000000</span></a>
+<a class="sourceLine" id="cb15-13" title="13"><span class="dv">4</span>     <span class="dv">6</span>   Male   <span class="dv">6</span> <span class="fl">0.9951112</span> <span class="fl">0.9567330</span> <span class="fl">0.04368942</span> <span class="fl">0.8704560</span> <span class="fl">1.0000000</span></a>
+<a class="sourceLine" id="cb15-14" title="14"><span class="dv">5</span>     <span class="dv">5</span> Female   <span class="dv">5</span> <span class="fl">0.9290541</span> <span class="fl">0.9110636</span> <span class="fl">0.06491508</span> <span class="fl">0.7884778</span> <span class="fl">1.0000000</span></a>
+<a class="sourceLine" id="cb15-15" title="15"><span class="dv">6</span>     <span class="dv">5</span>   Male   <span class="dv">5</span> <span class="fl">0.9953383</span> <span class="fl">0.9416982</span> <span class="fl">0.05007638</span> <span class="fl">0.8465082</span> <span class="fl">1.0000000</span></a>
+<a class="sourceLine" id="cb15-16" title="16"><span class="dv">7</span>     <span class="dv">4</span> Female   <span class="dv">4</span> <span class="fl">0.9369048</span> <span class="fl">0.8783982</span> <span class="fl">0.07796190</span> <span class="fl">0.7262238</span> <span class="fl">0.9923971</span></a>
+<a class="sourceLine" id="cb15-17" title="17"><span class="dv">8</span>     <span class="dv">4</span>   Male   <span class="dv">4</span> <span class="fl">0.9639034</span> <span class="fl">0.9220626</span> <span class="fl">0.06118877</span> <span class="fl">0.7977592</span> <span class="fl">0.9994631</span></a>
+<a class="sourceLine" id="cb15-18" title="18"><span class="dv">9</span>     <span class="dv">3</span> Female   <span class="dv">3</span> <span class="fl">0.9721815</span> <span class="fl">0.8897479</span> <span class="fl">0.08899024</span> <span class="fl">0.7146708</span> <span class="fl">0.9997964</span></a>
+<a class="sourceLine" id="cb15-19" title="19"><span class="dv">10</span>    <span class="dv">3</span>   Male   <span class="dv">3</span> <span class="fl">0.9869350</span> <span class="fl">0.9272389</span> <span class="fl">0.07132128</span> <span class="fl">0.7844138</span> <span class="fl">0.9999766</span></a>
+<a class="sourceLine" id="cb15-20" title="20"><span class="dv">11</span>    <span class="dv">2</span> Female   <span class="dv">2</span> <span class="fl">0.8138675</span> <span class="fl">0.7442329</span> <span class="fl">0.13826792</span> <span class="fl">0.4889068</span> <span class="fl">0.9815822</span></a>
+<a class="sourceLine" id="cb15-21" title="21"><span class="dv">12</span>    <span class="dv">2</span>   Male   <span class="dv">2</span> <span class="fl">0.9003932</span> <span class="fl">0.8186241</span> <span class="fl">0.11810416</span> <span class="fl">0.5969684</span> <span class="fl">0.9982825</span></a></code></pre></div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs">
+<div id="ref-ALBERT:1993fk">
+<p>Albert, JH, and S Chib. 1993. “Bayesian-Analysis of Binary and Polychotomous Reponse Data.” <em>Journal of the American Statistical Association</em> 88 (422): 669–79.</p>
+</div>
+<div id="ref-Baillargeon2007">
+<p>Baillargeon, S, and L P Rivest. 2007. “Rcapture: Loglinear models for capture-recapture in R.” <em>Journal of Statistical Software</em> 19 (5): 1–31.</p>
+</div>
+<div id="ref-Borchers2008">
+<p>Borchers, D L, and M G Efford. 2008. “Spatially Explicit Maximum Likelihood Methods for Capture-Recapture Studies.” <em>Biometrics</em> 64 (2): 377–85.</p>
+</div>
+<div id="ref-Colchero2012">
+<p>Colchero, Fernando, Owen R. Jones, and Maren Rebke. 2012. “BaSTA: an R package for Bayesian estimation of age-specific survival from incomplete mark-recapture/recovery data with covariates.” <em>Methods in Ecology and Evolution</em> 3 (February): 466–70.</p>
+</div>
+<div id="ref-Fiske2011">
+<p>Fiske, Ian J, and Richard B Chandler. 2011. “unmarked : An R Package for fitting hierarchical models of wildlife occurrence and abundance” 43 (10): 1–23.</p>
+</div>
+<div id="ref-Laake2008">
+<p>Laake, J, and E Rexstad. 2008. “RMark – an alternative approach to building linear models in MARK.” In <em>Program Mark: A Gentle Introduction</em>, edited by E Cooch and G C White.</p>
+</div>
+<div id="ref-Manly1968">
+<p>Manly, B F J, and M J Parr. 1968. “A new method of estimating population size, survivorship, and birth rate from recapture data.” <em>Transactions of the Society for British Entomology</em> 18: 81–89.</p>
+</div>
+<div id="ref-McDonald2005">
+<p>McDonald, T L, S C Amstrup, E V Regehr, and B F J Manly. 2005. “Examples.” In <em>Handbook of Capture-Recapture Analysis</em>, edited by S C Amstrup, T L McDonald, and B F J Manly, 196–265. Princeton, New Jersey USA: Princeton University Press.</p>
+</div>
+<div id="ref-Pledger2003">
+<p>Pledger, S, K H Pollock, and J L Norris. 2003. “Open capture-recapture models with heterogeneity: I. Cormack-Jolly-Seber model.” <em>Biometrics</em> 59 (4): 786–94.</p>
+</div>
+<div id="ref-Royle2009">
+<p>Royle, J Andrew, K Ullas Karanth, Arjun M Gopalaswamy, and N Samba Kumar. 2009. “Bayesian inference in camera trapping studies for a class of spatial capture-recapture models.” <em>Ecology</em> 90 (11): 3233–44.</p>
+</div>
+<div id="ref-Schwarz1996">
+<p>Schwarz, C. J., and A N. Arnason. 1996. “A general methodology for the analysis of capture-recapture experiments in open populations.” <em>Biometrics</em> 52 (3): 860–73.</p>
+</div>
+<div id="ref-Schwarz2009">
+<p>Schwarz, C. J., D. Pickard, K. Marine, and S. J. Bonner. 2009. “Juvenile Salmonid Outmigrant Monitoring Evaluation, Phase II, September 2009. Unpublished Report Prepared for the Trinity River Restoration Program, Weaverville, CA.”</p>
+</div>
+<div id="ref-White1999">
+<p>White, G C, and K P Burnham. 1999. “Program MARK: survival estimation from populations of marked animals.” <em>Bird Study</em> 46: 120–39.</p>
+</div>
+</div>
+</div>
+<div id="appendix" class="section level1 unnumbered">
+<h1>Appendix</h1>
+<div id="model-construction" class="section level2 unnumbered">
+<h2>Model construction</h2>
+<p>The manner in which models are constructed in the <code>marked</code> package
+is different than in MARK. We start by describing how MARK specifies
+and constructs models and how the <code>marked</code> package differs.
+The likelihood for CJS/JS is a product multinomial and the multinomial
+cell probabilities are functions of the parameters. We will focus
+on CJS which has two types of parameters: <span class="math inline">\(p\)</span> (capture/recapture
+probability) and <span class="math inline">\(\phi\)</span> (apparent survival). Each cell is associated
+with a release cohort and recapture time (occasion). The cohorts can
+be further split into groups based on categorical variables (e.g.,
+sex). In MARK, a parameter index matrix (PIM) is used to specify the
+parameters. Each cell can have a unique index for each type of parameter
+type (e.g., <span class="math inline">\(p\)</span> and <span class="math inline">\(\phi\)</span>). As a very simple example, we will consider
+a CJS model for a single group with k=4 occasions. For this structure
+the PIMS are triangular with a row for each cohort released at each
+occasion (time) and the column representing the occasions (times)
+following the release. Using an unique index for each potential parameter,
+the PIMS would be:</p>
+<pre><code>Registered S3 method overwritten by &#39;rvest&#39;:
+  method            from
+  read_xml.response xml2</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden" colspan="1">
+</th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+<span class="math inline">\(\phi\)</span>
+</div>
+</th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+<span class="math inline">\(p\)</span>
+</div>
+</th>
+</tr>
+<tr>
+<th style="border-bottom:hidden" colspan="1">
+</th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style>
+Time
+</div>
+</th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style>
+Time
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+Cohort
+</th>
+<th style="text-align:right;">
+2
+</th>
+<th style="text-align:right;">
+3
+</th>
+<th style="text-align:right;">
+4
+</th>
+<th style="text-align:right;">
+2
+</th>
+<th style="text-align:right;">
+3
+</th>
+<th style="text-align:right;">
+4
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;border-right:1px solid;min-width: 3em; font-family: monospace;">
+1
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+1
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+2
+</td>
+<td style="text-align:right;border-right:1px solid;min-width: 3em; font-family: monospace;">
+3
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+7
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+8
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;border-right:1px solid;min-width: 3em; font-family: monospace;">
+2
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+4
+</td>
+<td style="text-align:right;border-right:1px solid;min-width: 3em; font-family: monospace;">
+5
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+10
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;border-right:1px solid;min-width: 3em; font-family: monospace;">
+3
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+</td>
+<td style="text-align:right;border-right:1px solid;min-width: 3em; font-family: monospace;">
+6
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+</td>
+<td style="text-align:right;min-width: 3em; font-family: monospace;">
+12
+</td>
+</tr>
+</tbody>
+</table>
+<p>The index 5 represents survival of the second release cohort
+between occasions 3 and 4 and index 8 represents recapture probability
+of the first release cohort on the third occasion. A separate set
+of PIMS is created for each group defined in the data. For this example,
+if there were <span class="math inline">\(g\)</span> groups there would be <span class="math inline">\(g\times 12\)</span> possible
+unique indices.</p>
+<p>Some reduced models with constraints on parameters can be constructed
+by modifying the PIMS. For example, a model with constant survival
+and capture probability (Phi(.)p(.)) could be specified by setting
+all of the PIM values to 1 for the <span class="math inline">\(\phi\)</span> PIM and 2 for the <span class="math inline">\(p\)</span>
+PIM. Not all reduced models can be specified by modifying the PIMS
+and more generally reduced models are constructed with a design matrix
+which is a set of linear constraints. Each parameter index specifies
+a row in the design matrix which can be used to apply constraints
+on the parameters and to relate covariates to the parameters. The
+PIM approach minimizes the work of manually creating a design matrix
+by reducing the set of potential parameters and thus the number of
+rows in the design matrix. For our example, there would be 12 rows
+in the design matrix and each column in the design matrix (<span class="math inline">\(X\)</span>) represents
+one of the parameters in the vector<span class="math inline">\(\beta\)</span>. If a logit link is used,
+the real parameters <span class="math inline">\(\theta\)</span> (e.g., <span class="math inline">\(\phi\)</span> and <span class="math inline">\(p\)</span> in CJS) are:</p>
+<p><span class="math display" id="eq:link">\[\begin{equation}
+  \theta=\frac{1}{1+\exp(-X\beta)}
+  \tag{1}
+\end{equation}\]</span></p>
+<p>To specify the Phi(.)p(.) model, the design matrix (<span class="math inline">\(X\)</span>)
+would have 12 rows and 2 columns. The first column in <span class="math inline">\(X\)</span> would have
+a 1 in the first six rows (indices 1-6) and a 0 in the last six rows
+(indices 7-12). The second column would have 0 in the first six rows
+and a 1 in the last 6 rows. The resulting model would have two parameters
+with the first representing <span class="math inline">\(\phi\)</span> and the second <span class="math inline">\(p\)</span>.</p>
+<p>To automate the creation of design matrices with formula, the RMark
+package creates “design data” which are data about the parameters
+like cohort, time, group, and any related variables. However, having
+a single <span class="math inline">\(X\)</span> becomes problematic with individual covariates (variables
+that differ for animals in the same group/cohort). In MARK, these
+individual covariates are entered into the design matrix as a covariate
+name. When the real parameters are computed, the name of the covariate
+is replaced with the value for an animal. If there are only a few
+individual covariates and small number of animals, the time required
+for replacement and computation is minor, but when the individual
+covariates differ in time, there is a different covariate name for
+each time and most rows in the design matrix must be recomputed which
+results in longer execution times for large models.</p>
+<p>Even if computation time is not limiting, we agree with <span class="citation">McDonald et al. (2005)</span>
+that the PIMs used in MARK can be quite confusing to the novice user
+because they are an additional layer of abstraction from the data.
+PIMS are useful for manual model creation, but they become an unnecessary
+nuisance when models and design matrices are created with formula.
+Explicit PIMS can be avoided by having an underlying real parameter
+for each animal for each occasion regardless of the release cohort.
+It can be viewed as a rectangular matrix with a column for each animal
+and a row for each occasion. That was the solution of <span class="citation">McDonald et al. (2005)</span>
+who in their mra package use a rectangular covariate matrices as predictor
+for the real parameters as in standard regression.</p>
+<p>We use a similar approach that we believe is simpler for the user.
+For a specified model structure (e.g., CJS), the <code>marked</code> package
+creates from the raw data, a list of dataframes. Each dataframe contains
+the covariate data for a type of parameter in the model (e.g., <span class="math inline">\(\phi\)</span>
+and <span class="math inline">\(p\)</span>). The dataframes contain a record for each animal-occasion
+and the columns are the covariates. Each record contains the covariate
+values for that animal-occasion. If the covariate is constant across
+time then the value is the same value in each record for an animal
+and the value may be different for each occasion if the covariate
+is time-varying. Time-varying covariates must be named in the raw
+data in a certain manner and specified in the processing step. Each
+column in the dataframe is a vector that is equivalent to one of the
+covariate matrices in mra; however, rather than specifying the model
+as a set of covariate matrices, the standard R model formula (e.g.,
+<code>~time+sex</code>) can be used with the dataframe for each
+parameter which is even closer to a typical regression analysis.</p>
+<p>A separate dataframe is created for each parameter to allow different
+data (e.g., time values for <span class="math inline">\(\phi\)</span> and <span class="math inline">\(p\)</span>) and number of occasions
+(e.g., <span class="math inline">\(\phi\)</span> and <span class="math inline">\(p\)</span> in CJS) for each parameter. For <span class="math inline">\(\phi\)</span> and
+<span class="math inline">\(p\)</span> in the CJS model, there are <span class="math inline">\(n(k-1)\)</span> rows for <span class="math inline">\(n\)</span> animals and
+<span class="math inline">\(k-1\)</span> occasions for each parameter but time is labeled by 1 to <span class="math inline">\(k-1\)</span>
+for <span class="math inline">\(\phi\)</span> and 2 to <span class="math inline">\(k\)</span> for <span class="math inline">\(p\)</span>. For the JS model, there are <span class="math inline">\(n(k-1)\)</span>
+records for survival probability and entry probability, but for capture
+probability there are <span class="math inline">\(nk\)</span> records because the initial capture event
+is modeled.</p>
+<p>The parameter-specific animal-occasion dataframes are automatically
+created from the user’s data which contain a single record per animal
+containing the capture history and any covariates. Some covariates
+like cohort, age, and time are generated automatically for each record.
+Other static and time-varying covariates specified in the data are
+added. Static variables (e.g., sex) are repeated for each occasion
+for each animal. Time-varying covariates are specified in the data
+using a naming convention of <code>vt</code> where <code>v</code> is the covariate
+name and <code>t</code> is a numeric value for the time (occasion) (e.g.,
+td19 contains the value of covariate td at time 19). The time-varying
+covariates are collapsed in the animal-occasion dataframes to a single
+column with the name identified by <code>v</code> and each record contains
+the appropriate value for the occasion. All of this is transparent
+to the user who only needs to specify a dataframe, the type of model
+(e.g., CJS), the variables that should be treated as time-varying,
+and the formula for each parameter.</p>
+<p>With the R function model.matrix, the formula is applied to the dataframe
+to create the design matrix for each parameter (e.g, <span class="math inline">\(X_{\phi}\)</span>,<span class="math inline">\(X_{p}\)</span>).
+They are each equivalent to a portion of the design matrix in MARK
+for an animal which are then “stacked on top of one another” to
+make a matrix for all animals. For maximum likelihood estimation (MLE),
+equation <a href="#eq:link">(1)</a> (or similar inverse link function) is applied
+and the resulting vector is converted to a matrix with <span class="math inline">\(n\)</span> rows and
+a column for each required occasion (<span class="math inline">\(k-1\)</span> or <span class="math inline">\(k\)</span>). For Bayesian
+MCMC inference in <code>marked</code>, only<span class="math inline">\(X\beta\)</span> are needed for updating.</p>
+</div>
+<div id="model-fitting" class="section level2 unnumbered">
+<h2>Model fitting</h2>
+<p>Currently there are only three types of models implemented in the
+<code>marked</code> package: 1) CJS, 2) JS, and 3) probitCJS. The first
+two are based on MLE and the third is an MCMC implementation. The likelihoods for CJS and JS were developed
+hierarchically as described by <span class="citation">Pledger, Pollock, and Norris (2003)</span> for CJS. For simplicity
+we only consider a single animal to avoid the additional subscript.
+Let <span class="math inline">\(\omega\)</span> be a capture history vector having value <span class="math inline">\(\omega_{j}\)</span>=
+1 when the animal was initially captured and released or recaptured
+at occasion <span class="math inline">\(j\)</span> and <span class="math inline">\(\omega_{j}\)</span>= 0 if the animal was not
+captured on occasion <span class="math inline">\(j\)</span>, for occasions <span class="math inline">\(j=1,\dots,k\)</span>.
+The probability of observing a particular capture history <span class="math inline">\(Pr(\omega)\)</span>
+for CJS can be divided into two pieces (<span class="math inline">\(Pr(\omega)=Pr(\omega_{1})Pr(\omega_{2})\)</span>:
+1) <span class="math inline">\(\omega_{1}\)</span> is the portion of the capture history from the initial
+release (i.e., first 1) to the last occasion it was sighted (i.e.,
+last 1), and 2) <span class="math inline">\(\omega_{2}\)</span> is from the last 1 to the last occasion.
+<span class="math inline">\(Pr(\omega_{1})\)</span> is easily computed because the time period when
+the animal was available for capture is known but <span class="math inline">\(Pr(\omega_{2})\)</span>
+is more difficult to compute because it is unknown whether the animal
+survived until the last occasion, or if it died, when it died. Typically,
+<span class="math inline">\(Pr(\omega_{2})\)</span> has been computed recursively (Nichols 2005). A
+hierarchical construction is more direct and understandable. As described
+in <span class="citation">Pledger, Pollock, and Norris (2003)</span>, we let <span class="math inline">\(f\)</span> be the occasion an animal
+was released and let <span class="math inline">\(d\)</span> be the occasion after which the animal
+is no longer available to be recaptured due to death or termination
+of the study. Then <span class="math inline">\(Pr(\omega|\, f)=\sum_{d}Pr(\omega|\, f,\, d)Pr(d\,|\, f)\)</span>
+where the conditional probability <span class="math inline">\(Pr(\omega|\, f,\, d)\)</span> is:
+<span class="math display">\[
+Pr(\omega|\, f,\, d)=\prod_{j=f+1}^{d}p_{j}^{\omega_{j}}(1-p_{j})^{(1-\omega_{j})}
+\]</span>
+and the departure probability is
+<span class="math display">\[
+Pr(d\,|\, f)=\left(\prod_{j=f}^{d-1}\phi_{j}\right)(1-\phi_{d})
+\]</span>
+Viewed in this way, it is possible to construct the likelihood values
+for all of the observations with a set of matrices as we describe
+in the Appendix.</p>
+<p>The hierarchical approach is easily extended to JS. Now the capture
+history has an additional component with <span class="math inline">\(Pr(\omega)=Pr(\omega_{0})Pr(\omega_{1})Pr(\omega_{2})\)</span>
+where <span class="math inline">\(\omega_{0}\)</span> is the portion of the capture history vector from
+the first occasion (<span class="math inline">\(j\)</span>=1) to the occasion the animal was first
+seen (<span class="math inline">\(j=f\)</span>). The <span class="math inline">\(Pr(\omega_{0})\)</span> is similar to <span class="math inline">\(Pr(\omega_{2})\)</span>
+but now it is <span class="math inline">\(e\)</span>, the occasion at which the animal was first
+available for capture (i.e., entered in the prior interval) that is
+unknown. The CJS likelihood provides <span class="math inline">\(Pr(\omega|\, f)\)</span> so we only
+need to compute <span class="math inline">\(Pr(\omega_{0})=\sum_{e=0}^{f-1}Pr(\omega_{0}|\, e)\pi_{e}\)</span>
+where <span class="math inline">\(\pi_{e}\)</span> is the probability of an animal enters the population
+in the interval between occasion <span class="math inline">\(e\)</span> and <span class="math inline">\(e+1\)</span> (<span class="math inline">\(\sum_{e=1}^{k-1}\pi_{e}=1-\pi_{0}\)</span>;
+pent parameters in MARK and specified as <span class="math inline">\(\beta\)</span> by )
+and
+<span class="math display">\[
+Pr(\omega_{0}|\, e)=\left(\prod_{j=e+1}^{f-1}(1-p_{j})\right)p_{f}
+\]</span></p>
+<p>The JS likelihood also contains a component for animals
+that entered but were never seen. The details for the JS likelihood
+construction are provided in the Appendix.</p>
+<p>The MLEs are obtained numerically by finding the minimum of the negative
+log-likelihood using optimization methods provided through the optimx
+R package (Nash and ). The default optimization method is BFGS but
+you can specify alternate methods and several methods used independently
+or in sequence as described by Nash and (). Initial values for parameters
+can either be provided as a constant (e.g., 0) or as a vector from
+the results of a previously fitted similar model. If initial values
+are not specified then they are computed using general linear models
+(GLM) that provide approximations. Using the underlying idea in <span class="citation">Manly and Parr (1968)</span>
+we compute initial estimates for capture-probability <span class="math inline">\(p\)</span> for occasions
+2 to <span class="math inline">\(k-1\)</span> using a binomial GLM with the formula for <span class="math inline">\(p\)</span> which is
+fitted to a sequence of Bernoulli random variables that are a subset
+of the capture history values <span class="math inline">\(y_{ij}\)</span> <span class="math inline">\(i=1,...,n\)</span> and <span class="math inline">\(j=f_{i}+1,...,l_{i}-1\)</span>
+where <span class="math inline">\(f_{i}\)</span> and <span class="math inline">\(l_{i}\)</span> are the first and last occasions the <span class="math inline">\(i^{th}\)</span>
+animal was seen. A similar but more ad-hoc idea is used for <span class="math inline">\(\phi\)</span>.
+We know the animal is alive between <span class="math inline">\(f_{i}\)</span> and <span class="math inline">\(l_{i}\)</span> and assume
+that the animal dies at occasion <span class="math inline">\(l_{i}+1\leq k\)</span>. We use a binomial
+GLM with the formula for <span class="math inline">\(\phi\)</span> fitted to the <span class="math inline">\(y_{ij}^{*}\)</span> <span class="math inline">\(i=1,...,n\)</span>
+and <span class="math inline">\(j=f_{i}+1,...,l_{i}+1\leq k\)</span> where <span class="math inline">\(y_{ij}^{*}\)</span>=1 for <span class="math inline">\(j=f_{i}+1,...,l_{i}\)</span>
+and <span class="math inline">\(y_{ij}^{*}\)</span>=0 for <span class="math inline">\(j=l_{i}+1\leq k\)</span>. For <span class="math inline">\(\phi\)</span> and <span class="math inline">\(p\)</span>,
+a logit link is used for MLE and a probit link for MCMC. For JS, a
+log link is used for <span class="math inline">\(f^{0}\)</span>, the number never captured and the estimate
+of super-population size is the total number of individual animals
+plus <span class="math inline">\(f^{0}\)</span>. Also, for JS a multinomial logit link is used for <span class="math inline">\(\pi_{e}\)</span>.
+The initial value is set to 0 for any <span class="math inline">\(\beta\)</span> that is not estimated
+(e.g., <span class="math inline">\(p_{K}\)</span> in CJS or <span class="math inline">\(p_{1}\)</span>,<span class="math inline">\(\pi_{e}\)</span>, <span class="math inline">\(N\)</span> for JS).</p>
+</div>
+<div id="likelihood-details" class="section level2 unnumbered">
+<h2>Likelihood details</h2>
+<p>Here we provide some details for the likelihoods that are computed
+in cjs.lnl and cjs.f for the CJS model and in js.lnl for the JS model.
+Let <span class="math inline">\(\phi\)</span>,<span class="math inline">\(M\)</span> <span class="math inline">\(p\)</span> be <span class="math inline">\(n\times k\)</span> matrices which are functions
+of the parameters where<span class="math inline">\(\phi_{ij}\)</span> is the survival probability for
+animal <span class="math inline">\(i\)</span> from occasion <span class="math inline">\(j-1\)</span> to <span class="math inline">\(j\)</span> (<span class="math inline">\(\phi_{i1}=1\)</span> ), <span class="math inline">\(m_{ij}\)</span>
+is the probability of dying in the interval <span class="math inline">\(j\)</span> to <span class="math inline">\(j+1\)</span> (<span class="math inline">\(m_{ik}=1)\)</span>
+and <span class="math inline">\(p_{ij}\)</span> is the capture probability for animal <span class="math inline">\(i\)</span> on occasion
+<span class="math inline">\(j\)</span> (<span class="math inline">\(p_{i1}=0\)</span>). In addition we define a series of matrices and
+vectors computed from the data in the function process.ch. Let <span class="math inline">\(C\)</span>
+be an <span class="math inline">\(n\times k\)</span> matrix of the capture history values and <span class="math inline">\(f_{i}\)</span>and
+<span class="math inline">\(l_{i}\)</span> are the first and last occasions the <span class="math inline">\(i^{th}\)</span> animal was
+seen. Derived from those values are <span class="math inline">\(n\times k\)</span> matrices <span class="math inline">\(L\)</span>, <span class="math inline">\(F\)</span>
+and <span class="math inline">\(F^{+}\)</span> which contain 0 except that <span class="math inline">\(L_{ij}=1\; j\geq l_{i}\)</span>,<span class="math inline">\(F_{ij}=1\; j\geq f_{i}\)</span>
+and <span class="math inline">\(F_{ij}^{+}=1\; j&gt;f_{i}\)</span>. The likelihood calculation has the
+following steps where the matrix multiplication is element-wise and
+<span class="math inline">\(1\)</span> and represents an <span class="math inline">\(n\times k\)</span> matrix where each element is 1:</p>
+<ol style="list-style-type: decimal">
+<li>Construct the <span class="math inline">\(n\times k\)</span> matrix <span class="math inline">\(\phi&#39;=1-F^{+}+\phi F^{+}\)</span>which
+is the <span class="math inline">\(\phi\)</span> matrix modified such that <span class="math inline">\(\phi_{ij}=1\)</span> for <span class="math inline">\(j\leq f_{i}\)</span>.</li>
+<li>Construct the <span class="math inline">\(n\times k\)</span> matrix <span class="math inline">\(\phi*\)</span>from <span class="math inline">\(\phi&#39;\)</span> where <span class="math inline">\(\phi_{ij}*=\prod_{i=1}^{j}\phi_{ij}&#39;\)</span>.</li>
+<li>Construct the <span class="math inline">\(n\times k\)</span> matrix <span class="math inline">\(p&#39;=1-F^{+}+F^{+}(Cp+(1-C)(1-p))\)</span>.</li>
+<li>Construct the <span class="math inline">\(n\times k\)</span> matrix <span class="math inline">\(p*\)</span>from <span class="math inline">\(p&#39;\)</span> where <span class="math inline">\(p_{ij}*=\prod_{i=1}^{j}p_{ij}&#39;\)</span>.</li>
+<li>Compute <span class="math inline">\(n\times1\)</span> vector of probabilities of observed capture histories
+<span class="math inline">\(Pr(\omega_{i})\; i=1,...,n\)</span> which are the sums of the rows of <span class="math inline">\(LM\phi^{*}p^{*}\)</span>.</li>
+<li>Compute the log-likelihood <span class="math inline">\(\sum_{i=1}^{n}\ln(Pr(\omega_{i}))\)</span></li>
+</ol>
+<p>The R code translates from the mathematics quite literally as:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"> Phiprime =<span class="st"> </span><span class="dv">1</span><span class="op">-</span>Fplus <span class="op">+</span><span class="st"> </span>Phi<span class="op">*</span>Fplus</a>
+<a class="sourceLine" id="cb17-2" title="2"> Phistar =<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(Phiprime,<span class="dv">1</span>,cumprod))</a>
+<a class="sourceLine" id="cb17-3" title="3"> pprime =<span class="st"> </span>(<span class="dv">1</span><span class="op">-</span>Fplus)<span class="op">+</span>Fplus<span class="op">*</span>(C<span class="op">*</span>p<span class="op">+</span>(<span class="dv">1</span><span class="op">-</span>C)<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>p))</a>
+<a class="sourceLine" id="cb17-4" title="4"> pstar =<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(pprime,<span class="dv">1</span>,cumprod))</a>
+<a class="sourceLine" id="cb17-5" title="5"> pomega =<span class="st"> </span><span class="kw">rowSums</span>(L<span class="op">*</span>M<span class="op">*</span>Phistar<span class="op">*</span>pstar)</a>
+<a class="sourceLine" id="cb17-6" title="6"> lnl =<span class="st"> </span><span class="kw">sum</span>(<span class="kw">log</span>(pomega))</a></code></pre></div>
+<p>While this code is simple it is faster if the apply is replaced
+with a loop because there are far more rows than occasions or replaced
+with compiled code which we did with a FORTRAN subroutine (cjs.f called
+from cjs.lnl).</p>
+<p>The Jolly-Seber likelihood can be partitioned into 3 components: 1)
+CJS likelihood for <span class="math inline">\(Pr(\omega_{1})Pr(\omega_{2})\)</span> treating the first
+``1’’ as a release, 2) a likelihood component for <span class="math inline">\(Pr(\omega_{0})\)</span>;
+entry and first observation, 3) a component for those that entered
+before each occasion but were never seen. We define an additional
+<span class="math inline">\(n\times k\)</span> matrix <span class="math inline">\(\pi\)</span> which are the entry probabilities into
+the population (specified as <span class="math inline">\(\beta\)</span> by <span class="citation">Schwarz and Arnason (1996)</span>) with
+the obvious constraint that <span class="math inline">\(\sum_{j=0}^{k-1}\pi_{ij}=1\)</span> and <span class="math inline">\(N_{g}\: g=1,...,G\)</span>
+is the abundance of animals in each of the defined <span class="math inline">\(G\)</span> groups (e.g.,
+male/female) that were in the population at some time (super-population
+size). <span class="math inline">\(N_{g}=n_{g}+f_{g}^{0}\)</span> where <span class="math inline">\(n_{g}\)</span> is the number observed
+in the group and <span class="math inline">\(f_{g}^{0}\)</span> are the estimated number of animals
+in the group that were never seen.</p>
+<p>The same hierarchical approach used for CJS can be used for the second
+component. Construct the capture history probability for a given entry
+time and then sum over all possible entry times. . The second component
+is constructed with the following steps:</p>
+<ol style="list-style-type: decimal">
+<li>Construct the <span class="math inline">\(n\times k\)</span> matrix <span class="math inline">\(E=(1-p)\phi(1-F)+F\)</span>,</li>
+<li>Construct the <span class="math inline">\(n\times k\)</span> matrix <span class="math inline">\(E*\)</span>where <span class="math inline">\(E_{ij}*=\prod_{l=j}^{k}E_{il}\)</span>,</li>
+<li>Compute <span class="math inline">\(n\times1\)</span> vector of probabilities <span class="math inline">\(Pr(\omega&#39;)\)</span> which are
+the sums of the rows of <span class="math inline">\(E*(1-F^{+})\pi\)</span> multiplied by the vector
+<span class="math inline">\(p_{if_{i}}\: i=1,...,n\)</span>,</li>
+<li>Compute the log-likelihood <span class="math inline">\(\sum_{i=1}^{n}\ln(Pr(\omega_{i}&#39;))\)</span>.</li>
+</ol>
+<p>For the third likelihood component for missed animals, we constructed
+<span class="math inline">\(G\times k\)</span> dummy capture histories of all 0’s except for a ``1’’
+at the occasion the animals entered. From the CJS portion of the code,
+we obtained <span class="math inline">\(p_{gj}^{0}\)</span> the probability that an animal released
+in group <span class="math inline">\(g\)</span> on occasion <span class="math inline">\(j\)</span> would never be captured. The final
+log-likelihood component is:
+<span class="math display">\[
+\sum_{g=1}^{G}f_{g}^{0}\ln\left[\sum_{j=1}^{k}\pi_{g,j-1}(1-p_{gj})p_{gj}^{0}\right]+\ln(N_{g}!)-\ln(f_{g}^{0}!)
+\]</span></p>
+<p>The JS log-likelihood is the total of the 3 components plus <span class="math inline">\(-\sum_{g=1}^{G}\sum_{j=1}^{k}\ln(n_{gj}!)\)</span>
+which do not depend on the parameters but is added after optimization
+in function js, to be consistent with the output from MARK.</p>
+<p>With the structure we have used, the design matrices can become quite
+large and available memory could become limiting. For the design matrices,
+we use sparse matrices with the R package Matrix (citation). In addition,
+for MLE analysis, we use the following to reduce the required memory:</p>
+<ol style="list-style-type: decimal">
+<li>We reduce the data to <span class="math inline">\(n^{*}\leq n\)</span> individuals by aggregating records
+with identical data and using the frequencies (<span class="math inline">\(f_{1},...,f_{n^{*}};n=\sum_{i=1\:}^{n^{*}}f_{i}\)</span>)
+in the likelihood.</li>
+<li>We construct the design matrix <span class="math inline">\(X\)</span> incrementally with a user-specified
+size of data chunk that is processed at one time.</li>
+<li>We retain only the rows of <span class="math inline">\(X\)</span> which are unique for the design and
+including any fixed parameters which can be animal-specific.</li>
+</ol>
+<p>For Bayesian MCMC inference, we cannot aggregate records but we reduce
+the required memory by:</p>
+<ol style="list-style-type: decimal">
+<li>Eliminating the unused animal-occasion data for occasions prior to
+and including the release occasion for the animal, and</li>
+<li>Storing only the unique values of the real parameters which are unique
+rows of <span class="math inline">\(X_{\phi}\)</span>and <span class="math inline">\(X_{p}\)</span>.</li>
+</ol>
+</div>
+<div id="appendix-references" class="section level2 unnumbered">
+<h2>Appendix References</h2>
+<div id="refs">
+<div id="ref-ALBERT:1993fk">
+<p>Albert, JH, and S Chib. 1993. “Bayesian-Analysis of Binary and Polychotomous Reponse Data.” <em>Journal of the American Statistical Association</em> 88 (422): 669–79.</p>
+</div>
+<div id="ref-Baillargeon2007">
+<p>Baillargeon, S, and L P Rivest. 2007. “Rcapture: Loglinear models for capture-recapture in R.” <em>Journal of Statistical Software</em> 19 (5): 1–31.</p>
+</div>
+<div id="ref-Borchers2008">
+<p>Borchers, D L, and M G Efford. 2008. “Spatially Explicit Maximum Likelihood Methods for Capture-Recapture Studies.” <em>Biometrics</em> 64 (2): 377–85.</p>
+</div>
+<div id="ref-Colchero2012">
+<p>Colchero, Fernando, Owen R. Jones, and Maren Rebke. 2012. “BaSTA: an R package for Bayesian estimation of age-specific survival from incomplete mark-recapture/recovery data with covariates.” <em>Methods in Ecology and Evolution</em> 3 (February): 466–70.</p>
+</div>
+<div id="ref-Fiske2011">
+<p>Fiske, Ian J, and Richard B Chandler. 2011. “unmarked : An R Package for fitting hierarchical models of wildlife occurrence and abundance” 43 (10): 1–23.</p>
+</div>
+<div id="ref-Laake2008">
+<p>Laake, J, and E Rexstad. 2008. “RMark – an alternative approach to building linear models in MARK.” In <em>Program Mark: A Gentle Introduction</em>, edited by E Cooch and G C White.</p>
+</div>
+<div id="ref-Manly1968">
+<p>Manly, B F J, and M J Parr. 1968. “A new method of estimating population size, survivorship, and birth rate from recapture data.” <em>Transactions of the Society for British Entomology</em> 18: 81–89.</p>
+</div>
+<div id="ref-McDonald2005">
+<p>McDonald, T L, S C Amstrup, E V Regehr, and B F J Manly. 2005. “Examples.” In <em>Handbook of Capture-Recapture Analysis</em>, edited by S C Amstrup, T L McDonald, and B F J Manly, 196–265. Princeton, New Jersey USA: Princeton University Press.</p>
+</div>
+<div id="ref-Pledger2003">
+<p>Pledger, S, K H Pollock, and J L Norris. 2003. “Open capture-recapture models with heterogeneity: I. Cormack-Jolly-Seber model.” <em>Biometrics</em> 59 (4): 786–94.</p>
+</div>
+<div id="ref-Royle2009">
+<p>Royle, J Andrew, K Ullas Karanth, Arjun M Gopalaswamy, and N Samba Kumar. 2009. “Bayesian inference in camera trapping studies for a class of spatial capture-recapture models.” <em>Ecology</em> 90 (11): 3233–44.</p>
+</div>
+<div id="ref-Schwarz1996">
+<p>Schwarz, C. J., and A N. Arnason. 1996. “A general methodology for the analysis of capture-recapture experiments in open populations.” <em>Biometrics</em> 52 (3): 860–73.</p>
+</div>
+<div id="ref-Schwarz2009">
+<p>Schwarz, C. J., D. Pickard, K. Marine, and S. J. Bonner. 2009. “Juvenile Salmonid Outmigrant Monitoring Evaluation, Phase II, September 2009. Unpublished Report Prepared for the Trinity River Restoration Program, Weaverville, CA.”</p>
+</div>
+<div id="ref-White1999">
+<p>White, G C, and K P Burnham. 1999. “Program MARK: survival estimation from populations of marked animals.” <em>Bird Study</em> 46: 120–39.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

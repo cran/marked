@@ -84,7 +84,7 @@ extent. Thus, it is necessary to process a dataframe with the encounter
 history (\code{ch}) and a chosen \code{model} to define the relevant values.
 For example, number of capture occasions (\code{nocc}) is automatically
 computed based on the length of the encounter history (\code{ch}) in
-\code{data}. Currently, only 2 types of models are accepted in marked: cjs and js.  
+\code{data}. 
 The default time interval is unit time (1) and if this is
 adequate, the function will assign the appropriate length.  A processed data
 frame can only be analyzed using the model that was specified.  The
@@ -107,7 +107,7 @@ the time values for survivals are based on the beginning of the survival
 interval and capture probabilities are labeled based on the time of the
 capture occasion.  Likewise, age labels for survival are the ages at the
 beginning times of the intervals and for capture probabilities it is the age
-at the time of capture/recapture.
+at the time of capture/recapture. 
 
 The time.intervals argument can either be a vector of lengths of times for each interval between occasions
 that is constant for all animals or a matrix which has a row for each animal and a column for each
