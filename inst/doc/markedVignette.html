@@ -8,11 +8,11 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Jeff L. Laake, Devin S. Johnson, and Paul B. Conn" />
 
-<meta name="date" content="2019-12-08" />
+<meta name="date" content="2023-10-19" />
 
 <title>marked Package Vignette</title>
 
@@ -25,72 +25,305 @@
     }
 });
 </script>
+<style type="text/css">
+.lightable-minimal {
+border-collapse: separate;
+border-spacing: 16px 1px;
+width: 100%;
+margin-bottom: 10px;
+}
+.lightable-minimal td {
+margin-left: 5px;
+margin-right: 5px;
+}
+.lightable-minimal th {
+margin-left: 5px;
+margin-right: 5px;
+}
+.lightable-minimal thead tr:last-child th {
+border-bottom: 2px solid #00000050;
+empty-cells: hide;
+}
+.lightable-minimal tbody tr:first-child td {
+padding-top: 0.5em;
+}
+.lightable-minimal.lightable-hover tbody tr:hover {
+background-color: #f5f5f5;
+}
+.lightable-minimal.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-classic {
+border-top: 0.16em solid #111111;
+border-bottom: 0.16em solid #111111;
+width: 100%;
+margin-bottom: 10px;
+margin: 10px 5px;
+}
+.lightable-classic tfoot tr td {
+border: 0;
+}
+.lightable-classic tfoot tr:first-child td {
+border-top: 0.14em solid #111111;
+}
+.lightable-classic caption {
+color: #222222;
+}
+.lightable-classic td {
+padding-left: 5px;
+padding-right: 5px;
+color: #222222;
+}
+.lightable-classic th {
+padding-left: 5px;
+padding-right: 5px;
+font-weight: normal;
+color: #222222;
+}
+.lightable-classic thead tr:last-child th {
+border-bottom: 0.10em solid #111111;
+}
+.lightable-classic.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-classic.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-classic-2 {
+border-top: 3px double #111111;
+border-bottom: 3px double #111111;
+width: 100%;
+margin-bottom: 10px;
+}
+.lightable-classic-2 tfoot tr td {
+border: 0;
+}
+.lightable-classic-2 tfoot tr:first-child td {
+border-top: 3px double #111111;
+}
+.lightable-classic-2 caption {
+color: #222222;
+}
+.lightable-classic-2 td {
+padding-left: 5px;
+padding-right: 5px;
+color: #222222;
+}
+.lightable-classic-2 th {
+padding-left: 5px;
+padding-right: 5px;
+font-weight: normal;
+color: #222222;
+}
+.lightable-classic-2 tbody tr:last-child td {
+border-bottom: 3px double #111111;
+}
+.lightable-classic-2 thead tr:last-child th {
+border-bottom: 1px solid #111111;
+}
+.lightable-classic-2.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-classic-2.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-material {
+min-width: 100%;
+white-space: nowrap;
+table-layout: fixed;
+font-family: Roboto, sans-serif;
+border: 1px solid #EEE;
+border-collapse: collapse;
+margin-bottom: 10px;
+}
+.lightable-material tfoot tr td {
+border: 0;
+}
+.lightable-material tfoot tr:first-child td {
+border-top: 1px solid #EEE;
+}
+.lightable-material th {
+height: 56px;
+padding-left: 16px;
+padding-right: 16px;
+}
+.lightable-material td {
+height: 52px;
+padding-left: 16px;
+padding-right: 16px;
+border-top: 1px solid #eeeeee;
+}
+.lightable-material.lightable-hover tbody tr:hover {
+background-color: #f5f5f5;
+}
+.lightable-material.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-material.lightable-striped tbody td {
+border: 0;
+}
+.lightable-material.lightable-striped thead tr:last-child th {
+border-bottom: 1px solid #ddd;
+}
+.lightable-material-dark {
+min-width: 100%;
+white-space: nowrap;
+table-layout: fixed;
+font-family: Roboto, sans-serif;
+border: 1px solid #FFFFFF12;
+border-collapse: collapse;
+margin-bottom: 10px;
+background-color: #363640;
+}
+.lightable-material-dark tfoot tr td {
+border: 0;
+}
+.lightable-material-dark tfoot tr:first-child td {
+border-top: 1px solid #FFFFFF12;
+}
+.lightable-material-dark th {
+height: 56px;
+padding-left: 16px;
+padding-right: 16px;
+color: #FFFFFF60;
+}
+.lightable-material-dark td {
+height: 52px;
+padding-left: 16px;
+padding-right: 16px;
+color: #FFFFFF;
+border-top: 1px solid #FFFFFF12;
+}
+.lightable-material-dark.lightable-hover tbody tr:hover {
+background-color: #FFFFFF12;
+}
+.lightable-material-dark.lightable-striped tbody tr:nth-child(even) {
+background-color: #FFFFFF12;
+}
+.lightable-material-dark.lightable-striped tbody td {
+border: 0;
+}
+.lightable-material-dark.lightable-striped thead tr:last-child th {
+border-bottom: 1px solid #FFFFFF12;
+}
+.lightable-paper {
+width: 100%;
+margin-bottom: 10px;
+color: #444;
+}
+.lightable-paper tfoot tr td {
+border: 0;
+}
+.lightable-paper tfoot tr:first-child td {
+border-top: 1px solid #00000020;
+}
+.lightable-paper thead tr:last-child th {
+color: #666;
+vertical-align: bottom;
+border-bottom: 1px solid #00000020;
+line-height: 1.15em;
+padding: 10px 5px;
+}
+.lightable-paper td {
+vertical-align: middle;
+border-bottom: 1px solid #00000010;
+line-height: 1.15em;
+padding: 7px 5px;
+}
+.lightable-paper.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-paper.lightable-striped tbody tr:nth-child(even) {
+background-color: #00000008;
+}
+.lightable-paper.lightable-striped tbody td {
+border: 0;
+}
+</style>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {  }
+{ }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -99,13 +332,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -115,6 +355,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </script>
 
 
+
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
 
 <style type="text/css">body {
 background-color: #fff;
@@ -126,9 +389,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -297,7 +557,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -312,7 +573,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">marked Package Vignette</h1>
 <h4 class="author">Jeff L. Laake, Devin S. Johnson, and Paul B. Conn</h4>
-<h4 class="date">2019-12-08</h4>
+<h4 class="date">2023-10-19</h4>
 
 
 
@@ -395,10 +656,10 @@ or Male. Models are fitted with the function <code>crm</code> ([<em>c</em>]aptur
 [<em>m</em>]odel). After a call to library to attach the package, and
 data to retrieve the dipper data from the package, the model is fitted
 with <code>crm</code> and assigned to the object named <code>model</code>:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(marked) </a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(dipper)</a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="op">&gt;</span><span class="st"> </span>model=<span class="kw">crm</span>(dipper)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">library</span>(marked) </span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(dipper)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="sc">&gt;</span> model<span class="ot">=</span><span class="fu">crm</span>(dipper)</span></code></pre></div>
 <p>For this example, we are using the default CJS model and
 a default formula of <code>~ 1</code> (constant) for each parameter.
 The function <code>crm</code> calls three functions in turn: 1) <code>process.data</code>
@@ -419,18 +680,18 @@ every 100 evaluations of the objective function. It is not shown above
 because there were fewer than 100 function evaluations for this example.
 A brief listing of the model results is obtained by typing model which
 invokes the function <code>print.crm</code> because <code>class(model)=&quot;crm&quot;</code>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="op">&gt;</span><span class="st"> </span>model</a>
-<a class="sourceLine" id="cb2-2" title="2"></a>
-<a class="sourceLine" id="cb2-3" title="3">crm Model Summary</a>
-<a class="sourceLine" id="cb2-4" title="4"></a>
-<a class="sourceLine" id="cb2-5" title="5">Npar <span class="op">:</span><span class="st">  </span><span class="dv">2</span></a>
-<a class="sourceLine" id="cb2-6" title="6"><span class="op">-</span>2lnL<span class="op">:</span><span class="st">  </span><span class="fl">666.8377</span></a>
-<a class="sourceLine" id="cb2-7" title="7">AIC  <span class="op">:</span><span class="st">  </span><span class="fl">670.8377</span></a>
-<a class="sourceLine" id="cb2-8" title="8"></a>
-<a class="sourceLine" id="cb2-9" title="9">Beta</a>
-<a class="sourceLine" id="cb2-10" title="10">                 Estimate</a>
-<a class="sourceLine" id="cb2-11" title="11"><span class="kw">Phi.</span>(Intercept) <span class="fl">0.2420302</span></a>
-<a class="sourceLine" id="cb2-12" title="12"><span class="kw">p.</span>(Intercept)   <span class="fl">2.2270627</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="sc">&gt;</span> model</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>crm Model Summary</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>Npar <span class="sc">:</span>  <span class="dv">2</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="sc">-</span>2lnL<span class="sc">:</span>  <span class="fl">666.8377</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>AIC  <span class="sc">:</span>  <span class="fl">670.8377</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>Beta</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>                 Estimate</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">Phi.</span>(Intercept) <span class="fl">0.2420302</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">p.</span>(Intercept)   <span class="fl">2.2270627</span></span></code></pre></div>
 <p>The output includes the number of parameters (<code>npar</code>),
 -2log-likelihood, Akaike’s Information Criterion (<code>AIC</code>), and
 the estimates for <span class="math inline">\(\phi\)</span> and <span class="math inline">\(p\)</span>.</p>
@@ -445,19 +706,19 @@ penalty of computing the hessian at the final values each time. Separate
 functions (<code>cjs.hessian</code> and <code>js.hessian</code>) are provided
 to compute and store in the model the variance-covariance matrix from
 the hessian at the final estimates as shown below:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="op">&gt;</span><span class="st"> </span>model=<span class="kw">cjs.hessian</span>(model)</a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="op">&gt;</span><span class="st"> </span>model</a>
-<a class="sourceLine" id="cb3-3" title="3"></a>
-<a class="sourceLine" id="cb3-4" title="4">crm Model Summary</a>
-<a class="sourceLine" id="cb3-5" title="5"></a>
-<a class="sourceLine" id="cb3-6" title="6">Npar <span class="op">:</span><span class="st">  </span><span class="dv">2</span></a>
-<a class="sourceLine" id="cb3-7" title="7"><span class="op">-</span>2lnL<span class="op">:</span><span class="st">  </span><span class="fl">666.8377</span></a>
-<a class="sourceLine" id="cb3-8" title="8">AIC  <span class="op">:</span><span class="st">  </span><span class="fl">670.8377</span></a>
-<a class="sourceLine" id="cb3-9" title="9"></a>
-<a class="sourceLine" id="cb3-10" title="10">Beta</a>
-<a class="sourceLine" id="cb3-11" title="11">                 Estimate        se        lcl       ucl</a>
-<a class="sourceLine" id="cb3-12" title="12"><span class="kw">Phi.</span>(Intercept) <span class="fl">0.2420302</span> <span class="fl">0.1020079</span> <span class="fl">0.04209475</span> <span class="fl">0.4419656</span></a>
-<a class="sourceLine" id="cb3-13" title="13"><span class="kw">p.</span>(Intercept)   <span class="fl">2.2270627</span> <span class="fl">0.3252176</span> <span class="fl">1.58963625</span> <span class="fl">2.8644892</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="sc">&gt;</span> model<span class="ot">=</span><span class="fu">cjs.hessian</span>(model)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="sc">&gt;</span> model</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>crm Model Summary</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>Npar <span class="sc">:</span>  <span class="dv">2</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="sc">-</span>2lnL<span class="sc">:</span>  <span class="fl">666.8377</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>AIC  <span class="sc">:</span>  <span class="fl">670.8377</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>Beta</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>                 Estimate        se        lcl       ucl</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="fu">Phi.</span>(Intercept) <span class="fl">0.2420302</span> <span class="fl">0.1020079</span> <span class="fl">0.04209475</span> <span class="fl">0.4419656</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="fu">p.</span>(Intercept)   <span class="fl">2.2270627</span> <span class="fl">0.3252176</span> <span class="fl">1.58963625</span> <span class="fl">2.8644892</span></span></code></pre></div>
 <p>Once the hessian has been computed, printing the model will
 display the standard errors and 95% normal confidence intervals for
 the parameter estimates on the link scale (e.g., logit for <span class="math inline">\(\phi\)</span>
@@ -467,16 +728,16 @@ if you want to compute it when the model is fitted.</p>
 is to call <code>process.data</code> and <code>make.design.data</code> separately
 and pass the results to <code>crm</code> so they can be used for each
 fitted model as shown below:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="op">&gt;</span><span class="st"> </span>dipper.proc=<span class="kw">process.data</span>(dipper)</a>
-<a class="sourceLine" id="cb4-2" title="2"><span class="dv">255</span> capture histories collapsed into <span class="dv">53</span></a>
-<a class="sourceLine" id="cb4-3" title="3"><span class="op">&gt;</span><span class="st"> </span>dipper.ddl=<span class="kw">make.design.data</span>(dipper.proc)</a>
-<a class="sourceLine" id="cb4-4" title="4"><span class="op">&gt;</span><span class="st"> </span>Phi.sex=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>sex)</a>
-<a class="sourceLine" id="cb4-5" title="5"><span class="op">&gt;</span><span class="st"> </span>model=<span class="kw">crm</span>(dipper.proc,dipper.ddl,<span class="dt">model.parameters=</span><span class="kw">list</span>(<span class="dt">Phi=</span>Phi.sex),</a>
-<a class="sourceLine" id="cb4-6" title="6"><span class="op">+</span><span class="st">           </span><span class="dt">accumulate=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb4-7" title="7">Computing initial parameter estimates</a>
-<a class="sourceLine" id="cb4-8" title="8">Starting optimization <span class="cf">for</span> <span class="dv">3</span> parameters...</a>
-<a class="sourceLine" id="cb4-9" title="9"></a>
-<a class="sourceLine" id="cb4-10" title="10">Elapsed time <span class="cf">in</span> minutes<span class="op">:</span><span class="st">  </span><span class="fl">0.0023</span> </a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="sc">&gt;</span> dipper.proc<span class="ot">=</span><span class="fu">process.data</span>(dipper)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="dv">255</span> capture histories collapsed into <span class="dv">53</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="sc">&gt;</span> dipper.ddl<span class="ot">=</span><span class="fu">make.design.data</span>(dipper.proc)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="sc">&gt;</span> Phi.sex<span class="ot">=</span><span class="fu">list</span>(<span class="at">formula=</span><span class="sc">~</span>sex)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="sc">&gt;</span> model<span class="ot">=</span><span class="fu">crm</span>(dipper.proc,dipper.ddl,<span class="at">model.parameters=</span><span class="fu">list</span>(<span class="at">Phi=</span>Phi.sex),</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="sc">+</span>           <span class="at">accumulate=</span><span class="cn">FALSE</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>Computing initial parameter estimates</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>Starting optimization <span class="cf">for</span> <span class="dv">3</span> parameters...</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>Elapsed time <span class="cf">in</span> minutes<span class="sc">:</span>  <span class="fl">0.0035</span> </span></code></pre></div>
 <p>Collapsing capture history records is controlled by the
 <code>accumulate</code> arguments in <code>process.data</code> and <code>crm</code>.
 In the above example, <code>accumulate</code> was TRUE for the <code>process.data</code>
@@ -492,74 +753,74 @@ By default, <code>crm.wrapper</code> stores the model results externally
 and in the list it only stores the names of the files containing the
 models. If you set <code>external=FALSE</code>, then it will store the
 model results in the list as shown in the example below.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="op">&gt;</span><span class="st"> </span>dipper.proc=<span class="kw">process.data</span>(dipper)</a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="op">&gt;</span><span class="st"> </span>dipper.ddl=<span class="kw">make.design.data</span>(dipper.proc)</a>
-<a class="sourceLine" id="cb5-3" title="3"><span class="op">&gt;</span><span class="st"> </span>fit.models=<span class="cf">function</span>()</a>
-<a class="sourceLine" id="cb5-4" title="4"><span class="op">+</span><span class="st"> </span>{</a>
-<a class="sourceLine" id="cb5-5" title="5"><span class="op">+</span><span class="st">   </span>Phi.sex=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>sex)</a>
-<a class="sourceLine" id="cb5-6" title="6"><span class="op">+</span><span class="st">   </span>Phi.time=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>time)</a>
-<a class="sourceLine" id="cb5-7" title="7"><span class="op">+</span><span class="st">   </span>p.sex=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>sex)</a>
-<a class="sourceLine" id="cb5-8" title="8"><span class="op">+</span><span class="st">   </span>p.dot=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb5-9" title="9"><span class="op">+</span><span class="st">   </span>cml=<span class="kw">create.model.list</span>(<span class="kw">c</span>(<span class="st">&quot;Phi&quot;</span>,<span class="st">&quot;p&quot;</span>))</a>
-<a class="sourceLine" id="cb5-10" title="10"><span class="op">+</span><span class="st">   </span>results=<span class="kw">crm.wrapper</span>(cml,<span class="dt">data=</span>dipper.proc, <span class="dt">ddl=</span>dipper.ddl,</a>
-<a class="sourceLine" id="cb5-11" title="11"><span class="op">+</span><span class="st">                       </span><span class="dt">external=</span><span class="ot">FALSE</span>,<span class="dt">accumulate=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb5-12" title="12"><span class="op">+</span><span class="st">   </span><span class="kw">return</span>(results)</a>
-<a class="sourceLine" id="cb5-13" title="13"><span class="op">+</span><span class="st"> </span>}</a>
-<a class="sourceLine" id="cb5-14" title="14"><span class="op">&gt;</span><span class="st"> </span>dipper.models=<span class="kw">fit.models</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="sc">&gt;</span> dipper.proc<span class="ot">=</span><span class="fu">process.data</span>(dipper)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="sc">&gt;</span> dipper.ddl<span class="ot">=</span><span class="fu">make.design.data</span>(dipper.proc)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="sc">&gt;</span> fit.models<span class="ot">=</span><span class="cf">function</span>()</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="sc">+</span> {</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="sc">+</span>   Phi.sex<span class="ot">=</span><span class="fu">list</span>(<span class="at">formula=</span><span class="sc">~</span>sex)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="sc">+</span>   Phi.time<span class="ot">=</span><span class="fu">list</span>(<span class="at">formula=</span><span class="sc">~</span>time)</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="sc">+</span>   p.sex<span class="ot">=</span><span class="fu">list</span>(<span class="at">formula=</span><span class="sc">~</span>sex)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="sc">+</span>   p.dot<span class="ot">=</span><span class="fu">list</span>(<span class="at">formula=</span><span class="sc">~</span><span class="dv">1</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="sc">+</span>   cml<span class="ot">=</span><span class="fu">create.model.list</span>(<span class="fu">c</span>(<span class="st">&quot;Phi&quot;</span>,<span class="st">&quot;p&quot;</span>))</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="sc">+</span>   results<span class="ot">=</span><span class="fu">crm.wrapper</span>(cml,<span class="at">data=</span>dipper.proc, <span class="at">ddl=</span>dipper.ddl,</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="sc">+</span>                       <span class="at">external=</span><span class="cn">FALSE</span>,<span class="at">accumulate=</span><span class="cn">FALSE</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="sc">+</span>   <span class="fu">return</span>(results)</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="sc">+</span> }</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="sc">&gt;</span> dipper.models<span class="ot">=</span><span class="fu">fit.models</span>()</span></code></pre></div>
 <p>The model selection table is displayed with:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="op">&gt;</span><span class="st"> </span>dipper.models</a>
-<a class="sourceLine" id="cb6-2" title="2">              model npar      AIC DeltaAIC    weight  neg2lnl convergence</a>
-<a class="sourceLine" id="cb6-3" title="3"><span class="dv">1</span>    <span class="kw">Phi</span>(<span class="op">~</span>sex)<span class="kw">p</span>(<span class="op">~</span><span class="dv">1</span>)    <span class="dv">3</span> <span class="fl">672.6762</span> <span class="fl">0.000000</span> <span class="fl">0.4241510</span> <span class="fl">666.6762</span>           <span class="dv">0</span></a>
-<a class="sourceLine" id="cb6-4" title="4"><span class="dv">3</span>   <span class="kw">Phi</span>(<span class="op">~</span>time)<span class="kw">p</span>(<span class="op">~</span><span class="dv">1</span>)    <span class="dv">7</span> <span class="fl">673.7301</span> <span class="fl">1.053881</span> <span class="fl">0.2504224</span> <span class="fl">659.7301</span>           <span class="dv">0</span></a>
-<a class="sourceLine" id="cb6-5" title="5"><span class="dv">2</span>  <span class="kw">Phi</span>(<span class="op">~</span>sex)<span class="kw">p</span>(<span class="op">~</span>sex)    <span class="dv">4</span> <span class="fl">674.1518</span> <span class="fl">1.475609</span> <span class="fl">0.2028131</span> <span class="fl">666.1518</span>           <span class="dv">0</span></a>
-<a class="sourceLine" id="cb6-6" title="6"><span class="dv">4</span> <span class="kw">Phi</span>(<span class="op">~</span>time)<span class="kw">p</span>(<span class="op">~</span>sex)    <span class="dv">8</span> <span class="fl">675.1583</span> <span class="fl">2.482104</span> <span class="fl">0.1226135</span> <span class="fl">659.1583</span>           <span class="dv">0</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="sc">&gt;</span> dipper.models</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>              model npar      AIC DeltaAIC    weight  neg2lnl convergence</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="dv">1</span>    <span class="fu">Phi</span>(<span class="sc">~</span>sex)<span class="fu">p</span>(<span class="sc">~</span><span class="dv">1</span>)    <span class="dv">3</span> <span class="fl">672.6762</span> <span class="fl">0.000000</span> <span class="fl">0.4241510</span> <span class="fl">666.6762</span>           <span class="dv">0</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="dv">3</span>   <span class="fu">Phi</span>(<span class="sc">~</span>time)<span class="fu">p</span>(<span class="sc">~</span><span class="dv">1</span>)    <span class="dv">7</span> <span class="fl">673.7301</span> <span class="fl">1.053881</span> <span class="fl">0.2504224</span> <span class="fl">659.7301</span>           <span class="dv">0</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="dv">2</span>  <span class="fu">Phi</span>(<span class="sc">~</span>sex)<span class="fu">p</span>(<span class="sc">~</span>sex)    <span class="dv">4</span> <span class="fl">674.1518</span> <span class="fl">1.475609</span> <span class="fl">0.2028131</span> <span class="fl">666.1518</span>           <span class="dv">0</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="dv">4</span> <span class="fu">Phi</span>(<span class="sc">~</span>time)<span class="fu">p</span>(<span class="sc">~</span>sex)    <span class="dv">8</span> <span class="fl">675.1583</span> <span class="fl">2.482104</span> <span class="fl">0.1226135</span> <span class="fl">659.1583</span>           <span class="dv">0</span></span></code></pre></div>
 <p>A non-zero value for convergence means the model did not
 converge. If the models are not stored externally, an individual model
 can be extracted from the list with either the model number which
 is listed in the model table or with the model name which is the model
 formula specifications pasted together as shown below:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="op">&gt;</span><span class="st"> </span>dipper.models[[<span class="dv">1</span>]]</a>
-<a class="sourceLine" id="cb7-2" title="2"></a>
-<a class="sourceLine" id="cb7-3" title="3">crm Model Summary</a>
-<a class="sourceLine" id="cb7-4" title="4"></a>
-<a class="sourceLine" id="cb7-5" title="5">Npar <span class="op">:</span><span class="st">  </span><span class="dv">3</span></a>
-<a class="sourceLine" id="cb7-6" title="6"><span class="op">-</span>2lnL<span class="op">:</span><span class="st">  </span><span class="fl">666.6762</span></a>
-<a class="sourceLine" id="cb7-7" title="7">AIC  <span class="op">:</span><span class="st">  </span><span class="fl">672.6762</span></a>
-<a class="sourceLine" id="cb7-8" title="8"></a>
-<a class="sourceLine" id="cb7-9" title="9">Beta</a>
-<a class="sourceLine" id="cb7-10" title="10">                 Estimate</a>
-<a class="sourceLine" id="cb7-11" title="11"><span class="kw">Phi.</span>(Intercept) <span class="fl">0.2036416</span></a>
-<a class="sourceLine" id="cb7-12" title="12">Phi.sexMale     <span class="fl">0.0792854</span></a>
-<a class="sourceLine" id="cb7-13" title="13"><span class="kw">p.</span>(Intercept)   <span class="fl">2.2274858</span></a>
-<a class="sourceLine" id="cb7-14" title="14"><span class="op">&gt;</span><span class="st"> </span>dipper.models[[<span class="st">&quot;Phi.sex.p.dot&quot;</span>]]</a>
-<a class="sourceLine" id="cb7-15" title="15"></a>
-<a class="sourceLine" id="cb7-16" title="16">crm Model Summary</a>
-<a class="sourceLine" id="cb7-17" title="17"></a>
-<a class="sourceLine" id="cb7-18" title="18">Npar <span class="op">:</span><span class="st">  </span><span class="dv">3</span></a>
-<a class="sourceLine" id="cb7-19" title="19"><span class="op">-</span>2lnL<span class="op">:</span><span class="st">  </span><span class="fl">666.6762</span></a>
-<a class="sourceLine" id="cb7-20" title="20">AIC  <span class="op">:</span><span class="st">  </span><span class="fl">672.6762</span></a>
-<a class="sourceLine" id="cb7-21" title="21"></a>
-<a class="sourceLine" id="cb7-22" title="22">Beta</a>
-<a class="sourceLine" id="cb7-23" title="23">                 Estimate</a>
-<a class="sourceLine" id="cb7-24" title="24"><span class="kw">Phi.</span>(Intercept) <span class="fl">0.2036416</span></a>
-<a class="sourceLine" id="cb7-25" title="25">Phi.sexMale     <span class="fl">0.0792854</span></a>
-<a class="sourceLine" id="cb7-26" title="26"><span class="kw">p.</span>(Intercept)   <span class="fl">2.2274858</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="sc">&gt;</span> dipper.models[[<span class="dv">1</span>]]</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>crm Model Summary</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>Npar <span class="sc">:</span>  <span class="dv">3</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="sc">-</span>2lnL<span class="sc">:</span>  <span class="fl">666.6762</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>AIC  <span class="sc">:</span>  <span class="fl">672.6762</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>Beta</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>                 Estimate</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="fu">Phi.</span>(Intercept) <span class="fl">0.2036416</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>Phi.sexMale     <span class="fl">0.0792854</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="fu">p.</span>(Intercept)   <span class="fl">2.2274858</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="sc">&gt;</span> dipper.models[[<span class="st">&quot;Phi.sex.p.dot&quot;</span>]]</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>crm Model Summary</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>Npar <span class="sc">:</span>  <span class="dv">3</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="sc">-</span>2lnL<span class="sc">:</span>  <span class="fl">666.6762</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>AIC  <span class="sc">:</span>  <span class="fl">672.6762</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>Beta</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>                 Estimate</span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="fu">Phi.</span>(Intercept) <span class="fl">0.2036416</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>Phi.sexMale     <span class="fl">0.0792854</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="fu">p.</span>(Intercept)   <span class="fl">2.2274858</span></span></code></pre></div>
 <p>If the models are stored externally (by setting <code>external=TRUE</code> in the <code>crm.wrapper</code> call), they can be retrieved
 with the function <code>load.model</code> as shown below:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="op">&gt;</span><span class="st"> </span>model=<span class="kw">load.model</span>(dipper.models[[<span class="dv">1</span>]])</a>
-<a class="sourceLine" id="cb8-2" title="2"><span class="op">&gt;</span><span class="st"> </span>model</a>
-<a class="sourceLine" id="cb8-3" title="3"></a>
-<a class="sourceLine" id="cb8-4" title="4">crm Model Summary</a>
-<a class="sourceLine" id="cb8-5" title="5"></a>
-<a class="sourceLine" id="cb8-6" title="6">Npar <span class="op">:</span><span class="st">  </span><span class="dv">3</span></a>
-<a class="sourceLine" id="cb8-7" title="7"><span class="op">-</span>2lnL<span class="op">:</span><span class="st">  </span><span class="fl">666.6762</span></a>
-<a class="sourceLine" id="cb8-8" title="8">AIC  <span class="op">:</span><span class="st">  </span><span class="fl">672.6762</span></a>
-<a class="sourceLine" id="cb8-9" title="9"></a>
-<a class="sourceLine" id="cb8-10" title="10">Beta</a>
-<a class="sourceLine" id="cb8-11" title="11">                 Estimate</a>
-<a class="sourceLine" id="cb8-12" title="12"><span class="kw">Phi.</span>(Intercept) <span class="fl">0.2036416</span></a>
-<a class="sourceLine" id="cb8-13" title="13">Phi.sexMale     <span class="fl">0.0792854</span></a>
-<a class="sourceLine" id="cb8-14" title="14"><span class="kw">p.</span>(Intercept)   <span class="fl">2.2274858</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="sc">&gt;</span> model<span class="ot">=</span><span class="fu">load.model</span>(dipper.models[[<span class="dv">1</span>]])</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="sc">&gt;</span> model</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>crm Model Summary</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>Npar <span class="sc">:</span>  <span class="dv">3</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="sc">-</span>2lnL<span class="sc">:</span>  <span class="fl">666.6762</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>AIC  <span class="sc">:</span>  <span class="fl">672.6762</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>Beta</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>                 Estimate</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="fu">Phi.</span>(Intercept) <span class="fl">0.2036416</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>Phi.sexMale     <span class="fl">0.0792854</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="fu">p.</span>(Intercept)   <span class="fl">2.2274858</span></span></code></pre></div>
 <p>To make the analysis more interesting, we will add some covariates
 for <span class="math inline">\(\phi\)</span> and p. For <span class="math inline">\(\phi\)</span>, we will add a static covariate <code>weight</code>
 which is a random value between 1 and 10. For <span class="math inline">\(\phi\)</span>, we also add
@@ -576,28 +837,28 @@ and for <code>td</code> it will be <code>td2,...,td7</code> because time for
 for <code>p</code> it is the time for the capture occasion. Below the
 names of the covariates in the dataframe are shown after they are
 created:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(dipper)</a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Add a dummy weight field which are random values from 1 to 10</span></a>
-<a class="sourceLine" id="cb9-3" title="3"><span class="er">&gt;</span><span class="st"> </span><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
-<a class="sourceLine" id="cb9-4" title="4"><span class="op">&gt;</span><span class="st"> </span>dipper<span class="op">$</span>weight=<span class="kw">round</span>(<span class="kw">runif</span>(<span class="kw">nrow</span>(dipper),<span class="dv">0</span>,<span class="dv">9</span>),<span class="dv">0</span>)<span class="op">+</span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb9-5" title="5"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Add Flood covariate</span></a>
-<a class="sourceLine" id="cb9-6" title="6"><span class="er">&gt;</span><span class="st"> </span>Flood=<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dt">each=</span><span class="kw">nrow</span>(dipper)),<span class="dt">ncol=</span><span class="dv">6</span>)</a>
-<a class="sourceLine" id="cb9-7" title="7"><span class="op">&gt;</span><span class="st"> </span><span class="kw">colnames</span>(Flood)=<span class="kw">paste</span>(<span class="st">&quot;Flood&quot;</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>,<span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
-<a class="sourceLine" id="cb9-8" title="8"><span class="op">&gt;</span><span class="st"> </span>dipper=<span class="kw">cbind</span>(dipper,Flood)</a>
-<a class="sourceLine" id="cb9-9" title="9"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Add td covariate, but exclude first release as a capture</span></a>
-<a class="sourceLine" id="cb9-10" title="10"><span class="er">&gt;</span><span class="st"> </span><span class="co"># splitCH and process.ch are functions in the marked package</span></a>
-<a class="sourceLine" id="cb9-11" title="11"><span class="er">&gt;</span><span class="st"> </span>td=<span class="kw">splitCH</span>(dipper<span class="op">$</span>ch)</a>
-<a class="sourceLine" id="cb9-12" title="12"><span class="op">&gt;</span><span class="st"> </span>td=td[,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</a>
-<a class="sourceLine" id="cb9-13" title="13"><span class="op">&gt;</span><span class="st"> </span>releaseocc=<span class="kw">process.ch</span>(dipper<span class="op">$</span>ch)<span class="op">$</span>first</a>
-<a class="sourceLine" id="cb9-14" title="14"><span class="op">&gt;</span><span class="st"> </span>releaseocc=<span class="kw">cbind</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(releaseocc),releaseocc)</a>
-<a class="sourceLine" id="cb9-15" title="15"><span class="op">&gt;</span><span class="st"> </span>releaseocc=releaseocc[releaseocc[,<span class="dv">2</span>]<span class="op">&lt;</span><span class="kw">nchar</span>(dipper<span class="op">$</span>ch[<span class="dv">1</span>]),]</a>
-<a class="sourceLine" id="cb9-16" title="16"><span class="op">&gt;</span><span class="st"> </span>td[releaseocc]=<span class="dv">0</span></a>
-<a class="sourceLine" id="cb9-17" title="17"><span class="op">&gt;</span><span class="st"> </span><span class="kw">colnames</span>(td)=<span class="kw">paste</span>(<span class="st">&quot;td&quot;</span>,<span class="dv">2</span><span class="op">:</span><span class="dv">7</span>,<span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
-<a class="sourceLine" id="cb9-18" title="18"><span class="op">&gt;</span><span class="st"> </span>dipper=<span class="kw">cbind</span>(dipper,td)</a>
-<a class="sourceLine" id="cb9-19" title="19"><span class="op">&gt;</span><span class="st"> </span><span class="co"># show names</span></a>
-<a class="sourceLine" id="cb9-20" title="20"><span class="er">&gt;</span><span class="st"> </span><span class="kw">names</span>(dipper)</a>
-<a class="sourceLine" id="cb9-21" title="21"> [<span class="dv">1</span>] <span class="st">&quot;ch&quot;</span>     <span class="st">&quot;sex&quot;</span>    <span class="st">&quot;weight&quot;</span> <span class="st">&quot;Flood1&quot;</span> <span class="st">&quot;Flood2&quot;</span> <span class="st">&quot;Flood3&quot;</span> <span class="st">&quot;Flood4&quot;</span> <span class="st">&quot;Flood5&quot;</span></a>
-<a class="sourceLine" id="cb9-22" title="22"> [<span class="dv">9</span>] <span class="st">&quot;Flood6&quot;</span> <span class="st">&quot;td2&quot;</span>    <span class="st">&quot;td3&quot;</span>    <span class="st">&quot;td4&quot;</span>    <span class="st">&quot;td5&quot;</span>    <span class="st">&quot;td6&quot;</span>    <span class="st">&quot;td7&quot;</span>   </a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(dipper)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co"># Add a dummy weight field which are random values from 1 to 10</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="er">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="sc">&gt;</span> dipper<span class="sc">$</span>weight<span class="ot">=</span><span class="fu">round</span>(<span class="fu">runif</span>(<span class="fu">nrow</span>(dipper),<span class="dv">0</span>,<span class="dv">9</span>),<span class="dv">0</span>)<span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co"># Add Flood covariate</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="er">&gt;</span> Flood<span class="ot">=</span><span class="fu">matrix</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="at">each=</span><span class="fu">nrow</span>(dipper)),<span class="at">ncol=</span><span class="dv">6</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">colnames</span>(Flood)<span class="ot">=</span><span class="fu">paste</span>(<span class="st">&quot;Flood&quot;</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="sc">&gt;</span> dipper<span class="ot">=</span><span class="fu">cbind</span>(dipper,Flood)</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co"># Add td covariate, but exclude first release as a capture</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="er">&gt;</span> <span class="co"># splitCH and process.ch are functions in the marked package</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="er">&gt;</span> td<span class="ot">=</span><span class="fu">splitCH</span>(dipper<span class="sc">$</span>ch)</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="sc">&gt;</span> td<span class="ot">=</span>td[,<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="sc">&gt;</span> releaseocc<span class="ot">=</span><span class="fu">process.ch</span>(dipper<span class="sc">$</span>ch)<span class="sc">$</span>first</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="sc">&gt;</span> releaseocc<span class="ot">=</span><span class="fu">cbind</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(releaseocc),releaseocc)</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="sc">&gt;</span> releaseocc<span class="ot">=</span>releaseocc[releaseocc[,<span class="dv">2</span>]<span class="sc">&lt;</span><span class="fu">nchar</span>(dipper<span class="sc">$</span>ch[<span class="dv">1</span>]),]</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="sc">&gt;</span> td[releaseocc]<span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">colnames</span>(td)<span class="ot">=</span><span class="fu">paste</span>(<span class="st">&quot;td&quot;</span>,<span class="dv">2</span><span class="sc">:</span><span class="dv">7</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="sc">&gt;</span> dipper<span class="ot">=</span><span class="fu">cbind</span>(dipper,td)</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co"># show names</span></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a><span class="er">&gt;</span> <span class="fu">names</span>(dipper)</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a> [<span class="dv">1</span>] <span class="st">&quot;ch&quot;</span>     <span class="st">&quot;sex&quot;</span>    <span class="st">&quot;weight&quot;</span> <span class="st">&quot;Flood1&quot;</span> <span class="st">&quot;Flood2&quot;</span> <span class="st">&quot;Flood3&quot;</span> <span class="st">&quot;Flood4&quot;</span> <span class="st">&quot;Flood5&quot;</span></span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a> [<span class="dv">9</span>] <span class="st">&quot;Flood6&quot;</span> <span class="st">&quot;td2&quot;</span>    <span class="st">&quot;td3&quot;</span>    <span class="st">&quot;td4&quot;</span>    <span class="st">&quot;td5&quot;</span>    <span class="st">&quot;td6&quot;</span>    <span class="st">&quot;td7&quot;</span>   </span></code></pre></div>
 <p>Next we process the data with the default CJS model and make the design
 data with parameters that identify which covariates to use for each
 parameter. By default, each covariate in the dataframe is added to
@@ -615,41 +876,41 @@ and <code>Flood7</code> due to the different time labels for <span class="math i
 to specify what is needed. After specifying the design lists for <span class="math inline">\(\phi\)</span>
 and <code>p</code>, they are used in the call to <code>make.design.data</code>
 and the resulting dataframe names are shown below:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Process data</span></a>
-<a class="sourceLine" id="cb10-2" title="2"><span class="er">&gt;</span><span class="st"> </span>dipper.proc=<span class="kw">process.data</span>(dipper)</a>
-<a class="sourceLine" id="cb10-3" title="3"><span class="dv">255</span> capture histories collapsed into <span class="dv">171</span></a>
-<a class="sourceLine" id="cb10-4" title="4"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Create design data with static and time varying covariates</span></a>
-<a class="sourceLine" id="cb10-5" title="5"><span class="er">&gt;</span><span class="st"> </span>design.Phi=<span class="kw">list</span>(<span class="dt">static=</span><span class="kw">c</span>(<span class="st">&quot;weight&quot;</span>),<span class="dt">time.varying=</span><span class="kw">c</span>(<span class="st">&quot;Flood&quot;</span>))</a>
-<a class="sourceLine" id="cb10-6" title="6"><span class="op">&gt;</span><span class="st"> </span>design.p=<span class="kw">list</span>(<span class="dt">static=</span><span class="kw">c</span>(<span class="st">&quot;sex&quot;</span>),<span class="dt">time.varying=</span><span class="kw">c</span>(<span class="st">&quot;td&quot;</span>),</a>
-<a class="sourceLine" id="cb10-7" title="7"><span class="op">+</span><span class="st">                         </span><span class="dt">age.bins=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">20</span>))</a>
-<a class="sourceLine" id="cb10-8" title="8"><span class="op">&gt;</span><span class="st"> </span>design.parameters=<span class="kw">list</span>(<span class="dt">Phi=</span>design.Phi,<span class="dt">p=</span>design.p)</a>
-<a class="sourceLine" id="cb10-9" title="9"><span class="op">&gt;</span><span class="st"> </span>ddl=<span class="kw">make.design.data</span>(dipper.proc,<span class="dt">parameters=</span>design.parameters)</a>
-<a class="sourceLine" id="cb10-10" title="10"><span class="op">&gt;</span><span class="st"> </span><span class="kw">names</span>(ddl<span class="op">$</span>Phi)</a>
-<a class="sourceLine" id="cb10-11" title="11"><span class="op">&gt;</span><span class="st"> </span><span class="kw">names</span>(ddl<span class="op">$</span>p)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co"># Process data</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="er">&gt;</span> dipper.proc<span class="ot">=</span><span class="fu">process.data</span>(dipper)</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="dv">255</span> capture histories collapsed into <span class="dv">171</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co"># Create design data with static and time varying covariates</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="er">&gt;</span> design.Phi<span class="ot">=</span><span class="fu">list</span>(<span class="at">static=</span><span class="fu">c</span>(<span class="st">&quot;weight&quot;</span>),<span class="at">time.varying=</span><span class="fu">c</span>(<span class="st">&quot;Flood&quot;</span>))</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="sc">&gt;</span> design.p<span class="ot">=</span><span class="fu">list</span>(<span class="at">static=</span><span class="fu">c</span>(<span class="st">&quot;sex&quot;</span>),<span class="at">time.varying=</span><span class="fu">c</span>(<span class="st">&quot;td&quot;</span>),</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="sc">+</span>                         <span class="at">age.bins=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">20</span>))</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="sc">&gt;</span> design.parameters<span class="ot">=</span><span class="fu">list</span>(<span class="at">Phi=</span>design.Phi,<span class="at">p=</span>design.p)</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="sc">&gt;</span> ddl<span class="ot">=</span><span class="fu">make.design.data</span>(dipper.proc,<span class="at">parameters=</span>design.parameters)</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">names</span>(ddl<span class="sc">$</span>Phi)</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">names</span>(ddl<span class="sc">$</span>p)</span></code></pre></div>
 <p>Next we define the models for <span class="math inline">\(\phi\)</span> and <span class="math inline">\(p\)</span> that we want
 to fit and call crm.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="op">&gt;</span><span class="st"> </span>Phi.sfw=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>Flood<span class="op">+</span>weight)</a>
-<a class="sourceLine" id="cb11-2" title="2"><span class="op">&gt;</span><span class="st"> </span>p.ast=<span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>age<span class="op">+</span>sex<span class="op">+</span>td)</a>
-<a class="sourceLine" id="cb11-3" title="3"><span class="op">&gt;</span><span class="st"> </span>model=<span class="kw">crm</span>(dipper.proc,ddl,<span class="dt">hessian=</span><span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb11-4" title="4"><span class="op">+</span><span class="st">            </span><span class="dt">model.parameters=</span><span class="kw">list</span>(<span class="dt">Phi=</span>Phi.sfw,<span class="dt">p=</span>p.ast))</a>
-<a class="sourceLine" id="cb11-5" title="5">Computing initial parameter estimates</a>
-<a class="sourceLine" id="cb11-6" title="6">Starting optimization <span class="cf">for</span> <span class="dv">7</span> parameters...</a>
-<a class="sourceLine" id="cb11-7" title="7">Computing hessian...</a>
-<a class="sourceLine" id="cb11-8" title="8"></a>
-<a class="sourceLine" id="cb11-9" title="9">Elapsed time <span class="cf">in</span> minutes<span class="op">:</span><span class="st">  </span><span class="fl">0.0052</span> </a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="sc">&gt;</span> Phi.sfw<span class="ot">=</span><span class="fu">list</span>(<span class="at">formula=</span><span class="sc">~</span>Flood<span class="sc">+</span>weight)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="sc">&gt;</span> p.ast<span class="ot">=</span><span class="fu">list</span>(<span class="at">formula=</span><span class="sc">~</span>age<span class="sc">+</span>sex<span class="sc">+</span>td)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="sc">&gt;</span> model<span class="ot">=</span><span class="fu">crm</span>(dipper.proc,ddl,<span class="at">hessian=</span><span class="cn">TRUE</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="sc">+</span>            <span class="at">model.parameters=</span><span class="fu">list</span>(<span class="at">Phi=</span>Phi.sfw,<span class="at">p=</span>p.ast))</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>Computing initial parameter estimates</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>Starting optimization <span class="cf">for</span> <span class="dv">7</span> parameters...</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>Computing hessian...</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>Elapsed time <span class="cf">in</span> minutes<span class="sc">:</span>  <span class="fl">0.0057</span> </span></code></pre></div>
 <p>Below we create a range of data values to compute predicted <span class="math inline">\(\phi\)</span>
 values and then plot the results for Flood and non-Flood years for
 a range of weights. Not surprising that the slope for weight is nearly
 0 because the weight values were generated randomly.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="op">&gt;</span><span class="st"> </span>newdipper=<span class="kw">expand.grid</span>(<span class="dt">sex=</span><span class="kw">c</span>(<span class="st">&quot;Female&quot;</span>,<span class="st">&quot;Male&quot;</span>),<span class="dt">weight=</span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,<span class="dt">Flood1=</span><span class="dv">0</span>,</a>
-<a class="sourceLine" id="cb12-2" title="2"><span class="op">+</span><span class="st">       </span><span class="dt">Flood2=</span><span class="dv">1</span>,<span class="dt">Flood3=</span><span class="dv">1</span>,<span class="dt">Flood4=</span><span class="dv">0</span>,<span class="dt">Flood5=</span><span class="dv">0</span>,<span class="dt">Flood6=</span><span class="dv">0</span>,<span class="dt">td2=</span><span class="dv">0</span>,<span class="dt">td3=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb12-3" title="3"><span class="op">+</span><span class="st">       </span><span class="dt">td4=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="dt">td5=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="dt">td6=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="dt">td7=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)) </a>
-<a class="sourceLine" id="cb12-4" title="4"><span class="op">&gt;</span><span class="st"> </span>reals=<span class="kw">predict</span>(model,<span class="dt">newdata=</span>newdipper,<span class="dt">se=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb12-5" title="5"><span class="op">&gt;</span><span class="st"> </span>reals<span class="op">$</span>Phi<span class="op">$</span>Flood=<span class="kw">factor</span>(reals<span class="op">$</span>Phi<span class="op">$</span>Flood,<span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;Non-flood&quot;</span>,<span class="st">&quot;Flood&quot;</span>))</a>
-<a class="sourceLine" id="cb12-6" title="6"><span class="op">&gt;</span><span class="st"> </span><span class="kw">ggplot</span>(reals<span class="op">$</span>Phi,<span class="kw">aes</span>(weight,estimate,<span class="dt">ymin=</span>lcl,<span class="dt">ymax=</span>ucl))<span class="op">+</span></a>
-<a class="sourceLine" id="cb12-7" title="7"><span class="op">+</span><span class="st">       </span><span class="kw">geom_errorbar</span>(<span class="dt">width=</span><span class="fl">0.2</span>)<span class="op">+</span><span class="kw">geom_point</span>()<span class="op">+</span><span class="kw">geom_line</span>()<span class="op">+</span></a>
-<a class="sourceLine" id="cb12-8" title="8"><span class="op">+</span><span class="st">       </span><span class="kw">xlab</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">Weight&quot;</span>)<span class="op">+</span><span class="kw">ylab</span>(<span class="st">&quot;Survival</span><span class="ch">\n</span><span class="st">&quot;</span>)<span class="op">+</span><span class="kw">facet_grid</span>(Flood<span class="op">~</span>.)   </a></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="sc">&gt;</span> newdipper<span class="ot">=</span><span class="fu">expand.grid</span>(<span class="at">sex=</span><span class="fu">c</span>(<span class="st">&quot;Female&quot;</span>,<span class="st">&quot;Male&quot;</span>),<span class="at">weight=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,<span class="at">Flood1=</span><span class="dv">0</span>,</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="sc">+</span>       <span class="at">Flood2=</span><span class="dv">1</span>,<span class="at">Flood3=</span><span class="dv">1</span>,<span class="at">Flood4=</span><span class="dv">0</span>,<span class="at">Flood5=</span><span class="dv">0</span>,<span class="at">Flood6=</span><span class="dv">0</span>,<span class="at">td2=</span><span class="dv">0</span>,<span class="at">td3=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="sc">+</span>       <span class="at">td4=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="at">td5=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="at">td6=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="at">td7=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)) </span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="sc">&gt;</span> reals<span class="ot">=</span><span class="fu">predict</span>(model,<span class="at">newdata=</span>newdipper,<span class="at">se=</span><span class="cn">TRUE</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="sc">&gt;</span> reals<span class="sc">$</span>Phi<span class="sc">$</span>Flood<span class="ot">=</span><span class="fu">factor</span>(reals<span class="sc">$</span>Phi<span class="sc">$</span>Flood,<span class="at">labels=</span><span class="fu">c</span>(<span class="st">&quot;Non-flood&quot;</span>,<span class="st">&quot;Flood&quot;</span>))</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">ggplot</span>(reals<span class="sc">$</span>Phi,<span class="fu">aes</span>(weight,estimate,<span class="at">ymin=</span>lcl,<span class="at">ymax=</span>ucl))<span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="sc">+</span>       <span class="fu">geom_errorbar</span>(<span class="at">width=</span><span class="fl">0.2</span>)<span class="sc">+</span><span class="fu">geom_point</span>()<span class="sc">+</span><span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="sc">+</span>       <span class="fu">xlab</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">Weight&quot;</span>)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">&quot;Survival</span><span class="sc">\n</span><span class="st">&quot;</span>)<span class="sc">+</span><span class="fu">facet_grid</span>(Flood<span class="sc">~</span>.)   </span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 <p>Fitting an MCMC CJS model (<code>probitCJS</code>) to the dipper data
 is quite similar to the MLE models with the added arguments <code>burnin</code>
 and <code>iter</code> to control the number of burnin iterations
@@ -657,109 +918,125 @@ and the number of iterations to perform after the burnin
 process. The following fits <code>Phi(~Flood) p(~sex+time)</code>
 with low values set for <code>burnin</code> and <code>iter</code> to reduce
 the vignette build time.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(dipper)</a>
-<a class="sourceLine" id="cb13-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="co"># Add Flood covariate</span></a>
-<a class="sourceLine" id="cb13-3" title="3"><span class="er">&gt;</span><span class="st"> </span>Flood=<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dt">each=</span><span class="kw">nrow</span>(dipper)),<span class="dt">ncol=</span><span class="dv">6</span>)</a>
-<a class="sourceLine" id="cb13-4" title="4"><span class="op">&gt;</span><span class="st"> </span><span class="kw">colnames</span>(Flood)=<span class="kw">paste</span>(<span class="st">&quot;Flood&quot;</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>,<span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
-<a class="sourceLine" id="cb13-5" title="5"><span class="op">&gt;</span><span class="st"> </span>dipper=<span class="kw">cbind</span>(dipper,Flood)</a>
-<a class="sourceLine" id="cb13-6" title="6"><span class="op">&gt;</span><span class="st"> </span>design.parameters=<span class="kw">list</span>(<span class="dt">Phi=</span><span class="kw">list</span>(<span class="dt">time.varying=</span><span class="st">&quot;Flood&quot;</span>))</a>
-<a class="sourceLine" id="cb13-7" title="7"><span class="op">&gt;</span><span class="st"> </span>model.parameters=<span class="kw">list</span>(<span class="dt">Phi=</span><span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>Flood),</a>
-<a class="sourceLine" id="cb13-8" title="8"><span class="op">+</span><span class="st">                      </span><span class="dt">p=</span><span class="kw">list</span>(<span class="dt">formula=</span><span class="op">~</span>time<span class="op">+</span>sex))</a>
-<a class="sourceLine" id="cb13-9" title="9"><span class="op">&gt;</span><span class="st"> </span>MCMCfit=<span class="kw">crm</span>(dipper,<span class="dt">model=</span><span class="st">&quot;probitCJS&quot;</span>,</a>
-<a class="sourceLine" id="cb13-10" title="10"><span class="op">+</span><span class="st">             </span><span class="dt">model.parameters=</span>model.parameters,</a>
-<a class="sourceLine" id="cb13-11" title="11"><span class="op">+</span><span class="st">             </span><span class="dt">design.parameters=</span>design.parameters,</a>
-<a class="sourceLine" id="cb13-12" title="12"><span class="op">+</span><span class="st">             </span><span class="dt">burnin=</span><span class="dv">1000</span>,<span class="dt">iter=</span><span class="dv">5000</span>) </a>
-<a class="sourceLine" id="cb13-13" title="13">Computing initial parameter estimates</a>
-<a class="sourceLine" id="cb13-14" title="14">probitCJS MCMC beginning...</a>
-<a class="sourceLine" id="cb13-15" title="15">p model =<span class="st"> </span><span class="er">~</span>time <span class="op">+</span><span class="st"> </span>sex</a>
-<a class="sourceLine" id="cb13-16" title="16">phi model =<span class="st"> </span><span class="er">~</span>Flood</a>
-<a class="sourceLine" id="cb13-17" title="17">MCMC complete, processing output...</a>
-<a class="sourceLine" id="cb13-18" title="18"></a>
-<a class="sourceLine" id="cb13-19" title="19">Elapsed time <span class="cf">in</span> minutes<span class="op">:</span><span class="st">  </span><span class="fl">0.4968</span> </a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(dipper)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co"># Add Flood covariate</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="er">&gt;</span> Flood<span class="ot">=</span><span class="fu">matrix</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="at">each=</span><span class="fu">nrow</span>(dipper)),<span class="at">ncol=</span><span class="dv">6</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">colnames</span>(Flood)<span class="ot">=</span><span class="fu">paste</span>(<span class="st">&quot;Flood&quot;</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="sc">&gt;</span> dipper<span class="ot">=</span><span class="fu">cbind</span>(dipper,Flood)</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="sc">&gt;</span> design.parameters<span class="ot">=</span><span class="fu">list</span>(<span class="at">Phi=</span><span class="fu">list</span>(<span class="at">time.varying=</span><span class="st">&quot;Flood&quot;</span>))</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="sc">&gt;</span> model.parameters<span class="ot">=</span><span class="fu">list</span>(<span class="at">Phi=</span><span class="fu">list</span>(<span class="at">formula=</span><span class="sc">~</span>Flood),</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="sc">+</span>                      <span class="at">p=</span><span class="fu">list</span>(<span class="at">formula=</span><span class="sc">~</span>time<span class="sc">+</span>sex))</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="sc">&gt;</span> MCMCfit<span class="ot">=</span><span class="fu">crm</span>(dipper,<span class="at">model=</span><span class="st">&quot;probitCJS&quot;</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="sc">+</span>             <span class="at">model.parameters=</span>model.parameters,</span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="sc">+</span>             <span class="at">design.parameters=</span>design.parameters,</span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="sc">+</span>             <span class="at">burnin=</span><span class="dv">1000</span>,<span class="at">iter=</span><span class="dv">5000</span>) </span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>Computing initial parameter estimates</span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a>probitCJS MCMC beginning...</span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>p model <span class="ot">=</span> <span class="er">~</span>time <span class="sc">+</span> sex</span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a>phi model <span class="ot">=</span> <span class="er">~</span>Flood</span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a>MCMC complete, processing output...</span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a>Elapsed time <span class="cf">in</span> minutes<span class="sc">:</span>  <span class="fl">0.397</span> </span></code></pre></div>
 <p>The results shown are the mode,mean,standard deviation, and 95% highest
 posterior density interval for the beta parameters and unique <span class="math inline">\(\phi\)</span>
 and <span class="math inline">\(p\)</span> real values.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="co"># beta estimates</span></a>
-<a class="sourceLine" id="cb14-2" title="2"><span class="er">&gt;</span><span class="st"> </span>MCMCfit</a>
-<a class="sourceLine" id="cb14-3" title="3"></a>
-<a class="sourceLine" id="cb14-4" title="4">crm Model Summary</a>
-<a class="sourceLine" id="cb14-5" title="5"></a>
-<a class="sourceLine" id="cb14-6" title="6">Npar <span class="op">:</span><span class="st">  </span><span class="dv">9</span></a>
-<a class="sourceLine" id="cb14-7" title="7"></a>
-<a class="sourceLine" id="cb14-8" title="8">Beta</a>
-<a class="sourceLine" id="cb14-9" title="9">                      mode       mean        sd   CI.lower   CI.upper</a>
-<a class="sourceLine" id="cb14-10" title="10"><span class="kw">Phi.</span>(Intercept)  <span class="fl">0.2218764</span>  <span class="fl">0.1394034</span> <span class="fl">0.1988469</span> <span class="fl">-0.3236473</span>  <span class="fl">0.3973615</span></a>
-<a class="sourceLine" id="cb14-11" title="11">Phi.Flood       <span class="fl">-0.3032873</span> <span class="fl">-0.2177971</span> <span class="fl">0.2362796</span> <span class="fl">-0.5935488</span>  <span class="fl">0.3281377</span></a>
-<a class="sourceLine" id="cb14-12" title="12"><span class="kw">p.</span>(Intercept)    <span class="fl">0.6436777</span>  <span class="fl">0.7313005</span> <span class="fl">0.4823417</span> <span class="fl">-0.1948946</span>  <span class="fl">1.6849869</span></a>
-<a class="sourceLine" id="cb14-13" title="13">p.time3          <span class="fl">0.5352586</span>  <span class="fl">0.6701687</span> <span class="fl">0.6953046</span> <span class="fl">-0.6100731</span>  <span class="fl">2.0952347</span></a>
-<a class="sourceLine" id="cb14-14" title="14">p.time4          <span class="fl">0.4407369</span>  <span class="fl">0.5294992</span> <span class="fl">0.6049279</span> <span class="fl">-0.7215044</span>  <span class="fl">1.6491366</span></a>
-<a class="sourceLine" id="cb14-15" title="15">p.time5          <span class="fl">0.6660732</span>  <span class="fl">0.9236156</span> <span class="fl">0.9841979</span> <span class="fl">-0.5919596</span>  <span class="fl">3.2741951</span></a>
-<a class="sourceLine" id="cb14-16" title="16">p.time6          <span class="fl">0.8411414</span>  <span class="fl">1.2338615</span> <span class="fl">1.3159079</span> <span class="fl">-0.6319253</span>  <span class="fl">4.5546328</span></a>
-<a class="sourceLine" id="cb14-17" title="17">p.time7          <span class="fl">4.5265041</span>  <span class="fl">4.5959475</span> <span class="fl">3.2243378</span> <span class="fl">-0.6258622</span> <span class="fl">10.7480427</span></a>
-<a class="sourceLine" id="cb14-18" title="18">p.sexMale        <span class="fl">0.2456669</span>  <span class="fl">0.2932974</span> <span class="fl">0.4073129</span> <span class="fl">-0.5176629</span>  <span class="fl">1.0738007</span></a></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="co"># real estimates</span></a>
-<a class="sourceLine" id="cb15-2" title="2"><span class="er">&gt;</span><span class="st"> </span>MCMCfit<span class="op">$</span>results<span class="op">$</span>reals</a>
-<a class="sourceLine" id="cb15-3" title="3"><span class="op">$</span>Phi</a>
-<a class="sourceLine" id="cb15-4" title="4">  Flood occ      mode      mean         sd  CI.lower  CI.upper</a>
-<a class="sourceLine" id="cb15-5" title="5"><span class="dv">1</span>     <span class="dv">0</span>   <span class="dv">6</span> <span class="fl">0.5885365</span> <span class="fl">0.5549285</span> <span class="fl">0.07805424</span> <span class="fl">0.3731025</span> <span class="fl">0.6544496</span></a>
-<a class="sourceLine" id="cb15-6" title="6"><span class="dv">2</span>     <span class="dv">1</span>   <span class="dv">3</span> <span class="fl">0.4743363</span> <span class="fl">0.4689535</span> <span class="fl">0.04400546</span> <span class="fl">0.3831628</span> <span class="fl">0.5551082</span></a>
-<a class="sourceLine" id="cb15-7" title="7"></a>
-<a class="sourceLine" id="cb15-8" title="8"><span class="op">$</span>p</a>
-<a class="sourceLine" id="cb15-9" title="9">   time    sex occ      mode      mean         sd  CI.lower  CI.upper</a>
-<a class="sourceLine" id="cb15-10" title="10"><span class="dv">1</span>     <span class="dv">7</span> Female   <span class="dv">7</span> <span class="fl">0.9996926</span> <span class="fl">0.9669530</span> <span class="fl">0.07626647</span> <span class="fl">0.7779231</span> <span class="fl">1.0000000</span></a>
-<a class="sourceLine" id="cb15-11" title="11"><span class="dv">2</span>     <span class="dv">7</span>   Male   <span class="dv">7</span> <span class="fl">0.9998341</span> <span class="fl">0.9785297</span> <span class="fl">0.05306793</span> <span class="fl">0.8578692</span> <span class="fl">1.0000000</span></a>
-<a class="sourceLine" id="cb15-12" title="12"><span class="dv">3</span>     <span class="dv">6</span> Female   <span class="dv">6</span> <span class="fl">0.9945257</span> <span class="fl">0.9351462</span> <span class="fl">0.05447770</span> <span class="fl">0.8309172</span> <span class="fl">1.0000000</span></a>
-<a class="sourceLine" id="cb15-13" title="13"><span class="dv">4</span>     <span class="dv">6</span>   Male   <span class="dv">6</span> <span class="fl">0.9951112</span> <span class="fl">0.9567330</span> <span class="fl">0.04368942</span> <span class="fl">0.8704560</span> <span class="fl">1.0000000</span></a>
-<a class="sourceLine" id="cb15-14" title="14"><span class="dv">5</span>     <span class="dv">5</span> Female   <span class="dv">5</span> <span class="fl">0.9290541</span> <span class="fl">0.9110636</span> <span class="fl">0.06491508</span> <span class="fl">0.7884778</span> <span class="fl">1.0000000</span></a>
-<a class="sourceLine" id="cb15-15" title="15"><span class="dv">6</span>     <span class="dv">5</span>   Male   <span class="dv">5</span> <span class="fl">0.9953383</span> <span class="fl">0.9416982</span> <span class="fl">0.05007638</span> <span class="fl">0.8465082</span> <span class="fl">1.0000000</span></a>
-<a class="sourceLine" id="cb15-16" title="16"><span class="dv">7</span>     <span class="dv">4</span> Female   <span class="dv">4</span> <span class="fl">0.9369048</span> <span class="fl">0.8783982</span> <span class="fl">0.07796190</span> <span class="fl">0.7262238</span> <span class="fl">0.9923971</span></a>
-<a class="sourceLine" id="cb15-17" title="17"><span class="dv">8</span>     <span class="dv">4</span>   Male   <span class="dv">4</span> <span class="fl">0.9639034</span> <span class="fl">0.9220626</span> <span class="fl">0.06118877</span> <span class="fl">0.7977592</span> <span class="fl">0.9994631</span></a>
-<a class="sourceLine" id="cb15-18" title="18"><span class="dv">9</span>     <span class="dv">3</span> Female   <span class="dv">3</span> <span class="fl">0.9721815</span> <span class="fl">0.8897479</span> <span class="fl">0.08899024</span> <span class="fl">0.7146708</span> <span class="fl">0.9997964</span></a>
-<a class="sourceLine" id="cb15-19" title="19"><span class="dv">10</span>    <span class="dv">3</span>   Male   <span class="dv">3</span> <span class="fl">0.9869350</span> <span class="fl">0.9272389</span> <span class="fl">0.07132128</span> <span class="fl">0.7844138</span> <span class="fl">0.9999766</span></a>
-<a class="sourceLine" id="cb15-20" title="20"><span class="dv">11</span>    <span class="dv">2</span> Female   <span class="dv">2</span> <span class="fl">0.8138675</span> <span class="fl">0.7442329</span> <span class="fl">0.13826792</span> <span class="fl">0.4889068</span> <span class="fl">0.9815822</span></a>
-<a class="sourceLine" id="cb15-21" title="21"><span class="dv">12</span>    <span class="dv">2</span>   Male   <span class="dv">2</span> <span class="fl">0.9003932</span> <span class="fl">0.8186241</span> <span class="fl">0.11810416</span> <span class="fl">0.5969684</span> <span class="fl">0.9982825</span></a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co"># beta estimates</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="er">&gt;</span> MCMCfit</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>crm Model Summary</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>Npar <span class="sc">:</span>  <span class="dv">9</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>Beta</span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>                      mode       mean        sd   CI.lower   CI.upper</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="fu">Phi.</span>(Intercept)  <span class="fl">0.2218764</span>  <span class="fl">0.1394034</span> <span class="fl">0.1988469</span> <span class="sc">-</span><span class="fl">0.3236473</span>  <span class="fl">0.3973615</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>Phi.Flood       <span class="sc">-</span><span class="fl">0.3032873</span> <span class="sc">-</span><span class="fl">0.2177971</span> <span class="fl">0.2362796</span> <span class="sc">-</span><span class="fl">0.5935488</span>  <span class="fl">0.3281377</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="fu">p.</span>(Intercept)    <span class="fl">0.6436777</span>  <span class="fl">0.7313005</span> <span class="fl">0.4823417</span> <span class="sc">-</span><span class="fl">0.1948946</span>  <span class="fl">1.6849869</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a>p.time3          <span class="fl">0.5352586</span>  <span class="fl">0.6701687</span> <span class="fl">0.6953046</span> <span class="sc">-</span><span class="fl">0.6100731</span>  <span class="fl">2.0952347</span></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a>p.time4          <span class="fl">0.4407369</span>  <span class="fl">0.5294992</span> <span class="fl">0.6049279</span> <span class="sc">-</span><span class="fl">0.7215044</span>  <span class="fl">1.6491366</span></span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>p.time5          <span class="fl">0.6660732</span>  <span class="fl">0.9236156</span> <span class="fl">0.9841979</span> <span class="sc">-</span><span class="fl">0.5919596</span>  <span class="fl">3.2741951</span></span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>p.time6          <span class="fl">0.8411414</span>  <span class="fl">1.2338615</span> <span class="fl">1.3159079</span> <span class="sc">-</span><span class="fl">0.6319253</span>  <span class="fl">4.5546328</span></span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a>p.time7          <span class="fl">4.5265041</span>  <span class="fl">4.5959475</span> <span class="fl">3.2243378</span> <span class="sc">-</span><span class="fl">0.6258622</span> <span class="fl">10.7480427</span></span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>p.sexMale        <span class="fl">0.2456669</span>  <span class="fl">0.2932974</span> <span class="fl">0.4073129</span> <span class="sc">-</span><span class="fl">0.5176629</span>  <span class="fl">1.0738007</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co"># real estimates</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="er">&gt;</span> MCMCfit<span class="sc">$</span>results<span class="sc">$</span>reals</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="sc">$</span>Phi</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>  Flood occ estimate.mode estimate.mean estimate.sd estimate.CI.lower</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="dv">1</span>     <span class="dv">0</span>   <span class="dv">6</span>     <span class="fl">0.5885365</span>     <span class="fl">0.5549285</span>  <span class="fl">0.07805424</span>         <span class="fl">0.3731025</span></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="dv">2</span>     <span class="dv">1</span>   <span class="dv">3</span>     <span class="fl">0.4743363</span>     <span class="fl">0.4689535</span>  <span class="fl">0.04400546</span>         <span class="fl">0.3831628</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>  estimate.CI.upper</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="dv">1</span>         <span class="fl">0.6544496</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="dv">2</span>         <span class="fl">0.5551082</span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="sc">$</span>p</span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>   time    sex occ estimate.mode estimate.mean estimate.sd estimate.CI.lower</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="dv">1</span>     <span class="dv">7</span> Female   <span class="dv">7</span>     <span class="fl">0.9996926</span>     <span class="fl">0.9669530</span>  <span class="fl">0.07626647</span>         <span class="fl">0.7779231</span></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="dv">2</span>     <span class="dv">7</span>   Male   <span class="dv">7</span>     <span class="fl">0.9998341</span>     <span class="fl">0.9785297</span>  <span class="fl">0.05306793</span>         <span class="fl">0.8578692</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="dv">3</span>     <span class="dv">6</span> Female   <span class="dv">6</span>     <span class="fl">0.9945257</span>     <span class="fl">0.9351462</span>  <span class="fl">0.05447770</span>         <span class="fl">0.8309172</span></span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="dv">4</span>     <span class="dv">6</span>   Male   <span class="dv">6</span>     <span class="fl">0.9951112</span>     <span class="fl">0.9567330</span>  <span class="fl">0.04368942</span>         <span class="fl">0.8704560</span></span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a><span class="dv">5</span>     <span class="dv">5</span> Female   <span class="dv">5</span>     <span class="fl">0.9290541</span>     <span class="fl">0.9110636</span>  <span class="fl">0.06491508</span>         <span class="fl">0.7884778</span></span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="dv">6</span>     <span class="dv">5</span>   Male   <span class="dv">5</span>     <span class="fl">0.9953383</span>     <span class="fl">0.9416982</span>  <span class="fl">0.05007638</span>         <span class="fl">0.8465082</span></span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a><span class="dv">7</span>     <span class="dv">4</span> Female   <span class="dv">4</span>     <span class="fl">0.9369048</span>     <span class="fl">0.8783982</span>  <span class="fl">0.07796190</span>         <span class="fl">0.7262238</span></span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a><span class="dv">8</span>     <span class="dv">4</span>   Male   <span class="dv">4</span>     <span class="fl">0.9639034</span>     <span class="fl">0.9220626</span>  <span class="fl">0.06118877</span>         <span class="fl">0.7977592</span></span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="dv">9</span>     <span class="dv">3</span> Female   <span class="dv">3</span>     <span class="fl">0.9721815</span>     <span class="fl">0.8897479</span>  <span class="fl">0.08899024</span>         <span class="fl">0.7146708</span></span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a><span class="dv">10</span>    <span class="dv">3</span>   Male   <span class="dv">3</span>     <span class="fl">0.9869350</span>     <span class="fl">0.9272389</span>  <span class="fl">0.07132128</span>         <span class="fl">0.7844138</span></span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a><span class="dv">11</span>    <span class="dv">2</span> Female   <span class="dv">2</span>     <span class="fl">0.8138675</span>     <span class="fl">0.7442329</span>  <span class="fl">0.13826792</span>         <span class="fl">0.4889068</span></span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a><span class="dv">12</span>    <span class="dv">2</span>   Male   <span class="dv">2</span>     <span class="fl">0.9003932</span>     <span class="fl">0.8186241</span>  <span class="fl">0.11810416</span>         <span class="fl">0.5969684</span></span>
+<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a>   estimate.CI.upper</span>
+<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a><span class="dv">1</span>          <span class="fl">1.0000000</span></span>
+<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a><span class="dv">2</span>          <span class="fl">1.0000000</span></span>
+<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a><span class="dv">3</span>          <span class="fl">1.0000000</span></span>
+<span id="cb15-29"><a href="#cb15-29" tabindex="-1"></a><span class="dv">4</span>          <span class="fl">1.0000000</span></span>
+<span id="cb15-30"><a href="#cb15-30" tabindex="-1"></a><span class="dv">5</span>          <span class="fl">1.0000000</span></span>
+<span id="cb15-31"><a href="#cb15-31" tabindex="-1"></a><span class="dv">6</span>          <span class="fl">1.0000000</span></span>
+<span id="cb15-32"><a href="#cb15-32" tabindex="-1"></a><span class="dv">7</span>          <span class="fl">0.9923971</span></span>
+<span id="cb15-33"><a href="#cb15-33" tabindex="-1"></a><span class="dv">8</span>          <span class="fl">0.9994631</span></span>
+<span id="cb15-34"><a href="#cb15-34" tabindex="-1"></a><span class="dv">9</span>          <span class="fl">0.9997964</span></span>
+<span id="cb15-35"><a href="#cb15-35" tabindex="-1"></a><span class="dv">10</span>         <span class="fl">0.9999766</span></span>
+<span id="cb15-36"><a href="#cb15-36" tabindex="-1"></a><span class="dv">11</span>         <span class="fl">0.9815822</span></span>
+<span id="cb15-37"><a href="#cb15-37" tabindex="-1"></a><span class="dv">12</span>         <span class="fl">0.9982825</span></span></code></pre></div>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
-<div id="refs">
-<div id="ref-ALBERT:1993fk">
-<p>Albert, JH, and S Chib. 1993. “Bayesian-Analysis of Binary and Polychotomous Reponse Data.” <em>Journal of the American Statistical Association</em> 88 (422): 669–79.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-ALBERT:1993fk" class="csl-entry">
+Albert, JH, and S Chib. 1993. <span>“Bayesian-Analysis of Binary and Polychotomous Reponse Data.”</span> <em>Journal of the American Statistical Association</em> 88 (422): 669–79.
 </div>
-<div id="ref-Baillargeon2007">
-<p>Baillargeon, S, and L P Rivest. 2007. “Rcapture: Loglinear models for capture-recapture in R.” <em>Journal of Statistical Software</em> 19 (5): 1–31.</p>
+<div id="ref-Baillargeon2007" class="csl-entry">
+Baillargeon, S, and L P Rivest. 2007. <span>“<span class="nocase">Rcapture: Loglinear models for capture-recapture in R</span>.”</span> <em>Journal of Statistical Software</em> 19 (5): 1–31.
 </div>
-<div id="ref-Borchers2008">
-<p>Borchers, D L, and M G Efford. 2008. “Spatially Explicit Maximum Likelihood Methods for Capture-Recapture Studies.” <em>Biometrics</em> 64 (2): 377–85.</p>
+<div id="ref-Borchers2008" class="csl-entry">
+Borchers, D L, and M G Efford. 2008. <span>“<span class="nocase">Spatially Explicit Maximum Likelihood Methods for Capture-Recapture Studies</span>.”</span> <em>Biometrics</em> 64 (2): 377–85.
 </div>
-<div id="ref-Colchero2012">
-<p>Colchero, Fernando, Owen R. Jones, and Maren Rebke. 2012. “BaSTA: an R package for Bayesian estimation of age-specific survival from incomplete mark-recapture/recovery data with covariates.” <em>Methods in Ecology and Evolution</em> 3 (February): 466–70.</p>
+<div id="ref-Colchero2012" class="csl-entry">
+Colchero, Fernando, Owen R. Jones, and Maren Rebke. 2012. <span>“<span class="nocase">BaSTA: an R package for Bayesian estimation of age-specific survival from incomplete mark-recapture/recovery data with covariates</span>.”</span> <em>Methods in Ecology and Evolution</em> 3 (February): 466–70.
 </div>
-<div id="ref-Fiske2011">
-<p>Fiske, Ian J, and Richard B Chandler. 2011. “unmarked : An R Package for fitting hierarchical models of wildlife occurrence and abundance” 43 (10): 1–23.</p>
+<div id="ref-Fiske2011" class="csl-entry">
+Fiske, Ian J, and Richard B Chandler. 2011. <span>“<span class="nocase">unmarked : An R Package for fitting hierarchical models of wildlife occurrence and abundance</span>”</span> 43 (10): 1–23.
 </div>
-<div id="ref-Laake2008">
-<p>Laake, J, and E Rexstad. 2008. “RMark – an alternative approach to building linear models in MARK.” In <em>Program Mark: A Gentle Introduction</em>, edited by E Cooch and G C White.</p>
+<div id="ref-Laake2008" class="csl-entry">
+Laake, J, and E Rexstad. 2008. <span>“<span class="nocase">RMark – an alternative approach to building linear models in MARK</span>.”</span> In <em>Program MARK: A Gentle Introduction</em>, edited by E Cooch and G C White.
 </div>
-<div id="ref-Manly1968">
-<p>Manly, B F J, and M J Parr. 1968. “A new method of estimating population size, survivorship, and birth rate from recapture data.” <em>Transactions of the Society for British Entomology</em> 18: 81–89.</p>
+<div id="ref-Manly1968" class="csl-entry">
+Manly, B F J, and M J Parr. 1968. <span>“<span class="nocase">A new method of estimating population size, survivorship, and birth rate from recapture data</span>.”</span> <em>Transactions of the Society for British Entomology</em> 18: 81–89.
 </div>
-<div id="ref-McDonald2005">
-<p>McDonald, T L, S C Amstrup, E V Regehr, and B F J Manly. 2005. “Examples.” In <em>Handbook of Capture-Recapture Analysis</em>, edited by S C Amstrup, T L McDonald, and B F J Manly, 196–265. Princeton, New Jersey USA: Princeton University Press.</p>
+<div id="ref-McDonald2005" class="csl-entry">
+McDonald, T L, S C Amstrup, E V Regehr, and B F J Manly. 2005. <span>“<span>Examples</span>.”</span> In <em>Handbook of Capture-Recapture Analysis</em>, edited by S C Amstrup, T L McDonald, and B F J Manly, 196–265. Princeton, New Jersey USA: Princeton University Press.
 </div>
-<div id="ref-Pledger2003">
-<p>Pledger, S, K H Pollock, and J L Norris. 2003. “Open capture-recapture models with heterogeneity: I. Cormack-Jolly-Seber model.” <em>Biometrics</em> 59 (4): 786–94.</p>
+<div id="ref-Pledger2003" class="csl-entry">
+Pledger, S, K H Pollock, and J L Norris. 2003. <span>“<span class="nocase">Open capture-recapture models with heterogeneity: I. Cormack-Jolly-Seber model</span>.”</span> <em>Biometrics</em> 59 (4): 786–94.
 </div>
-<div id="ref-Royle2009">
-<p>Royle, J Andrew, K Ullas Karanth, Arjun M Gopalaswamy, and N Samba Kumar. 2009. “Bayesian inference in camera trapping studies for a class of spatial capture-recapture models.” <em>Ecology</em> 90 (11): 3233–44.</p>
+<div id="ref-Royle2009" class="csl-entry">
+Royle, J Andrew, K Ullas Karanth, Arjun M Gopalaswamy, and N Samba Kumar. 2009. <span>“Bayesian Inference in Camera Trapping Studies for a Class of Spatial Capture-Recapture Models.”</span> <em>Ecology</em> 90 (11): 3233–44.
 </div>
-<div id="ref-Schwarz1996">
-<p>Schwarz, C. J., and A N. Arnason. 1996. “A general methodology for the analysis of capture-recapture experiments in open populations.” <em>Biometrics</em> 52 (3): 860–73.</p>
+<div id="ref-Schwarz1996" class="csl-entry">
+Schwarz, C. J., and A N. Arnason. 1996. <span>“<span class="nocase">A general methodology for the analysis of capture-recapture experiments in open populations</span>.”</span> <em>Biometrics</em> 52 (3): 860–73.
 </div>
-<div id="ref-Schwarz2009">
-<p>Schwarz, C. J., D. Pickard, K. Marine, and S. J. Bonner. 2009. “Juvenile Salmonid Outmigrant Monitoring Evaluation, Phase II, September 2009. Unpublished Report Prepared for the Trinity River Restoration Program, Weaverville, CA.”</p>
+<div id="ref-Schwarz2009" class="csl-entry">
+Schwarz, C. J., D. Pickard, K. Marine, and S. J. Bonner. 2009. <span>“Juvenile Salmonid Outmigrant Monitoring Evaluation, <span>P</span>hase <span>II</span>, September 2009. <span>U</span>npublished <span>R</span>eport Prepared for the <span>T</span>rinity <span>R</span>iver <span>R</span>estoration <span>P</span>rogram, <span>W</span>eaverville, <span>CA</span>.”</span>
 </div>
-<div id="ref-White1999">
-<p>White, G C, and K P Burnham. 1999. “Program MARK: survival estimation from populations of marked animals.” <em>Bird Study</em> 46: 120–39.</p>
+<div id="ref-White1999" class="csl-entry">
+White, G C, and K P Burnham. 1999. <span>“<span class="nocase">Program MARK: survival estimation from populations of marked animals</span>.”</span> <em>Bird Study</em> 46: 120–39.
 </div>
 </div>
 </div>
@@ -784,34 +1061,31 @@ the PIMS are triangular with a row for each cohort released at each
 occasion (time) and the column representing the occasions (times)
 following the release. Using an unique index for each potential parameter,
 the PIMS would be:</p>
-<pre><code>Registered S3 method overwritten by &#39;rvest&#39;:
-  method            from
-  read_xml.response xml2</code></pre>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
-<th style="border-bottom:hidden" colspan="1">
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1">
 </th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
 <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
 <span class="math inline">\(\phi\)</span>
 </div>
 </th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
 <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
 <span class="math inline">\(p\)</span>
 </div>
 </th>
 </tr>
 <tr>
-<th style="border-bottom:hidden" colspan="1">
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1">
 </th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
 <div style>
 Time
 </div>
 </th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
 <div style>
 Time
 </div>
@@ -1125,12 +1399,12 @@ is the <span class="math inline">\(\phi\)</span> matrix modified such that <span
 <li>Compute the log-likelihood <span class="math inline">\(\sum_{i=1}^{n}\ln(Pr(\omega_{i}))\)</span></li>
 </ol>
 <p>The R code translates from the mathematics quite literally as:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"> Phiprime =<span class="st"> </span><span class="dv">1</span><span class="op">-</span>Fplus <span class="op">+</span><span class="st"> </span>Phi<span class="op">*</span>Fplus</a>
-<a class="sourceLine" id="cb17-2" title="2"> Phistar =<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(Phiprime,<span class="dv">1</span>,cumprod))</a>
-<a class="sourceLine" id="cb17-3" title="3"> pprime =<span class="st"> </span>(<span class="dv">1</span><span class="op">-</span>Fplus)<span class="op">+</span>Fplus<span class="op">*</span>(C<span class="op">*</span>p<span class="op">+</span>(<span class="dv">1</span><span class="op">-</span>C)<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>p))</a>
-<a class="sourceLine" id="cb17-4" title="4"> pstar =<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(pprime,<span class="dv">1</span>,cumprod))</a>
-<a class="sourceLine" id="cb17-5" title="5"> pomega =<span class="st"> </span><span class="kw">rowSums</span>(L<span class="op">*</span>M<span class="op">*</span>Phistar<span class="op">*</span>pstar)</a>
-<a class="sourceLine" id="cb17-6" title="6"> lnl =<span class="st"> </span><span class="kw">sum</span>(<span class="kw">log</span>(pomega))</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a> Phiprime <span class="ot">=</span> <span class="dv">1</span><span class="sc">-</span>Fplus <span class="sc">+</span> Phi<span class="sc">*</span>Fplus</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a> Phistar <span class="ot">=</span> <span class="fu">t</span>(<span class="fu">apply</span>(Phiprime,<span class="dv">1</span>,cumprod))</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a> pprime <span class="ot">=</span> (<span class="dv">1</span><span class="sc">-</span>Fplus)<span class="sc">+</span>Fplus<span class="sc">*</span>(C<span class="sc">*</span>p<span class="sc">+</span>(<span class="dv">1</span><span class="sc">-</span>C)<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>p))</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a> pstar <span class="ot">=</span> <span class="fu">t</span>(<span class="fu">apply</span>(pprime,<span class="dv">1</span>,cumprod))</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a> pomega <span class="ot">=</span> <span class="fu">rowSums</span>(L<span class="sc">*</span>M<span class="sc">*</span>Phistar<span class="sc">*</span>pstar)</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a> lnl <span class="ot">=</span> <span class="fu">sum</span>(<span class="fu">log</span>(pomega))</span></code></pre></div>
 <p>While this code is simple it is faster if the apply is replaced
 with a loop because there are far more rows than occasions or replaced
 with compiled code which we did with a FORTRAN subroutine (cjs.f called
@@ -1196,45 +1470,45 @@ rows of <span class="math inline">\(X_{\phi}\)</span>and <span class="math inlin
 </div>
 <div id="appendix-references" class="section level2 unnumbered">
 <h2>Appendix References</h2>
-<div id="refs">
-<div id="ref-ALBERT:1993fk">
-<p>Albert, JH, and S Chib. 1993. “Bayesian-Analysis of Binary and Polychotomous Reponse Data.” <em>Journal of the American Statistical Association</em> 88 (422): 669–79.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-ALBERT:1993fk" class="csl-entry">
+Albert, JH, and S Chib. 1993. <span>“Bayesian-Analysis of Binary and Polychotomous Reponse Data.”</span> <em>Journal of the American Statistical Association</em> 88 (422): 669–79.
 </div>
-<div id="ref-Baillargeon2007">
-<p>Baillargeon, S, and L P Rivest. 2007. “Rcapture: Loglinear models for capture-recapture in R.” <em>Journal of Statistical Software</em> 19 (5): 1–31.</p>
+<div id="ref-Baillargeon2007" class="csl-entry">
+Baillargeon, S, and L P Rivest. 2007. <span>“<span class="nocase">Rcapture: Loglinear models for capture-recapture in R</span>.”</span> <em>Journal of Statistical Software</em> 19 (5): 1–31.
 </div>
-<div id="ref-Borchers2008">
-<p>Borchers, D L, and M G Efford. 2008. “Spatially Explicit Maximum Likelihood Methods for Capture-Recapture Studies.” <em>Biometrics</em> 64 (2): 377–85.</p>
+<div id="ref-Borchers2008" class="csl-entry">
+Borchers, D L, and M G Efford. 2008. <span>“<span class="nocase">Spatially Explicit Maximum Likelihood Methods for Capture-Recapture Studies</span>.”</span> <em>Biometrics</em> 64 (2): 377–85.
 </div>
-<div id="ref-Colchero2012">
-<p>Colchero, Fernando, Owen R. Jones, and Maren Rebke. 2012. “BaSTA: an R package for Bayesian estimation of age-specific survival from incomplete mark-recapture/recovery data with covariates.” <em>Methods in Ecology and Evolution</em> 3 (February): 466–70.</p>
+<div id="ref-Colchero2012" class="csl-entry">
+Colchero, Fernando, Owen R. Jones, and Maren Rebke. 2012. <span>“<span class="nocase">BaSTA: an R package for Bayesian estimation of age-specific survival from incomplete mark-recapture/recovery data with covariates</span>.”</span> <em>Methods in Ecology and Evolution</em> 3 (February): 466–70.
 </div>
-<div id="ref-Fiske2011">
-<p>Fiske, Ian J, and Richard B Chandler. 2011. “unmarked : An R Package for fitting hierarchical models of wildlife occurrence and abundance” 43 (10): 1–23.</p>
+<div id="ref-Fiske2011" class="csl-entry">
+Fiske, Ian J, and Richard B Chandler. 2011. <span>“<span class="nocase">unmarked : An R Package for fitting hierarchical models of wildlife occurrence and abundance</span>”</span> 43 (10): 1–23.
 </div>
-<div id="ref-Laake2008">
-<p>Laake, J, and E Rexstad. 2008. “RMark – an alternative approach to building linear models in MARK.” In <em>Program Mark: A Gentle Introduction</em>, edited by E Cooch and G C White.</p>
+<div id="ref-Laake2008" class="csl-entry">
+Laake, J, and E Rexstad. 2008. <span>“<span class="nocase">RMark – an alternative approach to building linear models in MARK</span>.”</span> In <em>Program MARK: A Gentle Introduction</em>, edited by E Cooch and G C White.
 </div>
-<div id="ref-Manly1968">
-<p>Manly, B F J, and M J Parr. 1968. “A new method of estimating population size, survivorship, and birth rate from recapture data.” <em>Transactions of the Society for British Entomology</em> 18: 81–89.</p>
+<div id="ref-Manly1968" class="csl-entry">
+Manly, B F J, and M J Parr. 1968. <span>“<span class="nocase">A new method of estimating population size, survivorship, and birth rate from recapture data</span>.”</span> <em>Transactions of the Society for British Entomology</em> 18: 81–89.
 </div>
-<div id="ref-McDonald2005">
-<p>McDonald, T L, S C Amstrup, E V Regehr, and B F J Manly. 2005. “Examples.” In <em>Handbook of Capture-Recapture Analysis</em>, edited by S C Amstrup, T L McDonald, and B F J Manly, 196–265. Princeton, New Jersey USA: Princeton University Press.</p>
+<div id="ref-McDonald2005" class="csl-entry">
+McDonald, T L, S C Amstrup, E V Regehr, and B F J Manly. 2005. <span>“<span>Examples</span>.”</span> In <em>Handbook of Capture-Recapture Analysis</em>, edited by S C Amstrup, T L McDonald, and B F J Manly, 196–265. Princeton, New Jersey USA: Princeton University Press.
 </div>
-<div id="ref-Pledger2003">
-<p>Pledger, S, K H Pollock, and J L Norris. 2003. “Open capture-recapture models with heterogeneity: I. Cormack-Jolly-Seber model.” <em>Biometrics</em> 59 (4): 786–94.</p>
+<div id="ref-Pledger2003" class="csl-entry">
+Pledger, S, K H Pollock, and J L Norris. 2003. <span>“<span class="nocase">Open capture-recapture models with heterogeneity: I. Cormack-Jolly-Seber model</span>.”</span> <em>Biometrics</em> 59 (4): 786–94.
 </div>
-<div id="ref-Royle2009">
-<p>Royle, J Andrew, K Ullas Karanth, Arjun M Gopalaswamy, and N Samba Kumar. 2009. “Bayesian inference in camera trapping studies for a class of spatial capture-recapture models.” <em>Ecology</em> 90 (11): 3233–44.</p>
+<div id="ref-Royle2009" class="csl-entry">
+Royle, J Andrew, K Ullas Karanth, Arjun M Gopalaswamy, and N Samba Kumar. 2009. <span>“Bayesian Inference in Camera Trapping Studies for a Class of Spatial Capture-Recapture Models.”</span> <em>Ecology</em> 90 (11): 3233–44.
 </div>
-<div id="ref-Schwarz1996">
-<p>Schwarz, C. J., and A N. Arnason. 1996. “A general methodology for the analysis of capture-recapture experiments in open populations.” <em>Biometrics</em> 52 (3): 860–73.</p>
+<div id="ref-Schwarz1996" class="csl-entry">
+Schwarz, C. J., and A N. Arnason. 1996. <span>“<span class="nocase">A general methodology for the analysis of capture-recapture experiments in open populations</span>.”</span> <em>Biometrics</em> 52 (3): 860–73.
 </div>
-<div id="ref-Schwarz2009">
-<p>Schwarz, C. J., D. Pickard, K. Marine, and S. J. Bonner. 2009. “Juvenile Salmonid Outmigrant Monitoring Evaluation, Phase II, September 2009. Unpublished Report Prepared for the Trinity River Restoration Program, Weaverville, CA.”</p>
+<div id="ref-Schwarz2009" class="csl-entry">
+Schwarz, C. J., D. Pickard, K. Marine, and S. J. Bonner. 2009. <span>“Juvenile Salmonid Outmigrant Monitoring Evaluation, <span>P</span>hase <span>II</span>, September 2009. <span>U</span>npublished <span>R</span>eport Prepared for the <span>T</span>rinity <span>R</span>iver <span>R</span>estoration <span>P</span>rogram, <span>W</span>eaverville, <span>CA</span>.”</span>
 </div>
-<div id="ref-White1999">
-<p>White, G C, and K P Burnham. 1999. “Program MARK: survival estimation from populations of marked animals.” <em>Bird Study</em> 46: 120–39.</p>
+<div id="ref-White1999" class="csl-entry">
+White, G C, and K P Burnham. 1999. <span>“<span class="nocase">Program MARK: survival estimation from populations of marked animals</span>.”</span> <em>Bird Study</em> 46: 120–39.
 </div>
 </div>
 </div>

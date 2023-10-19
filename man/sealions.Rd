@@ -4,11 +4,13 @@
 \name{sealions}
 \alias{sealions}
 \title{Multivariate State example data}
-\format{A data frame with 485 observations on the following 3 variables.
+\format{
+A data frame with 485 observations on the following 3 variables.
 \describe{ \item{ch}{a character vector of 3-character values for each occasion separated by commas.} 
  \item{sex}{the sex of the sea lion designated as F or M}
  \item{weight}{the anomaly of the weight from the sex-specific mean}
-}}
+}
+}
 \description{
 An example data set using California sea lions to demonstrate the Multivariate
 state model with 3 variables defining the states : area, ltag and rtag.  The left tag (ltag) and
@@ -63,9 +65,9 @@ p.1=list(formula=~-1+time:area)
 delta.1=list(formula= ~ -1 + obs.ltag.u + obs.rtag.u + obs.ltag.u:obs.rtag.u)
 Phi.1=list(formula=~sex*bs(Age)+pup:weight+area)
 
-# Fit model with TMB
- mod=crm(dp,ddl,model.parameters=list(Psi=Psi.1,p=p.1,delta=delta.1,Phi=Phi.1),
- use.tmb=TRUE,method="nlminb",hessian=TRUE)
+# Fit model with TMB; remove comments to try
+ #mod=crm(dp,ddl,model.parameters=list(Psi=Psi.1,p=p.1,delta=delta.1,Phi=Phi.1),
+ #use.tmb=TRUE,method="nlminb",hessian=TRUE)
 }
 }
 \keyword{datasets}

@@ -176,6 +176,9 @@ NULL
 #'     barplot(t(tag_status(4,mod3$results$mat$gamma[1,1,,])),beside=TRUE,
 #'                    ylim=c(0,1),main="mod3")
 #' }
+#' unlink("*.cpp")
+#' unlink("*.o")
+#' unlink("symbols.rds")
 #' }
 NULL
 
@@ -200,24 +203,25 @@ NULL
 #' \donttest{
 #' data(mstrata)
 #' ms1=process.data(mstrata,model="MSCJS",strata.labels=c("A","B","C"))
-#' ms2=process.data(mstrata,model="hmmMSCJS",strata.labels=c("A","B","C"))
-#' # strata.labels for MVMS models must be specified as a list because more than one variable
-#' # can be used
-#' ms3=process.data(mstrata,model="MVMSCJS",strata.labels=list(state=c("A","B","C")))
 #' ms1.ddl=make.design.data(ms1)
-#' ms2.ddl=make.design.data(ms2)
-#' ms3.ddl=make.design.data(ms3)
-#' ms3.ddl$delta$fix=1
 #' # following requires ADMB or the exe constructed from ADMB and links set for ADMB
 #' # remove comments if you have admb
 #' #mod1=try(crm(ms1,ms1.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
 #' #                                               p=list(formula=~time)),hessian=TRUE))
 #' #mod1
 #' # file.remove("multistate.std")
+#' ms2=process.data(mstrata,model="hmmMSCJS",strata.labels=c("A","B","C"))
+#' ms2.ddl=make.design.data(ms2)
+#' # uses R/Fortran code with hmmMSCJS
 #' mod2=crm(ms2,ms2.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
 #'                                            p=list(formula=~time)),hessian=TRUE)
 #' mod2
-#' # uses R/Fortran code with MSCJS
+#' # strata.labels for MVMS models must be specified as a list because more than one variable
+#' # can be used
+#' ms3=process.data(mstrata,model="MVMSCJS",strata.labels=list(state=c("A","B","C")))
+#' ms3.ddl=make.design.data(ms3)
+#' ms3.ddl$delta$fix=1
+#' # uses R/Fortran code with MVMSCJS
 #' mod3=crm(ms3,ms3.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
 #'                                            p=list(formula=~time)),hessian=TRUE)
 #' mod3
@@ -226,15 +230,13 @@ NULL
 #' #                                           p=list(formula=~time)),hessian=TRUE,use.admb=TRUE)
 #' #mod4
 #' #file.remove("mvms.std")
-#' 
-#' # uses TMB with mvmscjs
-#' mod5=crm(ms3,ms3.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
-#'                                            p=list(formula=~time)),hessian=TRUE,use.tmb=TRUE)
-#' mod5
-#' # uses R/FORTAN code with mvmscjs
-#' mod6=crm(ms3,ms3.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
-#'                                            p=list(formula=~time)),hessian=TRUE)
-#' mod6
+#' # uses TMB with mvmscjs -remove comment to use
+#' #mod5=crm(ms3,ms3.ddl,model.parameters=list(Psi=list(formula=~-1+stratum:tostratum),
+#' #                                          p=list(formula=~time)),hessian=TRUE,use.tmb=TRUE)
+#' #mod5
+#' unlink("*.cpp")
+#' unlink("*.o")
+#' unlink("symbols.rds")
 #' }
 NULL
 
@@ -300,9 +302,9 @@ NULL
 #' delta.1=list(formula= ~ -1 + obs.ltag.u + obs.rtag.u + obs.ltag.u:obs.rtag.u)
 #' Phi.1=list(formula=~sex*bs(Age)+pup:weight+area)
 #' 
-#' # Fit model with TMB
-#'  mod=crm(dp,ddl,model.parameters=list(Psi=Psi.1,p=p.1,delta=delta.1,Phi=Phi.1),
-#'  use.tmb=TRUE,method="nlminb",hessian=TRUE)
+#' # Fit model with TMB; remove comments to try
+#'  #mod=crm(dp,ddl,model.parameters=list(Psi=Psi.1,p=p.1,delta=delta.1,Phi=Phi.1),
+#'  #use.tmb=TRUE,method="nlminb",hessian=TRUE)
 #' }
 NULL
 
@@ -408,11 +410,15 @@ NULL
 #' r.1=list(formula=~-1+time+sex+site)
 #' Psi.1=list(formula=~-1+stratum:tostratum)
 #' # Run top model from paper but only for observable strata
-#' crmmod=crm(ps_dp,ddl,model.parameters=list(S=S.1,p=p.1,r=r.1,Psi=Psi.1),
-#'               method="nlminb",hessian=TRUE)
+#' # commented out to prevent dll being built - problem with CRAN check
+#' #crmmod=crm(ps_dp,ddl,model.parameters=list(S=S.1,p=p.1,r=r.1,Psi=Psi.1),
+#' #              method="nlminb",hessian=TRUE)
 #' # Run top model from paper for all strata using simulated annealing (commented out)
 #' # crmmod=crm(ps_dp,ddl,model.parameters=list(S=S.1,p=p.1,r=r.1,Psi=Psi.1),
 #' #                     method="SANN",itnmax=6e6,hessian=TRUE)
+#' unlink("*.cpp")
+#' unlink("*.o")
+#' unlink("symbols.rds")
 #'}
 NULL
 
